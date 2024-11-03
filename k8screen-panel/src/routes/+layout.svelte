@@ -31,7 +31,7 @@
 		user: {
 			name: "shadcn",
 			email: "m@example.com",
-			avatar: "/avatars/k8s-logo.png",
+			avatar: "/k8s-logo.png",
 		},
 		teams: [
 			{
@@ -103,7 +103,7 @@
 					{/each}
 					</Breadcrumb.List>
 				</Breadcrumb.Root>
-				<Button class="ms-auto" variant="outline" size="icon">
+				<Button class="ms-auto" variant="outline" size="icon" onclick={toggleMode}>
 					<Sun
 					 class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 					/>

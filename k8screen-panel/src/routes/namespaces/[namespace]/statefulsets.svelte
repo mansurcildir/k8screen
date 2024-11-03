@@ -25,7 +25,6 @@
 </script>
 
 <Table.Root>
-<Table.Caption>List of {namespace} statefulsets.</Table.Caption>
 <Table.Header>
  <Table.Row>
   <Table.Head>NAME</Table.Head>

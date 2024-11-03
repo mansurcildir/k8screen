@@ -26,7 +26,6 @@
 </script>
 
 <Table.Root>
-  <Table.Caption>List of {namespace} deployments.</Table.Caption>
   <Table.Header>
    <Table.Row>
     <Table.Head>NAME</Table.Head>
