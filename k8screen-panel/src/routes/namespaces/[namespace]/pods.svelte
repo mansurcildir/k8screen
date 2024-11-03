@@ -14,6 +14,7 @@
   let pods: Pod[] = [];
   let currentPod: string;
   let logs: string;
+  let open: boolean;
 
   $: if (namespace) {
     getAllPods();
@@ -33,6 +34,7 @@
 		try {
 			logs = await podAPI.getPodLogs(namespace, podName);
       currentPod = podName;
+      open = true;
 		} finally  {
       logIsLoading = false;
 		}
@@ -76,21 +78,23 @@
     </Table.Root>
   </div>
   
-  <Collapsible.Root class="bottom-0 left-0 right-0 group/collapsible" >
+  <Collapsible.Root class="bottom-0 left-0 right-0 group/collapsible" {open}>
     <Collapsible.Trigger>
-    <ChevronRight
-      class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
-    />
-  </Collapsible.Trigger>
+      <div class="flex justify-center items-center">
+        <ChevronRight
+        class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
+      />
+      <h1>{currentPod}:</h1>
+      </div>
+    </Collapsible.Trigger>
     <Collapsible.Content>
-      <h1 class="mb-2">{currentPod}:</h1>
       <div class="h-96 bg-black text-white log-container overflow-auto rounded-md p-5">
         {#if logIsLoading}
-          <div class="flex justify-center items-center h-full">
-            <Spinner />
-          </div>
+        <div class="flex justify-center items-center h-full">
+          <Spinner />
+        </div>
         {:else}
-          {logs}
+        {logs}
         {/if}
       </div>
     </Collapsible.Content>
