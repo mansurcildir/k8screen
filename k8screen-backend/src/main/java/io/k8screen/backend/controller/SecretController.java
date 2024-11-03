@@ -1,5 +1,6 @@
 package io.k8screen.backend.controller;
 
+import io.k8screen.backend.data.dto.SecretDTO;
 import io.k8screen.backend.service.SecretService;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1Status;
@@ -27,17 +28,17 @@ public class SecretController {
   }
 
   @GetMapping
-  public ResponseEntity<List<V1Secret>> listSecrets(@PathVariable final @NotNull String namespace)
+  public ResponseEntity<List<SecretDTO>> listSecrets(@PathVariable final @NotNull String namespace)
       throws Exception {
-    final List<V1Secret> secrets = this.secretService.findAll(namespace);
+    final List<SecretDTO> secrets = this.secretService.findAll(namespace);
     return ResponseEntity.status(HttpStatus.OK).body(secrets);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<V1Secret> getSecret(
+  public ResponseEntity<SecretDTO> getSecret(
       @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
       throws Exception {
-    final V1Secret secret = this.secretService.findByName(namespace, name);
+    final SecretDTO secret = this.secretService.findByName(namespace, name);
     return ResponseEntity.status(HttpStatus.OK).body(secret);
   }
 

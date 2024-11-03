@@ -1,5 +1,6 @@
 package io.k8screen.backend.config;
 
+import io.k8screen.backend.mapper.ServiceConverter;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.PodLogs;
 import io.kubernetes.client.openapi.ApiClient;

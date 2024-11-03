@@ -1,5 +1,6 @@
 package io.k8screen.backend.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
@@ -7,6 +8,6 @@ import org.jetbrains.annotations.NotNull;
 public record SecretDTO (
   @NotNull String name,
   @NotNull String type,
-  @NotNull String data,
+  @JsonProperty("data_size") int dataSize,
   @NotNull String age) {
 }

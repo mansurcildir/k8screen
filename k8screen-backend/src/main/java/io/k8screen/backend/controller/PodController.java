@@ -1,5 +1,6 @@
 package io.k8screen.backend.controller;
 
+import io.k8screen.backend.data.dto.PodDTO;
 import io.k8screen.backend.service.PodService;
 import io.kubernetes.client.openapi.models.V1Pod;
 import java.util.List;
@@ -25,17 +26,17 @@ public class PodController {
   }
 
   @GetMapping
-  public ResponseEntity<List<V1Pod>> listPods(@PathVariable final @NotNull String namespace)
+  public ResponseEntity<List<PodDTO>> listPods(@PathVariable final @NotNull String namespace)
       throws Exception {
-    final List<V1Pod> pods = this.podService.findAll(namespace);
+    final List<PodDTO> pods = this.podService.findAll(namespace);
     return ResponseEntity.status(HttpStatus.OK).body(pods);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<V1Pod> getPod(
+  public ResponseEntity<PodDTO> getPod(
       @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
       throws Exception {
-    final V1Pod pod = this.podService.findByName(namespace, name);
+    final PodDTO pod = this.podService.findByName(namespace, name);
     return ResponseEntity.status(HttpStatus.OK).body(pod);
   }
 

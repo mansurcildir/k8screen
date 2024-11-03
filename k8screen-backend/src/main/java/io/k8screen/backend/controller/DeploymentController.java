@@ -1,5 +1,6 @@
 package io.k8screen.backend.controller;
 
+import io.k8screen.backend.data.dto.DeploymentDTO;
 import io.k8screen.backend.service.DeploymentService;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Status;
@@ -36,17 +37,17 @@ public class DeploymentController {
   }
 
   @GetMapping
-  public ResponseEntity<List<V1Deployment>> listDeployments(
+  public ResponseEntity<List<DeploymentDTO>> listDeployments(
       @PathVariable final @NotNull String namespace) throws Exception {
-    final List<V1Deployment> deployment = this.deploymentService.findAll(namespace);
+    final List<DeploymentDTO> deployment = this.deploymentService.findAll(namespace);
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<V1Deployment> getDeployment(
+  public ResponseEntity<DeploymentDTO> getDeployment(
       @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
       throws Exception {
-    final V1Deployment deployment = this.deploymentService.findByName(namespace, name);
+    final DeploymentDTO deployment = this.deploymentService.findByName(namespace, name);
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 

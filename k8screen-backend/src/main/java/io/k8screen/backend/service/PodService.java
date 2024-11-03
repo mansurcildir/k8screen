@@ -1,5 +1,8 @@
 package io.k8screen.backend.service;
 
+import io.k8screen.backend.data.dto.PodDTO;
+import io.k8screen.backend.mapper.PodConverter;
+import io.k8screen.backend.mapper.ServiceConverter;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
@@ -17,20 +20,23 @@ public class PodService {
 
   private final @NotNull CoreV1Api coreV1Api;
   private final @NotNull Exec exec;
+  private final @NotNull PodConverter podConverter;
 
-  public PodService(final @NotNull CoreV1Api coreV1Api, final @NotNull Exec exec) {
+  public PodService(final @NotNull CoreV1Api coreV1Api, final @NotNull Exec exec, final @NotNull PodConverter podConverter) {
     this.coreV1Api = coreV1Api;
     this.exec = exec;
+    this.podConverter = podConverter;
   }
 
-  public List<V1Pod> findAll(final @NotNull String namespace) throws Exception {
+  public List<PodDTO> findAll(final @NotNull String namespace) throws Exception {
     final V1PodList podList = this.coreV1Api.listNamespacedPod(namespace).execute();
-    return podList.getItems();
+    return podList.getItems().stream().map(this.podConverter::toPodDTO).toList();
   }
 
-  public V1Pod findByName(final @NotNull String namespace, final @NotNull String name)
+  public PodDTO findByName(final @NotNull String namespace, final @NotNull String name)
       throws Exception {
-    return this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    return this.podConverter.toPodDTO(pod);
   }
 
   public V1Pod deleteByName(final @NotNull String namespace, final @NotNull String name)

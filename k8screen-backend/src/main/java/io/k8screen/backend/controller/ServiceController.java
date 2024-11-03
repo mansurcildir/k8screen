@@ -44,9 +44,9 @@ public class ServiceController {
   }
 
   @GetMapping
-  public ResponseEntity<List<V1Service>> listServices(@PathVariable final @NotNull String namespace)
+  public ResponseEntity<List<ServiceDTO>> listServices(@PathVariable final @NotNull String namespace)
       throws Exception {
-    final List<V1Service> services = this.serviceService.findAll(namespace);
+    final List<ServiceDTO> services = this.serviceService.findAll(namespace);
     return ResponseEntity.status(HttpStatus.OK).body(services);
   }
 

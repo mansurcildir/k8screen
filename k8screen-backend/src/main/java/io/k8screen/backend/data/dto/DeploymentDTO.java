@@ -7,8 +7,9 @@ import org.jetbrains.annotations.NotNull;
 @Builder
 public record DeploymentDTO (
   @NotNull String name,
-  @NotNull String ready,
-  @NotNull @JsonProperty("up_to_date") String upToDate,
-  @NotNull String available,
+  @JsonProperty("total_replicas") int totalReplicas,
+  @JsonProperty("ready_replicas") int readyReplicas,
+  @JsonProperty("up_to_date") int upToDate,
+  int available,
   @NotNull String age) {
 }
