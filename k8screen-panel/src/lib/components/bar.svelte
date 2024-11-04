@@ -1,5 +1,5 @@
 <script>
-  export let color = 'bg-black';
+  export let color = 'bg-primary';
   export let width = 'w-1'; 
   export let height = 'h-4'; 
 </script>

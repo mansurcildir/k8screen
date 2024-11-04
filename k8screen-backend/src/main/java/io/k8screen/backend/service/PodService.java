@@ -12,6 +12,8 @@ import io.kubernetes.client.util.Streams;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+
+import io.kubernetes.client.util.Yaml;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,12 @@ public class PodService {
       throws Exception {
     V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
     return this.podConverter.toPodDTO(pod);
+  }
+
+  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+    throws Exception {
+    V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    return Yaml.dump(pod);
   }
 
   public V1Pod deleteByName(final @NotNull String namespace, final @NotNull String name)

@@ -14,6 +14,11 @@ export const podAPI = {
     return await (await applyGetRequest(url)).text();
   },
 
+  getPodDetails: async (namespace: string, name: string): Promise<string> => {
+    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/pods/${name}/detail`;
+    return await (await applyGetRequest(url)).text();
+  },
+
   exec: async (namespace: string, name: string, cmd: string[]): Promise<string> => {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/pods/${name}/exec`;
     return await (await applyPostRequest(url, JSON.stringify(cmd))).text();

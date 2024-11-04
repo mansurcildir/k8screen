@@ -9,17 +9,18 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import SquareTerminal from "lucide-svelte/icons/square-terminal";
   import CodeXML from "lucide-svelte/icons/code-xml";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
   export let namespace;
   let loading = false;
-  let logIsLoading = false;
   let cmdIsLoading = false;
   let option: string = "LOGS";
   let cmdReq: string;
   let cmdRes: string;
 
   let pods: Pod[] = [];
-  let currentPod: string;
+  let pod: string;
+  let podDetail: string;
   let logs: string;
   let open: boolean;
   let containerHeight = 300; // Başlangıç yüksekliği
@@ -40,13 +41,25 @@
   };
 
   const getPodLogs = async (podName: string) => {
-    logIsLoading = true;
+    cmdIsLoading = true;
     try {
       logs = await podAPI.getPodLogs(namespace, podName);
-      currentPod = podName;
+      pod = podName;
       open = true;
     } finally {
-      logIsLoading = false;
+      cmdIsLoading = false;
+    }
+  };
+
+  const getPodDetails = async (podName: string) => {
+    cmdIsLoading = true;
+    try {
+      podDetail = await podAPI.getPodDetails(namespace, podName);
+      console.log(podDetail)
+      pod = podName;
+      open = true;
+    } finally {
+      cmdIsLoading = false;
     }
   };
 
@@ -105,11 +118,13 @@
           <Table.Head>STATUS</Table.Head>
           <Table.Head>RESTARTS</Table.Head>
           <Table.Head>AGE</Table.Head>
+          <Table.Head></Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {#if loading}
           <Table.Row>
+            <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -124,6 +139,22 @@
               <Table.Cell>{pod.status}</Table.Cell>
               <Table.Cell>{pod.restarts}</Table.Cell>
               <Table.Cell>{pod.age}</Table.Cell>
+              <Table.Cell>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button class="p-2 h-auto" variant="ghost">
+                      <svg width="24" height="24" class="h-4 w-4" role="img" aria-label="dots horizontal," viewBox="0 0 15 15" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.625 7.5C3.625 8.12132 3.12132 8.625 2.5 8.625C1.87868 8.625 1.375 8.12132 1.375 7.5C1.375 6.87868 1.87868 6.375 2.5 6.375C3.12132 6.375 3.625 6.87868 3.625 7.5ZM8.625 7.5C8.625 8.12132 8.12132 8.625 7.5 8.625C6.87868 8.625 6.375 8.12132 6.375 7.5C6.375 6.87868 6.87868 6.375 7.5 6.375C8.12132 6.375 8.625 6.87868 8.625 7.5ZM12.5 8.625C13.1213 8.625 13.625 8.12132 13.625 7.5C13.625 6.87868 13.1213 6.375 12.5 6.375C11.8787 6.375 11.375 6.87868 11.375 7.5C11.375 8.12132 11.8787 8.625 12.5 8.625Z" fill="currentColor"></path></svg>
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content align="end">
+                    <DropdownMenu.Group>
+                      <DropdownMenu.Item>View</DropdownMenu.Item>
+                      <DropdownMenu.Item>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                    </DropdownMenu.Group>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Table.Cell>
             </Table.Row>
           {/each}
         {/if}
@@ -138,14 +169,22 @@
           class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
         />
       </Collapsible.Trigger>
-      <h1 style="font-family: 'Courier New', Courier, monospace;">{currentPod} {option == "LOGS" ? "[logs]" : "[sh]"} </h1>
+      <h1 style="font-family: 'Courier New', Courier, monospace;">
+        {#if (option == "LOGS")}
+        {pod} [logs]
+        {:else if (option == "TERMINAL")}
+        {pod} [sh]
+        {:else if (option == "DETAILS")}
+        {pod}.yaml
+        {/if}
+      </h1>
       
-      {#if (currentPod)}
+      {#if (pod)}
       <Button
       variant="ghost"
       class="ms-auto bg-muted rounded-lg p-2 h-auto"
       aria-label="Playground"
-      onclick={() => {option = "LOGS"; getPodLogs(currentPod)}}
+      onclick={() => {option = "DETAILS"; getPodDetails(pod)}}
       >
         <CodeXML class="size-5" />
       </Button>
@@ -154,7 +193,16 @@
       variant="ghost"
       class="bg-muted rounded-lg p-2 h-auto"
       aria-label="Playground"
-      onclick={() => {option = "TERMINAL"}}
+      onclick={() => {option = "LOGS"; getPodLogs(pod)}}
+      >
+        <CodeXML class="size-5" />
+      </Button>
+
+      <Button
+      variant="ghost"
+      class="bg-muted rounded-lg p-2 h-auto"
+      aria-label="Playground"
+      onclick={() => {option = "TERMINAL"; getPodDetails(pod)}}
       >
         <SquareTerminal class="size-5" />
       </Button>
@@ -166,26 +214,24 @@
       <div class="resize-handle" on:mousedown={handleMouseDown} style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"></div>
       <div class="relative">
         <div class="bg-black text-white log-container overflow-auto rounded-b-md p-5" style="height: {containerHeight}px;">
-          {#if (option === "LOGS" && logIsLoading)}
+          {#if (cmdIsLoading)}
           <div class="flex justify-center items-center h-full">
             <Spinner />
           </div>
           {:else if (option === "LOGS")}
           {logs}
-          {:else if (option === "TERMINAL" && cmdIsLoading)}
-          <div class="flex justify-center items-center h-full">
-            <Spinner />
-          </div>
           {:else if (option === "TERMINAL")}
           <div class="flex flex-col justify-between h-full">
             {cmdRes}
             <div class="flex items-center w-full">
               > 
-              <form on:submit={() => exec(currentPod, cmdReq)} class="flex items-center w-full">
+              <form on:submit={() => exec(pod, cmdReq)} class="flex items-center w-full">
                 <input type="text" bind:value={cmdReq} class="bg-black text-white w-full resize-none outline-none no-animation"/>
               </form>
             </div>
           </div>
+          {:else if (option === "DETAILS")}
+          {podDetail}
           {/if}
         </div>
       </div>
