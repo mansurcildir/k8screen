@@ -6,5 +6,10 @@ export const secretAPI = {
   getAllSecrets: async (namespace: string): Promise<Secret[]> => {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/secrets`;
     return await (await applyGetRequest(url)).json();
-  }
+  },
+
+  getSecretDetails: async (namespace: string, name: string): Promise<string> => {
+    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/secrets/${name}/details`;
+    return await (await applyGetRequest(url)).text();
+  },
 }

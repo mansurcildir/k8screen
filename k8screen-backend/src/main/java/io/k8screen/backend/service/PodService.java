@@ -2,7 +2,6 @@ package io.k8screen.backend.service;
 
 import io.k8screen.backend.data.dto.PodDTO;
 import io.k8screen.backend.mapper.PodConverter;
-import io.k8screen.backend.mapper.ServiceConverter;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
@@ -44,6 +43,9 @@ public class PodService {
   public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
     throws Exception {
     V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    if (pod.getMetadata() != null && pod.getMetadata().getManagedFields() != null) {
+      pod.getMetadata().setManagedFields(null);
+    }
     return Yaml.dump(pod);
   }
 

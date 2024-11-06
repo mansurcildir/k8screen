@@ -2,12 +2,14 @@ package io.k8screen.backend.service;
 
 import io.k8screen.backend.data.dto.DeploymentDTO;
 import io.k8screen.backend.mapper.DeploymentConverter;
-import io.k8screen.backend.mapper.PodConverter;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1DeploymentList;
+import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
+
+import io.kubernetes.client.util.Yaml;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,15 @@ public class DeploymentService {
       throws Exception {
     V1Deployment deployment = this.appsV1Api.readNamespacedDeployment(name, namespace).execute();
     return this.deploymentConverter.toDeploymentDTO(deployment);
+  }
+
+  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+    throws Exception {
+    V1Deployment deployment = this.appsV1Api.readNamespacedDeployment(name, namespace).execute();
+    if (deployment.getMetadata() != null && deployment.getMetadata().getManagedFields() != null) {
+      deployment.getMetadata().setManagedFields(null);
+    }
+    return Yaml.dump(deployment);
   }
 
   public V1Status deleteByName(final @NotNull String namespace, final @NotNull String name)

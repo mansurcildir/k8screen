@@ -3,8 +3,13 @@ import { SPRING_BASE_URL } from "$lib/utils/utils";
 import { applyGetRequest } from "./http-request";
 
 export const deploymentAPI = {
-  getAllPods: async (namespace: string): Promise<Deployment[]> => {
+  getAllDeployments: async (namespace: string): Promise<Deployment[]> => {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/deployments`;
     return await (await applyGetRequest(url)).json();
-  }
+  },
+
+  getDeploymentDetails: async (namespace: string, name: string): Promise<string> => {
+    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/deployments/${name}/details`;
+    return await (await applyGetRequest(url)).text();
+  },
 }

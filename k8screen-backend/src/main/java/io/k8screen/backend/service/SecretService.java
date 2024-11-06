@@ -3,10 +3,13 @@ package io.k8screen.backend.service;
 import io.k8screen.backend.data.dto.SecretDTO;
 import io.k8screen.backend.mapper.SecretConverter;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
+
+import io.kubernetes.client.util.Yaml;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,15 @@ public class SecretService {
       throws Exception {
     V1Secret secret = this.coreV1Api.readNamespacedSecret(name, namespace).execute();
     return secretConverter.toSecretDTO(secret);
+  }
+
+  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+    throws Exception {
+    V1Secret secret = this.coreV1Api.readNamespacedSecret(name, namespace).execute();
+    if (secret.getMetadata() != null && secret.getMetadata().getManagedFields() != null) {
+      secret.getMetadata().setManagedFields(null);
+    }
+    return Yaml.dump(secret);
   }
 
   public List<SecretDTO> findAll(final @NotNull String namespace) throws Exception {
