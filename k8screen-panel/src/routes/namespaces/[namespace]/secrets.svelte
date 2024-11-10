@@ -4,6 +4,7 @@
   import * as Table from "$lib/components/ui/table";
   import type { Secret } from "$lib/model/Secret";
   import { secretAPI } from "$lib/service/secret-service";
+  import * as yaml from 'yaml';
 
   export let namespace;
   let loading = false;
@@ -33,6 +34,15 @@
       loadingTable = false;
 		}
 	}
+
+  const updateItem = async (editedSecret: string) => {
+    try {
+      loading = true;
+      return secretAPI.updateSecret(namespace, k8sItem, yaml.parse(editedSecret));
+		} finally  {
+      loading = false;
+		}
+  }
 
   const getDetails = async (): Promise<string> => {
     loading = true;
@@ -75,5 +85,5 @@
   </Table.Body>
  </Table.Root>
 </div>
- <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails}/>
+ <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails} {updateItem}/>
 </div>

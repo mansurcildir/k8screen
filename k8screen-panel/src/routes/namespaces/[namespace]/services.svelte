@@ -4,6 +4,7 @@
   import * as Table from "$lib/components/ui/table";
   import type { Service } from "$lib/model/Service";
   import { serviceAPI } from "$lib/service/service-service";
+  import * as yaml from 'yaml';
 
   export let namespace;
   let loading = true;
@@ -41,6 +42,15 @@
     loading = false;
     return details;
   };
+
+  const updateItem = async (editedService: string) => {
+    try {
+      loading = true;
+      return serviceAPI.updateService(namespace, k8sItem, yaml.parse(editedService));
+		} finally  {
+      loading = false;
+		}
+  }
 
 
 </script>
@@ -83,5 +93,5 @@
       </Table.Body>
      </Table.Root>
   </div>
- <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails}/>
+ <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails} {updateItem}/>
 </div>

@@ -4,6 +4,7 @@
   import * as Table from "$lib/components/ui/table";
   import type { Deployment } from "$lib/model/Deployment";
   import { deploymentAPI } from "$lib/service/deployment-service";
+  import * as yaml from 'yaml';
 
   export let namespace;
   let loading = false;
@@ -41,6 +42,14 @@
     return details;
   };
 
+  const updateItem = async (editedDeployment: string) => {
+    try {
+      loading = true;
+      return deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(editedDeployment));
+		} finally  {
+      loading = false;
+		}
+  }
 
 </script>
 <div class="flex flex-col" style="height: calc(100vh - 150px);">
@@ -79,5 +88,5 @@
  </Table.Root>
 </div>
 
-<Terminal {k8sItem} {option} {details} {loading} {open} {getDetails}/>
+<Terminal {k8sItem} {option} {details} {loading} {open} {getDetails} {updateItem}/>
 </div>

@@ -1,6 +1,6 @@
 import type { Service } from "$lib/model/Service";
 import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequest } from "./http-request";
+import { applyGetRequest, applyPutRequest } from "./http-request";
 
 export const serviceAPI = {
   getAllServices: async (namespace: string): Promise<Service[]> => {
@@ -12,4 +12,9 @@ export const serviceAPI = {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/services/${name}/details`;
     return await (await applyGetRequest(url)).text();
   },
+
+  updateService: async (namespace: string, name: string, body: any): Promise<any> => {
+    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/services/${name}`;
+    return await (await applyPutRequest(url, JSON.stringify(body))).json();
+  }
 }

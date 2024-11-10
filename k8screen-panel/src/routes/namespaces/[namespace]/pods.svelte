@@ -6,6 +6,7 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import Terminal from "$lib/components/terminal.svelte";
+  import * as yaml from 'yaml';
 
 
   export let namespace;
@@ -53,6 +54,15 @@
     loading = false;
     return details;
   };
+
+  const updateItem = async (editedPod: string) => {
+    try {
+      loading = true;
+      return podAPI.updatePod(namespace, k8sItem, yaml.parse(editedPod));
+		} finally  {
+      loading = false;
+		}
+  }
 
   const exec = async (execReq: string): Promise<string> => {
     loading = true;
@@ -117,5 +127,5 @@
     </Table.Root>
   </div>
 
-  <Terminal {k8sItem} {option} {details} {logs} {loading} {open} isPod = {true} {getDetails} {getLogs} {exec}/>
+  <Terminal {k8sItem} {option} {details} {logs} {loading} {open} isPod = {true} {getDetails} {updateItem} {getLogs} {exec}/>
 </div>
