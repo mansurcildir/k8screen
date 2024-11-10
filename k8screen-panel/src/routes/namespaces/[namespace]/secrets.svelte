@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Bar from "$lib/components/bar.svelte";
-    import Terminal from "$lib/components/terminal.svelte";
+  import Bar from "$lib/components/bar.svelte";
+  import Terminal from "$lib/components/terminal.svelte";
   import * as Table from "$lib/components/ui/table";
   import type { Secret } from "$lib/model/Secret";
   import { secretAPI } from "$lib/service/secret-service";
@@ -19,8 +19,8 @@
     getAllSecrets();
   }
 
-  const handleSecret = (deploymentName: string) => {
-    k8sItem = deploymentName;
+  const handleSecret = (secret: string) => {
+    k8sItem = secret;
     open = true;
     getDetails();
   }

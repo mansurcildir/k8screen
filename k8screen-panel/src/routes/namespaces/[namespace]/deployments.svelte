@@ -19,8 +19,8 @@
     getAllDeployments();
   }
 
-  const handleDeployment = (deploymentName: string) => {
-    k8sItem = deploymentName;
+  const handleDeployment = (deployment: string) => {
+    k8sItem = deployment;
     open = true;
     getDetails();
   }

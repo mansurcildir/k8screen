@@ -16,6 +16,7 @@
   export let execRes: string = "";
   export let loading: boolean = false;
   export let open: boolean = false;
+  export let isPod: boolean = false;
   export let containerHeight = 300;
   export let getDetails: () => Promise<string> 
   export let getLogs: () => Promise<string> = async () => "";
@@ -117,6 +118,7 @@
       <Code class="size-5" />
     </Button>
 
+    {#if (isPod)}
     <Button
     variant="ghost"
     class="bg-muted rounded-lg p-2 h-auto"
@@ -134,6 +136,7 @@
     >
       <SquareTerminal class="size-5" />
     </Button>
+    {/if}
     {/if}
 
   </div>
@@ -171,5 +174,6 @@
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;
     overflow-wrap: break-word;
+    word-break: break-word; /* Uzun kelimelerin satırı aşmasını engeller */
   }
 </style>
