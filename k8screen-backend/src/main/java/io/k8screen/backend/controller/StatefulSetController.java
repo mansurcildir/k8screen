@@ -36,7 +36,7 @@ public class StatefulSetController {
   }
 
   @PutMapping("/{name}")
-  public ResponseEntity<V1StatefulSet> getService(
+  public ResponseEntity<V1StatefulSet> getStatefulSet(
     @PathVariable final @NotNull String namespace,
     @PathVariable final @NotNull String name,
     @RequestBody final @NotNull V1StatefulSet statefulSet)
@@ -46,22 +46,30 @@ public class StatefulSetController {
   }
 
   @GetMapping
-  public ResponseEntity<List<StatefulSetDTO>> listServices(@PathVariable final @NotNull String namespace)
+  public ResponseEntity<List<StatefulSetDTO>> listStatefulSet(@PathVariable final @NotNull String namespace)
     throws Exception {
     final List<StatefulSetDTO> service = this.statefulSetService.findAll(namespace);
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<StatefulSetDTO> getService(
+  public ResponseEntity<StatefulSetDTO> getStatefulSet(
     @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
     throws Exception {
     final StatefulSetDTO service = this.statefulSetService.findByName(namespace, name);
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
+  @GetMapping("/{name}/details")
+  public ResponseEntity<String> getStatefulSetDetail(
+    @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
+    throws Exception {
+    final String statefulSet = this.statefulSetService.getDetailByName(namespace, name);
+    return ResponseEntity.status(HttpStatus.OK).body(statefulSet);
+  }
+
   @DeleteMapping("/{name}")
-  public ResponseEntity<V1Status> deleteSecret(
+  public ResponseEntity<V1Status> deleteStatefulSet(
     @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
     throws Exception {
     final V1Status status = this.statefulSetService.deleteByName(namespace, name);

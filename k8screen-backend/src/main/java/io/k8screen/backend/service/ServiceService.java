@@ -2,15 +2,13 @@ package io.k8screen.backend.service;
 
 import io.k8screen.backend.data.dto.ServiceDTO;
 import io.k8screen.backend.mapper.ServiceConverter;
-import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 
-import java.time.Duration;
-import java.time.OffsetDateTime;
 import java.util.List;
 
+import io.kubernetes.client.util.Yaml;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,15 @@ public class ServiceService {
 
     V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
     return this.serviceConverter.toServiceDTO(service);
+  }
 
+  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+    throws Exception {
+    V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
+    if (service.getMetadata() != null && service.getMetadata().getManagedFields() != null) {
+      service.getMetadata().setManagedFields(null);
+    }
+    return Yaml.dump(service);
   }
 
   public V1Service deleteByName(final @NotNull String namespace, final @NotNull String name)

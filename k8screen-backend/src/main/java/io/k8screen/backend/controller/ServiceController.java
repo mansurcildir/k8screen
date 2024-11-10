@@ -43,6 +43,14 @@ public class ServiceController {
     return ResponseEntity.status(HttpStatus.OK).body(updatedService);
   }
 
+  @GetMapping("/{name}/details")
+  public ResponseEntity<String> getServiceDetail(
+    @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
+    throws Exception {
+    final String service = this.serviceService.getDetailByName(namespace, name);
+    return ResponseEntity.status(HttpStatus.OK).body(service);
+  }
+
   @GetMapping
   public ResponseEntity<List<ServiceDTO>> listServices(@PathVariable final @NotNull String namespace)
       throws Exception {

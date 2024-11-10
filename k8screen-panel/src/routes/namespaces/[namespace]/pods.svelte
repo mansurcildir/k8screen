@@ -24,8 +24,8 @@
     getAllPods();
   }
 
-  const handlePod = (podName: string) => {
-    k8sItem = podName;
+  const handlePod = (pod: string) => {
+    k8sItem = pod;
     open = true;
     getDetails();
     getLogs();
@@ -60,7 +60,6 @@
     loading = false;
     return execRes;
   }
-
   
 </script>
 
@@ -118,5 +117,5 @@
     </Table.Root>
   </div>
 
-  <Terminal {k8sItem} {option} {details} {logs} {loading} {open} {getDetails} {getLogs} {exec}/>
+  <Terminal {k8sItem} {option} {details} {logs} {loading} {open} isPod = {true} {getDetails} {getLogs} {exec}/>
 </div>

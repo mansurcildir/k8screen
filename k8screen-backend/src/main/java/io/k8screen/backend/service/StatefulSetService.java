@@ -3,9 +3,11 @@ package io.k8screen.backend.service;
 import io.k8screen.backend.data.dto.StatefulSetDTO;
 import io.k8screen.backend.mapper.StatefulSetConverter;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
+import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import io.kubernetes.client.openapi.models.V1StatefulSetList;
 import io.kubernetes.client.openapi.models.V1Status;
+import io.kubernetes.client.util.Yaml;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +46,15 @@ public class StatefulSetService {
     V1StatefulSet statefulSet = this.appsV1Api.readNamespacedStatefulSet(name, namespace).execute();
     return this.statefulSetConverter.toStatefulSetDTO(statefulSet);
 
+  }
+
+  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+    throws Exception {
+    V1StatefulSet statefulSet = this.appsV1Api.readNamespacedStatefulSet(name, namespace).execute();
+    if (statefulSet.getMetadata() != null && statefulSet.getMetadata().getManagedFields() != null) {
+      statefulSet.getMetadata().setManagedFields(null);
+    }
+    return Yaml.dump(statefulSet);
   }
 
   public V1Status deleteByName(final @NotNull String namespace, final @NotNull String name)
