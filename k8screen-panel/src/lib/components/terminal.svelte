@@ -117,7 +117,7 @@
     
     {#if (k8sItem)}
 
-    <div class="flex ms-auto">
+    <div class="flex ms-auto gap-2">
       {#if (editedItem !== details)}
     <Button
     variant="ghost"
@@ -193,7 +193,7 @@
         {:else if (option === "DETAILS")}
         <div class="w-full h-full p-5 overflow-auto">{details}</div>
         {:else if (option === "EDIT")}
-        <textarea bind:value={editedItem} class="w-full h-full p-5 bg-black overflow-auto resize-none"></textarea>
+        <textarea bind:value={editedItem} class="w-full h-full p-5 bg-black overflow-auto resize-none outline-none"></textarea>
         {/if}
     </div>
   </Collapsible.Content>
