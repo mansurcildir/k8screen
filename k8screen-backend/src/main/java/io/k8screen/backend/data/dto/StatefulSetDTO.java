@@ -6,8 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Builder
 public record StatefulSetDTO(
-  @NotNull String name,
-  @JsonProperty("total_replicas") int totalReplicas,
-  @JsonProperty("ready_replicas") int readyReplicas,
-  @NotNull String age) {
-}
+    @NotNull String name,
+    @JsonProperty("total_replicas") int totalReplicas,
+    @JsonProperty("ready_replicas") int readyReplicas,
+    @NotNull String age) {}

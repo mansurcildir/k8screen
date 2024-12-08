@@ -42,8 +42,8 @@ public class PodController {
 
   @GetMapping("/{name}/details")
   public ResponseEntity<String> getPodDetail(
-    @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
-    throws Exception {
+      @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
+      throws Exception {
     final String pod = this.podService.getDetailByName(namespace, name);
     return ResponseEntity.status(HttpStatus.OK).body(pod);
   }

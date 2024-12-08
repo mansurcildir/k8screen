@@ -8,11 +8,10 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.util.Streams;
+import io.kubernetes.client.util.Yaml;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-
-import io.kubernetes.client.util.Yaml;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,10 @@ public class PodService {
   private final @NotNull Exec exec;
   private final @NotNull PodConverter podConverter;
 
-  public PodService(final @NotNull CoreV1Api coreV1Api, final @NotNull Exec exec, final @NotNull PodConverter podConverter) {
+  public PodService(
+      final @NotNull CoreV1Api coreV1Api,
+      final @NotNull Exec exec,
+      final @NotNull PodConverter podConverter) {
     this.coreV1Api = coreV1Api;
     this.exec = exec;
     this.podConverter = podConverter;
@@ -36,13 +38,13 @@ public class PodService {
 
   public PodDTO findByName(final @NotNull String namespace, final @NotNull String name)
       throws Exception {
-    V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    final V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
     return this.podConverter.toPodDTO(pod);
   }
 
   public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
-    throws Exception {
-    V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+      throws Exception {
+    final V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
     if (pod.getMetadata() != null && pod.getMetadata().getManagedFields() != null) {
       pod.getMetadata().setManagedFields(null);
     }
