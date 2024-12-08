@@ -53,8 +53,8 @@ public class DeploymentController {
 
   @GetMapping("/{name}/details")
   public ResponseEntity<String> getDeploymentDetail(
-    @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
-    throws Exception {
+      @PathVariable final @NotNull String namespace, @PathVariable final @NotNull String name)
+      throws Exception {
     final String deployment = this.deploymentService.getDetailByName(namespace, name);
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }

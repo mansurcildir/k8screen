@@ -5,11 +5,10 @@ import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
 @Builder
-public record PodDTO (
-  @NotNull String name,
-  @JsonProperty("total_containers") int totalContainers,
-  @JsonProperty("ready_containers") int readyContainers,
-  @NotNull String status,
-  int restarts,
-  @NotNull String age) {
-}
+public record PodDTO(
+    @NotNull String name,
+    @JsonProperty("total_containers") int totalContainers,
+    @JsonProperty("ready_containers") int readyContainers,
+    @NotNull String status,
+    int restarts,
+    @NotNull String age) {}

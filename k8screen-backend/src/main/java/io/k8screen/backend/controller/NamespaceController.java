@@ -1,5 +1,6 @@
 package io.k8screen.backend.controller;
 
+import org.springframework.security.oauth2.jwt.Jwt;
 import io.k8screen.backend.service.NamespaceService;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1Status;
@@ -7,6 +8,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +28,10 @@ public class NamespaceController {
   }
 
   @GetMapping
-  public ResponseEntity<List<String>> listNamespaces() throws Exception {
+  public ResponseEntity<List<String>> listNamespaces(final @NotNull Authentication authentication) throws Exception {
     final List<String> namespaces = this.namespaceService.getAllNamespaces();
+
+    System.out.println(authentication.getPrincipal());
     return ResponseEntity.status(HttpStatus.OK).body(namespaces);
   }
 

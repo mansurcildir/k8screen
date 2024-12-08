@@ -1,0 +1,45 @@
+k8screen-api:
+  base-url: ${API_BASE_URL:http://localhost:8080}
+
+k8screen-db:
+  host: ${K8SCREEN_DB_HOST:localhost}
+  port: ${K8SCREEN_DB_PORT:5432}
+  db: ${K8SCREEN_DB_DATABASE:k8screen}
+  username: ${K8SCREEN_DB_USERNAME:admin}
+  password: ${K8SCREEN_DB_PASSWORD:admin123}
+  url: jdbc:postgresql://${k8screen-db.host}:${k8screen-db.port}/${k8screen-db.db}
+
+spring:
+  datasource:
+    url: ${k8screen-db.url}
+    driver-class-name: org.postgresql.Driver
+    username: ${k8screen-db.username}
+    password: ${k8screen-db.password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    baseline-on-migrate: true
+    baseline-description: "init"
+    baseline-version: 0
+    enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope: profile, email
+            redirect-uri: ${k8screen.api}/login/oauth2/code/google
+            authorization-grant-type: authorization_code
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo

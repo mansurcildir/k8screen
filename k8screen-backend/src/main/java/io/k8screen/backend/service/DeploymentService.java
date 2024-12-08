@@ -5,11 +5,9 @@ import io.k8screen.backend.mapper.DeploymentConverter;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1DeploymentList;
-import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1Status;
-import java.util.List;
-
 import io.kubernetes.client.util.Yaml;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,8 @@ public class DeploymentService {
   private final @NotNull AppsV1Api appsV1Api;
   private final @NotNull DeploymentConverter deploymentConverter;
 
-  public DeploymentService(final @NotNull AppsV1Api appsV1Api, final @NotNull DeploymentConverter deploymentConverter) {
+  public DeploymentService(
+      final @NotNull AppsV1Api appsV1Api, final @NotNull DeploymentConverter deploymentConverter) {
     this.appsV1Api = appsV1Api;
     this.deploymentConverter = deploymentConverter;
   }
@@ -40,18 +39,22 @@ public class DeploymentService {
   public List<DeploymentDTO> findAll(final @NotNull String namespace) throws Exception {
     final V1DeploymentList deploymentList =
         this.appsV1Api.listNamespacedDeployment(namespace).execute();
-    return deploymentList.getItems().stream().map(this.deploymentConverter::toDeploymentDTO).toList();
+    return deploymentList.getItems().stream()
+        .map(this.deploymentConverter::toDeploymentDTO)
+        .toList();
   }
 
   public DeploymentDTO findByName(final @NotNull String namespace, final @NotNull String name)
       throws Exception {
-    V1Deployment deployment = this.appsV1Api.readNamespacedDeployment(name, namespace).execute();
+    final V1Deployment deployment =
+        this.appsV1Api.readNamespacedDeployment(name, namespace).execute();
     return this.deploymentConverter.toDeploymentDTO(deployment);
   }
 
   public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
-    throws Exception {
-    V1Deployment deployment = this.appsV1Api.readNamespacedDeployment(name, namespace).execute();
+      throws Exception {
+    final V1Deployment deployment =
+        this.appsV1Api.readNamespacedDeployment(name, namespace).execute();
     if (deployment.getMetadata() != null && deployment.getMetadata().getManagedFields() != null) {
       deployment.getMetadata().setManagedFields(null);
     }

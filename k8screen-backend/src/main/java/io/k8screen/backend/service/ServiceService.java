@@ -5,10 +5,8 @@ import io.k8screen.backend.mapper.ServiceConverter;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceList;
-
-import java.util.List;
-
 import io.kubernetes.client.util.Yaml;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +16,8 @@ public class ServiceService {
   private final @NotNull CoreV1Api coreV1Api;
   private final @NotNull ServiceConverter serviceConverter;
 
-  public ServiceService(final @NotNull CoreV1Api coreV1Api, final @NotNull ServiceConverter serviceConverter) {
+  public ServiceService(
+      final @NotNull CoreV1Api coreV1Api, final @NotNull ServiceConverter serviceConverter) {
     this.coreV1Api = coreV1Api;
     this.serviceConverter = serviceConverter;
   }
@@ -40,15 +39,15 @@ public class ServiceService {
   }
 
   public ServiceDTO findByName(final @NotNull String namespace, final @NotNull String name)
-    throws Exception {
+      throws Exception {
 
-    V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
+    final V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
     return this.serviceConverter.toServiceDTO(service);
   }
 
   public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
-    throws Exception {
-    V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
+      throws Exception {
+    final V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
     if (service.getMetadata() != null && service.getMetadata().getManagedFields() != null) {
       service.getMetadata().setManagedFields(null);
     }
