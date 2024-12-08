@@ -52,7 +52,6 @@
 		}
   }
 
-
 </script>
 
 <div class="flex flex-col" style="height: calc(100vh - 150px);">
@@ -93,5 +92,6 @@
       </Table.Body>
      </Table.Root>
   </div>
+  
  <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails} {updateItem}/>
 </div>

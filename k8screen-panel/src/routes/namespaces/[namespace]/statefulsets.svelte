@@ -1,6 +1,7 @@
 <script lang="ts">
   import Bar from "$lib/components/bar.svelte";
   import Terminal from "$lib/components/terminal.svelte";
+
   import * as Table from "$lib/components/ui/table";
   import type { StatefulSet } from "$lib/model/StatefulSet";
   import { statefulSetAPI } from "$lib/service/statefulset-service";
@@ -82,5 +83,6 @@
       </Table.Body>
       </Table.Root>
   </div>
+
  <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails} {updateItem}/>
 </div>
