@@ -1,9 +1,11 @@
 <script lang="ts">
   import Bar from "$lib/components/bar.svelte";
-    import Terminal from "$lib/components/terminal.svelte";
+  import Terminal from "$lib/components/terminal.svelte";
+
   import * as Table from "$lib/components/ui/table";
   import type { StatefulSet } from "$lib/model/StatefulSet";
   import { statefulSetAPI } from "$lib/service/statefulset-service";
+  import * as yaml from 'yaml';
 
   export let namespace;
   let loading = true;
@@ -41,6 +43,15 @@
     return details;
   };
 
+  const updateItem = async (editedStatefulSet: string) => {
+    try {
+      loading = true;
+      return statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(editedStatefulSet));
+		} finally  {
+      loading = false;
+		}
+  }
+
 </script>
 
 <div class="flex flex-col" style="height: calc(100vh - 150px);">
@@ -72,5 +83,6 @@
       </Table.Body>
       </Table.Root>
   </div>
- <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails}/>
+
+ <Terminal {k8sItem} {option} {details} {loading} {open} {getDetails} {updateItem}/>
 </div>

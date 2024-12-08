@@ -7,6 +7,7 @@
   import CodeXML from "lucide-svelte/icons/code-xml";
   import Code from "lucide-svelte/icons/code";
   import Logs from "lucide-svelte/icons/logs";
+  import Save from "lucide-svelte/icons/save";
 
   export let k8sItem: string;
   export let option: string;
@@ -18,10 +19,17 @@
   export let open: boolean = false;
   export let isPod: boolean = false;
   export let containerHeight = 300;
+  
   export let getDetails: () => Promise<string> 
+  export let updateItem: (editedItem: string) => Promise<any> 
   export let getLogs: () => Promise<string> = async () => "";
   export let exec: (execReq: string) => Promise<string> = async () => "";
 
+  $: if (details) {
+    editedItem = details;
+  }
+
+  let editedItem: string;
   let isResizing = false;
   const maxContainerHeight = 500;
   const minContainerHeight = 100;
@@ -37,6 +45,14 @@
     loading = true;
     option = "EDIT";
     details = await getDetails();
+    loading = false;
+  }
+
+  const handleSave = async () => {
+    loading = true;
+    await updateItem(editedItem);
+    details = await getDetails();
+    editedItem = details;
     loading = false;
   }
 
@@ -100,6 +116,19 @@
     </h1>
     
     {#if (k8sItem)}
+
+    <div class="flex ms-auto gap-2">
+      {#if (editedItem !== details)}
+    <Button
+    variant="ghost"
+    class=" bg-muted rounded-lg p-2 h-auto"
+    aria-label="Playground"
+    onclick={handleSave}
+    >
+      <Save class="size-5" />
+    </Button>
+    {/if}
+
     <Button
     variant="ghost"
     class="ms-auto bg-muted rounded-lg p-2 h-auto"
@@ -137,6 +166,7 @@
       <SquareTerminal class="size-5" />
     </Button>
     {/if}
+    </div>
     {/if}
 
   </div>
@@ -163,7 +193,7 @@
         {:else if (option === "DETAILS")}
         <div class="w-full h-full p-5 overflow-auto">{details}</div>
         {:else if (option === "EDIT")}
-        <textarea class="w-full h-full p-5 bg-black overflow-auto resize-none">{details}</textarea>
+        <textarea bind:value={editedItem} class="w-full h-full p-5 bg-black overflow-auto resize-none outline-none"></textarea>
         {/if}
     </div>
   </Collapsible.Content>
