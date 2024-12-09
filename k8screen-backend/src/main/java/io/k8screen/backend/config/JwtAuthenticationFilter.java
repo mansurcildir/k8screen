@@ -19,8 +19,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final CustomUserDetailsService customUserDetailsService;
 
   public JwtAuthenticationFilter(
-    final @NotNull JwtUtil jwtUtil,
-    final @NotNull CustomUserDetailsService customUserDetailsService) {
+      final @NotNull JwtUtil jwtUtil,
+      final @NotNull CustomUserDetailsService customUserDetailsService) {
     this.jwtUtil = jwtUtil;
     this.customUserDetailsService = customUserDetailsService;
   }
@@ -35,16 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     try {
       if (token != null) {
-        final String username = (String) this.jwtUtil.getClaim(JwtUtil.SIGN_KEY, "username", token);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-          userDetails, null, userDetails.getAuthorities());
+        final String username = this.jwtUtil.getAccessClaim(token);
+        final UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(username);
+        final UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
       }
-    }
-
-    finally {
+    } finally {
       filterChain.doFilter(request, response);
     }
   }

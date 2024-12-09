@@ -12,38 +12,34 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 /** Provides JWT services */
 @Component
 public class JwtUtil {
 
-  public static final String SIGN_KEY =
+  private final String accessKey =
       "561744090F30C5564F793305AB783BC96545E88EE42A7ED0CED578C72CE132A3";
 
-  /**
-   * Gets the claim from the token.
-   *
-   * @param signKey sign key of the token
-   * @param claimKey name of the claim
-   * @param token JWT token
-   * @return Object
-   */
+  private final String refreshKey =
+      "42DCCF1E0B06EF601CF9DCDA0ED3877F4F0DB32FAE243DC5F0C681DB09AFB454";
+
   public @NotNull Object getClaim(
       @NotNull final String signKey, final @NotNull String claimKey, final @NotNull String token) {
 
     return this.extractClaim(token, signKey, claims -> claims.get(claimKey, String.class));
   }
 
-  /**
-   * Extracts the claim on the token.
-   *
-   * @param token JWT token
-   * @param signKey sign key of the token
-   * @param claimsResolver lambda function which resolves the claims on the token
-   * @return <T> T
-   */
+  public @NotNull String getAccessClaim(final @NotNull String token) {
+    return this.extractClaim(token, this.accessKey, claims -> claims.get("username", String.class));
+  }
+
+  public @NotNull String getRefreshClaim(final @NotNull String token) {
+
+    return this.extractClaim(
+        token, this.refreshKey, claims -> claims.get("username", String.class));
+  }
+
   public @NotNull <T> T extractClaim(
       final @NotNull String token,
       final @NotNull String signKey,
@@ -52,13 +48,6 @@ public class JwtUtil {
     return claimsResolver.apply(claims);
   }
 
-  /**
-   * Extracts the all claims on the token.
-   *
-   * @param token JWT token
-   * @param signKey sign key of the token
-   * @return Claims
-   */
   public @NotNull Claims extractAllClaims(
       final @NotNull String token, final @NotNull String signKey) {
     return Jwts.parser()
@@ -68,29 +57,20 @@ public class JwtUtil {
         .getPayload();
   }
 
-  /**
-   * Generates a token.
-   *
-   * @param signKey sign key of the token
-   * @param claims claims of the token
-   * @param expDay expiration day of the token
-   * @return Map<String, String>
-   */
-  public @NotNull Map<String, String> generateToken(
-      @NotNull final String signKey, final @NotNull Map<String, Object> claims, final int expDay) {
+  public @NotNull String generateToken(
+      @NotNull final String signKey, final @NotNull Map<String, Object> claims, final int expMin) {
 
-    final String token = this.createToken(claims, signKey, expDay);
-    return Map.of("token", token);
+    return this.createToken(claims, signKey, expMin);
   }
 
-  /**
-   * Creates the token.
-   *
-   * @param claims claims of the token
-   * @param signKey sign key of the token
-   * @param expMin expiration day of the token
-   * @return String
-   */
+  public @NotNull String generateAccessToken(final @NotNull String username) {
+    return this.createToken(Map.of("username", username), this.accessKey, 5);
+  }
+
+  public @NotNull String generateRefreshToken(final @NotNull String username) {
+    return this.createToken(Map.of("username", username), this.refreshKey, 60 * 24);
+  }
+
   private @NotNull String createToken(
       final @NotNull Map<String, Object> claims, final @NotNull String signKey, final int expMin) {
 
@@ -114,20 +94,8 @@ public class JwtUtil {
         .compact();
   }
 
-  /**
-   * Gets the sign key as a SecretKeySpec object.
-   *
-   * @param signKey sign key of the token
-   * @return SecretKey
-   */
   private @NotNull SecretKey getSignKey(final @NotNull String signKey) {
     final byte[] keyBytes = Decoders.BASE64.decode(signKey);
     return new SecretKeySpec(keyBytes, "HmacSHA256");
   }
-
-  public Boolean validateToken(String token, UserDetails userDetails, boolean isAccessToken) {
-    final String username = (String) getClaim(SIGN_KEY, userDetails.getUsername(), token);
-    return (username.equals(userDetails.getUsername()));
-  }
-
 }
