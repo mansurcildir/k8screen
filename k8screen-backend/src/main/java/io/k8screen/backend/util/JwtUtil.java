@@ -60,20 +60,6 @@ public class JwtUtil {
   public @NotNull String generateToken(
       @NotNull final String signKey, final @NotNull Map<String, Object> claims, final int expMin) {
 
-    return this.createToken(claims, signKey, expMin);
-  }
-
-  public @NotNull String generateAccessToken(final @NotNull String username) {
-    return this.createToken(Map.of("username", username), this.accessKey, 5);
-  }
-
-  public @NotNull String generateRefreshToken(final @NotNull String username) {
-    return this.createToken(Map.of("username", username), this.refreshKey, 60 * 24);
-  }
-
-  private @NotNull String createToken(
-      final @NotNull Map<String, Object> claims, final @NotNull String signKey, final int expMin) {
-
     final Instant now = Instant.now();
     final Instant futureInstant = now.plusSeconds((long) expMin * 60);
     final ZonedDateTime zonedDateTime = futureInstant.atZone(ZoneId.systemDefault());
@@ -81,17 +67,25 @@ public class JwtUtil {
     final Date expirationDate = Date.from(zonedDateTime.toInstant());
 
     return Jwts.builder()
-        .header()
-        .add(
-            Map.of(
-                "alg", "HS256",
-                "typ", "JWT"))
-        .and()
-        .claims(claims)
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(expirationDate)
-        .signWith(this.getSignKey(signKey))
-        .compact();
+      .header()
+      .add(
+        Map.of(
+          "alg", "HS256",
+          "typ", "JWT"))
+      .and()
+      .claims(claims)
+      .issuedAt(new Date(System.currentTimeMillis()))
+      .expiration(expirationDate)
+      .signWith(this.getSignKey(signKey))
+      .compact();
+  }
+
+  public @NotNull String generateAccessToken(final @NotNull String username) {
+    return this.generateToken(this.accessKey, Map.of("username", username), 1);
+  }
+
+  public @NotNull String generateRefreshToken(final @NotNull String username) {
+    return this.generateToken(this.refreshKey, Map.of("username", username), 60 * 24);
   }
 
   private @NotNull SecretKey getSignKey(final @NotNull String signKey) {

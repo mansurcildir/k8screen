@@ -2,6 +2,8 @@ package io.k8screen.backend.config;
 
 import io.k8screen.backend.util.JwtUtil;
 import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,12 +45,20 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login")
+                    .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/auth/access-token")
+                    .requestMatchers(HttpMethod.GET, "/api/auth/access-token")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
+        .logout(logout -> logout
+        .logoutUrl("/api/auth/logout")
+        .invalidateHttpSession(true)
+        .deleteCookies("JSESSIONID")
+        .logoutSuccessHandler((request, response, authentication) -> {
+          response.setStatus(HttpServletResponse.SC_OK);
+          response.getWriter().write("Logout successful");
+        }))
         .authenticationProvider(this.authenticationProvider())
         .addFilterBefore(
             new JwtAuthenticationFilter(this.jwtUtil, this.customUserDetailsService),

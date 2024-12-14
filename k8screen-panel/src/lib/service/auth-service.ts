@@ -1,5 +1,4 @@
 import type { LoginReq } from "$lib/model/user/LoginReq";
-import type { LoginRes } from "$lib/model/user/LoginRes";
 import type { UserForm } from "$lib/model/user/UserForm";
 import { SPRING_BASE_URL } from "$lib/utils/utils";
 import { applyGetRequest, applyGetRequestOptional, applyPostRequest } from "./http-request";

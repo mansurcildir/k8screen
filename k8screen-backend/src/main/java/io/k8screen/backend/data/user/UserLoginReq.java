@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UserLoginRequest {
+public class UserLoginReq {
   @NotNull @NotEmpty String username;
   @NotNull @NotEmpty String password;
 }

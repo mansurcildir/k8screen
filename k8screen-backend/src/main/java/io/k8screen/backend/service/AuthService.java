@@ -2,7 +2,7 @@ package io.k8screen.backend.service;
 
 import io.k8screen.backend.data.user.UserForm;
 import io.k8screen.backend.data.user.UserItem;
-import io.k8screen.backend.data.user.UserLoginRequest;
+import io.k8screen.backend.data.user.UserLoginReq;
 import io.k8screen.backend.util.JwtUtil;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class AuthService {
     this.userService = userService;
   }
 
-  public Map<String, String> login(final @NotNull UserLoginRequest loginRequest) {
+  public Map<String, String> login(final @NotNull UserLoginReq loginRequest) {
     final Authentication authentication =
         this.authManager.authenticate(
             new UsernamePasswordAuthenticationToken(
@@ -43,8 +43,8 @@ public class AuthService {
       final String refreshToken = this.jwtUtil.generateRefreshToken(loginRequest.getUsername());
 
       return Map.of(
-          "accessToken", accessToken,
-          "refreshToken", refreshToken);
+        "access_token", accessToken,
+        "refresh_token", refreshToken);
 
     } else {
       throw new BadCredentialsException("Username or password is invalid");
@@ -60,13 +60,13 @@ public class AuthService {
     final String refreshToken = this.jwtUtil.generateAccessToken(createdUser.username());
 
     return Map.of(
-        "accessToken", accessToken,
-        "refreshToken", refreshToken);
+        "access_token", accessToken,
+        "refresh_token", refreshToken);
   }
 
   public Map<String, String> getAccessToken(final @NotNull String refreshToken) {
     final String username = this.jwtUtil.getRefreshClaim(refreshToken);
     final String accessToken = this.jwtUtil.generateAccessToken(username);
-    return Map.of("accessToken", accessToken);
+    return Map.of("access_token", accessToken);
   }
 }

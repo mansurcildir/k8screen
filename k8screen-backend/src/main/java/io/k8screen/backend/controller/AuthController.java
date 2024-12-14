@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.user.UserForm;
-import io.k8screen.backend.data.user.UserLoginRequest;
+import io.k8screen.backend.data.user.UserLoginReq;
 import io.k8screen.backend.service.AuthService;
 import io.k8screen.backend.util.JwtUtil;
 import jakarta.validation.Valid;
@@ -17,18 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
   private final @NotNull AuthService authService;
 
-  public AuthController(final @NotNull JwtUtil jwtUtil, final @NotNull AuthService authService) {
+  public AuthController(final @NotNull AuthService authService) {
     this.authService = authService;
   }
 
   @PostMapping("/login")
   public ResponseEntity<Map<String, String>> login(
-      @Valid @RequestBody final UserLoginRequest loginRequest) {
+      @Valid @RequestBody final UserLoginReq loginRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(this.authService.login(loginRequest));
   }
 
@@ -40,7 +40,7 @@ public class AuthController {
   @GetMapping("/access-token")
   public ResponseEntity<Map<String, String>> getAccessToken(
       @RequestHeader("Refresh-Token") final @NotNull String header) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(this.authService.getAccessToken(header.substring(7)));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.authService.getAccessToken(header));
   }
 }

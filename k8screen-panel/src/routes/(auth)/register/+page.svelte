@@ -4,7 +4,7 @@
   import Label from "$lib/components/ui/label/label.svelte";
   import type { UserForm } from "$lib/model/user/UserForm";
   import { authAPI } from "$lib/service/auth-service";
-    import { setTokens } from "$lib/service/storage-manager";
+  import { setTokens } from "$lib/service/storage-manager";
 
   let loading = false;
 
@@ -29,6 +29,7 @@
 <form on:submit|preventDefault={register}>
   <div class="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
     <div class="flex items-center justify-center py-12">
+      {#if !loading}
       <div class="mx-auto grid w-[350px] gap-6">
         <div class="grid gap-2 text-center">
           <h1 class="text-3xl font-bold">Register</h1>
@@ -59,6 +60,23 @@
           <a href="/login" class="underline"> Login </a>
         </div>
       </div>
+      {:else}
+        <div class="h-full w-full flex items-center justify-center">
+          <div class="h-10 w-10">
+            <svg
+              class="animate-spin text-black"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" class="opacity-25" />
+              <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75" />
+            </svg>
+          </div>
+        </div>
+      {/if}
     </div>
     <div class="bg-muted hidden lg:block">
       <img

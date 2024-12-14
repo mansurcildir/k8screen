@@ -12,7 +12,7 @@
 		"lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "prebuild": "pnpm exec eslint \"src/**/*.{ts,js,svelte}\"",
-
+    "predev": "pnpm exec eslint \"src/**/*.{ts,js,svelte}\"",
     "prestart": "pnpm exec eslint \"src/**/*.{ts,js,svelte}\""
 	},
 	"devDependencies": {
