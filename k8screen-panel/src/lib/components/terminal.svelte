@@ -70,13 +70,9 @@
   const handleMouseMove = (event: MouseEvent) => {
     if (isResizing) {
       const newHeight = containerHeight - event.movementY;
-
-      // Eğer yeni yükseklik, maksimum yüksekliği geçmiyorsa ve minimum yüksekliğin altında değilse ayarlıyoruz
       if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
-        // Yüksekliği artırma koşulu
         if (newHeight < containerHeight) {
-          // Yukarı doğru kaydırma engeli
-          const isAtTop = window.innerHeight - (containerHeight - event.movementY) <= 150; // Değiştirilebilir yükseklik sınırı
+          const isAtTop = window.innerHeight - (containerHeight - event.movementY) <= 150;
           if (!isAtTop) {
             containerHeight = newHeight;
           }
@@ -172,7 +168,7 @@
   </div>
 
   <Collapsible.Content>
-    <div class="resize-handle" on:mousedown={handleMouseDown} style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"></div>
+    <div class="resize-handle" role="button" tabindex="0" on:mousedown={handleMouseDown} style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"></div>
     <div class="relative text-white log-container rounded-b-md bg-black" style="height: {containerHeight}px;">
         {#if (loading)}
         <div class="flex justify-center items-center h-full">
@@ -204,6 +200,6 @@
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;
     overflow-wrap: break-word;
-    word-break: break-word; /* Uzun kelimelerin satırı aşmasını engeller */
+    word-break: break-word;
   }
 </style>

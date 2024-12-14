@@ -1,17 +1,28 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { useSidebar } from "$lib/components/ui/sidebar/index.js";
+    import { authAPI } from "$lib/service/auth-service";
+  import { clearTokens } from "$lib/service/storage-manager";
 	import BadgeCheck from "lucide-svelte/icons/badge-check";
 	import Bell from "lucide-svelte/icons/bell";
 	import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
 	import CreditCard from "lucide-svelte/icons/credit-card";
-	import LogOut from "lucide-svelte/icons/log-out";
 	import Sparkles from "lucide-svelte/icons/sparkles";
 
 	let { user }: { user: { name: string; email: string; avatar: string } } = $props();
 	const sidebar = useSidebar();
+
+	const logout = () => {
+		authAPI.logout()
+		.then(() => {
+			clearTokens();
+			goto("/login");
+		});
+	}
+
 </script>
 
 <Sidebar.Menu>
@@ -78,8 +89,9 @@
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>
-					<LogOut />
-					Log out
+					<!-- <LogOut />
+					Log out -->
+					<input class="w-full text-start" value="Log out" type="button" onclick={() => { logout() }}>
 				</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>

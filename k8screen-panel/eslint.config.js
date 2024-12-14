@@ -9,22 +9,26 @@ export default ts.config(
   ...svelte.configs["flat/recommended"],
   {
     languageOptions: {
-	  globals: {
-	    ...globals.browser,
-	    ...globals.node
-	  }
-	}
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      }
+    },
+    rules: {
+      ...ts.configs.recommended.rules,
+      "@typescript-eslint/no-explicit-any": "off",
+    },
   },
   {
     files: ["**/*.svelte"],
 
     languageOptions: {
-	  parserOptions: {
-	    parser: ts.parser
-	  }
-	}
+      parserOptions: {
+        parser: ts.parser
+      }
+    }
   },
   {
-    ignores: ["build/", ".svelte-kit/", "dist/"]
+    ignores: ["build/", ".svelte-kit/", "dist/", "src/lib/components/ui"]
   }
 );
