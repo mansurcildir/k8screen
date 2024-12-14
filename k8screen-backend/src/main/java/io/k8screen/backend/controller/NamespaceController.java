@@ -1,6 +1,5 @@
 package io.k8screen.backend.controller;
 
-import org.springframework.security.oauth2.jwt.Jwt;
 import io.k8screen.backend.service.NamespaceService;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1Status;
@@ -28,10 +27,9 @@ public class NamespaceController {
   }
 
   @GetMapping
-  public ResponseEntity<List<String>> listNamespaces(final @NotNull Authentication authentication) throws Exception {
+  public ResponseEntity<List<String>> listNamespaces(final @NotNull Authentication authentication)
+      throws Exception {
     final List<String> namespaces = this.namespaceService.getAllNamespaces();
-
-    System.out.println(authentication.getPrincipal());
     return ResponseEntity.status(HttpStatus.OK).body(namespaces);
   }
 

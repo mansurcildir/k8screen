@@ -40,8 +40,7 @@ public class UserService {
   }
 
   public UserItem findByUsername(final @NotNull String username) {
-    final User user =
-        this.userRepository.findByUsername(username).orElseThrow();
+    final User user = this.userRepository.findByUsername(username).orElseThrow();
     return this.userConverter.toUserItem(user);
   }
 }

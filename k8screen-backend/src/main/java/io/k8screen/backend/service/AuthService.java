@@ -1,10 +1,10 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.entity.User;
 import io.k8screen.backend.data.user.UserForm;
 import io.k8screen.backend.data.user.UserItem;
-import io.k8screen.backend.data.user.UserLoginRequest;
+import io.k8screen.backend.data.user.UserLoginReq;
 import io.k8screen.backend.util.JwtUtil;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,8 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class AuthService {
@@ -24,20 +22,29 @@ public class AuthService {
   private final @NotNull UserService userService;
 
   public AuthService(
-    final @NotNull AuthenticationManager authManager,
-    final @NotNull JwtUtil jwtUtil,
-    final @NotNull PasswordEncoder passwordEncoder,
-    final @NotNull UserService userService) {
+      final @NotNull AuthenticationManager authManager,
+      final @NotNull JwtUtil jwtUtil,
+      final @NotNull PasswordEncoder passwordEncoder,
+      final @NotNull UserService userService) {
     this.authManager = authManager;
     this.jwtUtil = jwtUtil;
     this.passwordEncoder = passwordEncoder;
     this.userService = userService;
   }
 
-  public Map<String, String> login(final @NotNull UserLoginRequest loginRequest) {
-    Authentication authentication = this.authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-    if(authentication.isAuthenticated()){
-      return this.jwtUtil.generateToken(JwtUtil.SIGN_KEY, Map.of("username", loginRequest.getUsername()), 5);
+  public Map<String, String> login(final @NotNull UserLoginReq loginRequest) {
+    final Authentication authentication =
+        this.authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(), loginRequest.getPassword()));
+
+    if (authentication.isAuthenticated()) {
+      final String accessToken = this.jwtUtil.generateAccessToken(loginRequest.getUsername());
+      final String refreshToken = this.jwtUtil.generateRefreshToken(loginRequest.getUsername());
+
+      return Map.of(
+        "access_token", accessToken,
+        "refresh_token", refreshToken);
 
     } else {
       throw new BadCredentialsException("Username or password is invalid");
@@ -45,10 +52,21 @@ public class AuthService {
   }
 
   public Map<String, String> register(final @NotNull UserForm userForm) {
-    String encoded = this.passwordEncoder.encode(userForm.getPassword());
+    final String encoded = this.passwordEncoder.encode(userForm.getPassword());
     userForm.setPassword(encoded);
-    UserItem createdUser = this.userService.create(userForm);
-    return this.jwtUtil.generateToken(JwtUtil.SIGN_KEY, Map.of("username", createdUser.username()), 5);
+    final UserItem createdUser = this.userService.create(userForm);
+
+    final String accessToken = this.jwtUtil.generateAccessToken(createdUser.username());
+    final String refreshToken = this.jwtUtil.generateAccessToken(createdUser.username());
+
+    return Map.of(
+        "access_token", accessToken,
+        "refresh_token", refreshToken);
   }
 
+  public Map<String, String> getAccessToken(final @NotNull String refreshToken) {
+    final String username = this.jwtUtil.getRefreshClaim(refreshToken);
+    final String accessToken = this.jwtUtil.generateAccessToken(username);
+    return Map.of("access_token", accessToken);
+  }
 }
