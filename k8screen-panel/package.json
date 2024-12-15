@@ -8,7 +8,12 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "eslint ."
+		"test": "vitest",
+		"lint": "prettier --check . && eslint .",
+    "format": "prettier --write .",
+    "prebuild": "pnpm exec eslint \"src/**/*.{ts,js,svelte}\"",
+    "predev": "pnpm exec eslint \"src/**/*.{ts,js,svelte}\"",
+    "prestart": "pnpm exec eslint \"src/**/*.{ts,js,svelte}\""
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -30,9 +35,11 @@
 		"tailwindcss-animate": "^1.0.7",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",
-		"vite": "^5.0.3"
+		"vite": "^5.0.3",
+		"vitest": "^2.1.8"
 	},
 	"dependencies": {
-		"mode-watcher": "^0.4.1"
+		"mode-watcher": "^0.4.1",
+		"jwt-decode": "^4.0.0"
 	}
 }

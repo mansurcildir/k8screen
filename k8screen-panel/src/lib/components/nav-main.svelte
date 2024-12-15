@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { page } from "$app/stores";
+  import { page } from "$app/stores";
 	import * as Collapsible from "$lib/components/ui/collapsible/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import ChevronRight from "lucide-svelte/icons/chevron-right";
 	import Plus from "lucide-svelte/icons/plus";
-    import Button from "./ui/button/button.svelte";
+  import Button from "./ui/button/button.svelte";
 	import Check from "lucide-svelte/icons/check";
 	import X from "lucide-svelte/icons/x";
-    import { namespaceAPI } from "$lib/service/namespace-service";
+  import { namespaceAPI } from "$lib/service/namespace-service";
 
 	let namespace: string = $state("");
 	let visible: boolean = $state(false);
@@ -67,27 +67,27 @@
 						<Collapsible.Content>
 							{#if mainItem.items}
 								<Sidebar.MenuSub>
+									{#if (!visible)}
 									<Sidebar.MenuSubItem>
 										<Sidebar.MenuSubButton isActive={$page.params.namespace == "Add namespace"}>
 											{#snippet child({ props })}
-
-											<a href="" on:click={() => visible = true} {...props}>
+											<button style="display: block; width: 100%" onclick={() => visible = true} {...props}>
 												<div class="flex justify-between items-center w-full">
-													{"Add namespace"} 
-													<Plus class="size-5 hidden group-hover:inline-flex"/>
+													<span class="text-left">Add namespace</span> 
+													<Plus class="size-5 hidden group-hover:inline-flex ml-auto"/>
 												</div>
-											</a>
+											</button>
 											{/snippet}
 										</Sidebar.MenuSubButton>
 									</Sidebar.MenuSubItem>
 
-									{#if (visible)}
+									{:else}
 									<Sidebar.MenuSubItem>
 										<Sidebar.MenuSubButton>
 											{#snippet child({ props })}
 												<div class="flex justify-between items-center gap-2">
 											      <input type="text" bind:value={namespace} placeholder="namespace..." {...props}/>
-												  <form on:submit|preventDefault={createNamespace}>
+												  <form onsubmit={createNamespace}>
 													<div class="flex justify-end gap-1">
 														{#if (namespace)}
 														<Button type="submit" class="ms-auto h-8 w-5" variant="outline" size="sm">
@@ -105,18 +105,19 @@
 									</Sidebar.MenuSubItem>
 									{/if}
 								
-
 									{#each mainItem.items as subItem (subItem.title)}
-										<Sidebar.MenuSubItem>
-											<Sidebar.MenuSubButton isActive={$page.params.namespace == subItem.title}>
-												{#snippet child({ props })}
-													<a href={subItem.url} {...props}>
-														<span>{subItem.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuSubButton>
-										</Sidebar.MenuSubItem>
-									{/each}
+									<Sidebar.MenuSubItem>
+										<Sidebar.MenuSubButton isActive={$page.params.namespace == subItem.title}>
+											{#snippet child({ props })}
+												<a href={subItem.url} {...props}>
+													<span>{subItem.title}</span>
+												</a>
+											{/snippet}
+										</Sidebar.MenuSubButton>
+									</Sidebar.MenuSubItem>
+							  	{/each}
+
+									
 								</Sidebar.MenuSub>
 							{/if}
 						</Collapsible.Content>

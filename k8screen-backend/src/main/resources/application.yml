@@ -9,6 +9,11 @@ k8screen-db:
   password: ${K8SCREEN_DB_PASSWORD:admin123}
   url: jdbc:postgresql://${k8screen-db.host}:${k8screen-db.port}/${k8screen-db.db}
 
+k8screen-frontend:
+  base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
+  login-url: ${k8screen-frontend.base-url}/login
+  success-url: ${k8screen-frontend.base-url}/login
+
 spring:
   datasource:
     url: ${k8screen-db.url}
@@ -28,3 +33,20 @@ spring:
     baseline-description: "init"
     baseline-version: 0
     enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_GOOGLE_CLIENT_ID
+            client-secret: YOUR_GOOGLE_CLIENT_SECRET
+            scope: openid,profile,email
+            redirect-uri: http://localhost:5173/login
+            authorization-grant-type: authorization_code
+            client-name: Google
+        provider:
+          google:
+            token-uri: https://oauth2.googleapis.com/token
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs

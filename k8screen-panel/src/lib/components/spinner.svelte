@@ -1,5 +1,5 @@
 <script>
-  export let size = '10'; // Spinner boyutu için varsayılan sınıf
+  export let size = '10';
 </script>
 
 <div class={`flex items-center justify-center h-${size} w-${size}`}>
@@ -15,7 +15,3 @@
     <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75" />
   </svg>
 </div>
-
-<style>
-  /* Dilerseniz ek stil ekleyebilirsiniz */
-</style>

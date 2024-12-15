@@ -1,8 +1,10 @@
 package io.k8screen.backend.config;
 
 import io.k8screen.backend.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,10 +27,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
+  @Value("${k8screen-frontend.login-url}")
+  private String loginURL;
+
+  @Value("${k8screen-frontend.success-url}")
+  private String apiSuccessURL;
+
   private final JwtUtil jwtUtil;
   private final CustomUserDetailsService customUserDetailsService;
 
-  public SecurityConfig(final @NotNull JwtUtil jwtUtil, final @NotNull CustomUserDetailsService customUserDetailsService) {
+  public SecurityConfig(
+      final @NotNull JwtUtil jwtUtil,
+      final @NotNull CustomUserDetailsService customUserDetailsService) {
     this.jwtUtil = jwtUtil;
     this.customUserDetailsService = customUserDetailsService;
   }
@@ -43,14 +53,39 @@ public class SecurityConfig {
                 authorizeRequests
                     .requestMatchers(
                         HttpMethod.POST,
-                        "/auth/register",
-                        "/auth/login")
+                        "/api/auth/register",
+                        "/api/auth/login",
+                        "/api/auth/google/tokens")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/auth/access-token")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-      .authenticationProvider(authenticationProvider())
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/api/auth/logout")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                    .logoutSuccessHandler(
+                        (request, response, authentication) -> {
+                          response.setStatus(HttpServletResponse.SC_OK);
+                          response.getWriter().write("Logout successful");
+                          response.sendRedirect(this.loginURL);
+                        }))
+        .authenticationProvider(this.authenticationProvider())
         .addFilterBefore(
-            new JwtAuthenticationFilter(this.jwtUtil, this.customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+            new JwtAuthenticationFilter(this.jwtUtil, this.customUserDetailsService),
+            UsernamePasswordAuthenticationFilter.class)
+        .oauth2Login(
+            oauth2 -> {
+              oauth2.defaultSuccessUrl("http://localhost:5173/login");
+              oauth2.successHandler(
+                  (request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.sendRedirect(this.apiSuccessURL);
+                  });
+            });
 
     return http.build();
   }
@@ -77,20 +112,21 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+  public AuthenticationManager authenticationManager(
+      final @NotNull AuthenticationConfiguration config) throws Exception {
     return config.getAuthenticationManager();
   }
 
   @Bean
-  public PasswordEncoder passwordEncoder(){
+  public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
   @Bean
-  public AuthenticationProvider authenticationProvider(){
-    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-    authenticationProvider.setUserDetailsService(customUserDetailsService);
-    authenticationProvider.setPasswordEncoder(passwordEncoder());
+  public AuthenticationProvider authenticationProvider() {
+    final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    authenticationProvider.setUserDetailsService(this.customUserDetailsService);
+    authenticationProvider.setPasswordEncoder(this.passwordEncoder());
     return authenticationProvider;
   }
-
 }
