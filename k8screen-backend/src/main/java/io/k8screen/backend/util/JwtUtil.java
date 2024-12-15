@@ -67,17 +67,17 @@ public class JwtUtil {
     final Date expirationDate = Date.from(zonedDateTime.toInstant());
 
     return Jwts.builder()
-        .header()
-        .add(
-            Map.of(
-                "alg", "HS256",
-                "typ", "JWT"))
-        .and()
-        .claims(claims)
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(expirationDate)
-        .signWith(this.getSignKey(signKey))
-        .compact();
+      .header()
+      .add(
+        Map.of(
+          "alg", "HS256",
+          "typ", "JWT"))
+      .and()
+      .claims(claims)
+      .issuedAt(new Date(System.currentTimeMillis()))
+      .expiration(expirationDate)
+      .signWith(this.getSignKey(signKey))
+      .compact();
   }
 
   public @NotNull String generateAccessToken(final @NotNull String username) {

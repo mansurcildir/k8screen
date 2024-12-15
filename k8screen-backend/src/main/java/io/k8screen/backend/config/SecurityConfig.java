@@ -3,6 +3,8 @@ package io.k8screen.backend.config;
 import io.k8screen.backend.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -56,11 +58,13 @@ public class SecurityConfig {
                         "/api/auth/register",
                         "/api/auth/login",
                         "/api/auth/google/tokens")
+
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/auth/access-token")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
+
         .logout(
             logout ->
                 logout

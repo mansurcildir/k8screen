@@ -45,7 +45,7 @@ public class AuthService {
       return Map.of(
           "access_token", accessToken,
           "refresh_token", refreshToken);
-
+      
     } else {
       throw new BadCredentialsException("Username or password is invalid");
     }
