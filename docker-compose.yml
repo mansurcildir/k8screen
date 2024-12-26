@@ -20,7 +20,6 @@ services:
 volumes:
   k8screen-postgres:
     driver: local
-  pgadmin:
 
 networks:
   k8screen:
