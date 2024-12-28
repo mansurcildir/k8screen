@@ -8,12 +8,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 public class CustomSuccessHandler implements AuthenticationSuccessHandler {
+  @Value("${k8screen-frontend.success-url}")
+  private String apiSuccessURL;
+
   private final UserService userService;
 
   public CustomSuccessHandler(final @NotNull UserService userService) {
@@ -29,6 +33,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     if (authentication.getPrincipal() instanceof DefaultOAuth2User) {
       final DefaultOAuth2User userDetails = (DefaultOAuth2User) authentication.getPrincipal();
       final String username = userDetails.getAttribute("email");
+      System.out.println(username);
 
       try {
         this.userService.findByUsername(username);
@@ -37,8 +42,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
             UserForm.builder().username(username).email(username).password("dummy").build();
         this.userService.create(userForm);
       }
-
-      new DefaultRedirectStrategy().sendRedirect(request, response, "/api/auth/success");
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.sendRedirect(this.apiSuccessURL);
     }
   }
 }

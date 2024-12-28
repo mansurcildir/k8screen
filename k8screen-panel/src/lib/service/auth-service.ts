@@ -2,7 +2,7 @@ import type { LoginReq } from "$lib/model/user/LoginReq";
 import type { UserForm } from "$lib/model/user/UserForm";
 import { SPRING_BASE_URL } from "$lib/utils/utils";
 import { applyGetRequest, applyGetRequestOptional, applyPostRequest } from "./http-request";
-import { checkTokensExist, clearTokens, getAllTokens } from "./storage-manager";
+import { checkTokensExist, clearTokens, getAllTokens, setTokens } from "./storage-manager";
 import { isTokenExpired } from "./token-decoder";
 
 export const authAPI = {
@@ -17,10 +17,9 @@ export const authAPI = {
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
-
-  loginGoogle: async (): Promise<{ access_token: string, refresh_token: string }> => {
+  loginGoogle: async (body: {code: string}): Promise<{ access_token: string, refresh_token: string }> => {
     const url = `${SPRING_BASE_URL}/api/auth/login/google`;
-    return await (await applyGetRequest(url)).json();
+    return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
   
   logout: async (): Promise<string> => {
@@ -45,13 +44,24 @@ export const authAPI = {
     })
   },
 
-  authenticate: async (): Promise<boolean> => {
+  authenticate: async (code: string | null): Promise<boolean> => {
     const tokens = getAllTokens();
 
     if (!tokens.accessToken || !tokens.refreshToken) {
-      console.error('Access Token or Refresh Token is not provided');
+
+      if(code) {
+        console.log(code)
+        authAPI.loginGoogle({code: code})
+        .then((data) => {
+          setTokens(data.access_token, data.refresh_token);
+          window.location.href = "/";
+        })
+        return true;
+      }
+
       return unAuthorize();
     }
+
     if (isTokenExpired(tokens.accessToken)) {
       if (isTokenExpired(tokens.refreshToken)) {
         console.error('Refresh Token is expired');
@@ -73,6 +83,5 @@ export const authAPI = {
 
 const unAuthorize = () => {
   clearTokens();
-  window.location.href = "/login";
   return false;
 }

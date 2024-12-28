@@ -10,6 +10,7 @@ CREATE TABLE "users" (
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255),
+    picture TEXT,
     enabled BOOLEAN DEFAULT TRUE NOT NULL
 );
 

@@ -33,7 +33,7 @@
 		.then((user: UserItem) => {
 			data.user.name = user.username;
 			data.user.email = user.email;
-			data.user.avatar = "/k8s-logo.png";
+			data.user.avatar = user.picture || "/k8s-logo.png";
 		})
 	}
 

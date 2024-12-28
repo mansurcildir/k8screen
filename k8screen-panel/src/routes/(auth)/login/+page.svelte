@@ -1,12 +1,21 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import Label from "$lib/components/ui/label/label.svelte";
   import type { LoginReq } from "$lib/model/user/LoginReq";
   import { authAPI } from "$lib/service/auth-service";
   import { setTokens } from "$lib/service/storage-manager";
+  import { onMount } from "svelte";
 
   let loading = false;
+
+
+  onMount(async () => {
+    const code = new URLSearchParams(window.location.search).get('code');
+    await authAPI
+      .authenticate(code)
+  });
 
   const userForm: LoginReq = {
     username: "",
@@ -27,7 +36,6 @@
   const loginGoogle = () => {
     loading = true;
     window.location.href = "http://localhost:8080/oauth2/authorization/google";
-
   };
 </script>
 

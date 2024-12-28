@@ -57,7 +57,7 @@ public class SecurityConfig {
                         HttpMethod.POST,
                         "/api/auth/register",
                         "/api/auth/login",
-                        "/api/auth/google/tokens")
+                        "/api/auth/login/google")
 
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/auth/access-token")
@@ -83,12 +83,7 @@ public class SecurityConfig {
             UsernamePasswordAuthenticationFilter.class)
         .oauth2Login(
             oauth2 -> {
-              oauth2.defaultSuccessUrl("http://localhost:5173/login");
-              oauth2.successHandler(
-                  (request, response, authentication) -> {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.sendRedirect(this.apiSuccessURL);
-                  });
+              oauth2.defaultSuccessUrl(this.apiSuccessURL);
             });
 
     return http.build();
