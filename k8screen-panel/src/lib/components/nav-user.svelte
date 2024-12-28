@@ -86,8 +86,7 @@
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
         <DropdownMenu.Item>
-          <!-- <LogOut />
-					Log out -->
+          <!-- <LogOut /> Log out -->
           <button
             class="w-full text-start"
             type="button"
