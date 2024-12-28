@@ -25,4 +25,3 @@ public class KubernetesController {
     return ResponseEntity.status(HttpStatus.OK).body(nodes);
   }
 }
-
