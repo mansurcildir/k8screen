@@ -4,7 +4,7 @@
   import * as Table from '$lib/components/ui/table';
   import type { Deployment } from '$lib/model/Deployment';
   import { deploymentAPI } from '$lib/service/deployment-service';
-  import * as yaml from 'yaml';
+  import yaml from 'yaml';
 
   export let namespace;
   let loading = false;

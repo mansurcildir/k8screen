@@ -20,22 +20,22 @@ public class KubernetesConfig {
 
   @Bean
   public CoreV1Api coreV1Api() throws IOException {
-    return new CoreV1Api(apiClient());
+    return new CoreV1Api(this.apiClient());
   }
 
   @Bean
   public AppsV1Api appsV1Api() throws IOException {
-    return new AppsV1Api(apiClient());
+    return new AppsV1Api(this.apiClient());
   }
 
   @Bean
   public PodLogs podLogs() throws IOException {
-    return new PodLogs(apiClient());
+    return new PodLogs(this.apiClient());
   }
 
   @Bean
   public Exec exec() throws IOException {
-    return new Exec(apiClient());
+    return new Exec(this.apiClient());
   }
 
   @Bean
