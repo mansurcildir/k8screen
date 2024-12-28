@@ -43,3 +43,4 @@ public class KubernetesConfig {
     return new RestTemplate();
   }
 }
+
