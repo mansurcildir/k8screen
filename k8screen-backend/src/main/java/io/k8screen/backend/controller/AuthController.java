@@ -6,7 +6,6 @@ import io.k8screen.backend.service.AuthService;
 import io.k8screen.backend.service.UserService;
 import io.k8screen.backend.util.JwtUtil;
 import jakarta.validation.Valid;
-
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,11 +52,10 @@ public class AuthController {
   }
 
   @PostMapping("/login/google")
-  public ResponseEntity<Object> loginGoogle(
-    final @RequestBody @NotNull Map<String, String> body) {
+  public ResponseEntity<Object> loginGoogle(final @RequestBody @NotNull Map<String, String> body) {
 
     try {
-      Map<String, Object> tokens = this.authService.loginGoogle(body.get("code"));
+      final Map<String, Object> tokens = this.authService.loginGoogle(body.get("code"));
       return ResponseEntity.ok(tokens);
     } catch (HttpClientErrorException e) {
       return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAs(Map.class));
