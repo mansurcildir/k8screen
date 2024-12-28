@@ -1,6 +1,6 @@
-import type { Deployment } from "$lib/model/Deployment";
-import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from "./http-request";
+import type { Deployment } from '$lib/model/Deployment';
+import { SPRING_BASE_URL } from '$lib/utils/utils';
+import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from './http-request';
 
 export const deploymentAPI = {
   getAllDeployments: async (namespace: string): Promise<Deployment[]> => {
@@ -17,4 +17,4 @@ export const deploymentAPI = {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/deployments/${name}`;
     return await (await applyPutRequestWithBearerHeader(url, JSON.stringify(body))).json();
   }
-}
+};

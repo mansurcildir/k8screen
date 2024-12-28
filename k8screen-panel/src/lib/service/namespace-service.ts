@@ -1,5 +1,5 @@
-import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequestWithBearerHeader, applyPostRequestWithBearerHeader } from "./http-request";
+import { SPRING_BASE_URL } from '$lib/utils/utils';
+import { applyGetRequestWithBearerHeader, applyPostRequestWithBearerHeader } from './http-request';
 
 export const namespaceAPI = {
   getAllNamespaces: async (): Promise<string[]> => {
@@ -11,4 +11,4 @@ export const namespaceAPI = {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces`;
     return await (await applyPostRequestWithBearerHeader(url, body)).json();
   }
-}
+};

@@ -1,6 +1,6 @@
-import type { StatefulSet } from "$lib/model/StatefulSet";
-import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from "./http-request";
+import type { StatefulSet } from '$lib/model/StatefulSet';
+import { SPRING_BASE_URL } from '$lib/utils/utils';
+import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from './http-request';
 
 export const statefulSetAPI = {
   getAllStatefulSets: async (namespace: string): Promise<StatefulSet[]> => {
@@ -17,4 +17,4 @@ export const statefulSetAPI = {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/stateful-sets/${name}`;
     return await (await applyPutRequestWithBearerHeader(url, JSON.stringify(body))).json();
   }
-}
+};

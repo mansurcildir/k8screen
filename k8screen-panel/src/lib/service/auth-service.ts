@@ -1,27 +1,27 @@
-import type { LoginReq } from "$lib/model/user/LoginReq";
-import type { UserForm } from "$lib/model/user/UserForm";
-import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequest, applyGetRequestOptional, applyPostRequest } from "./http-request";
-import { checkTokensExist, clearTokens, getAllTokens, setTokens } from "./storage-manager";
-import { isTokenExpired } from "./token-decoder";
+import type { LoginReq } from '$lib/model/user/LoginReq';
+import type { UserForm } from '$lib/model/user/UserForm';
+import { SPRING_BASE_URL } from '$lib/utils/utils';
+import { applyGetRequest, applyGetRequestOptional, applyPostRequest } from './http-request';
+import { checkTokensExist, clearTokens, getAllTokens, setTokens } from './storage-manager';
+import { isTokenExpired } from './token-decoder';
 
 export const authAPI = {
-  register: async (body: UserForm): Promise<{ access_token: string, refresh_token: string }> => {
+  register: async (body: UserForm): Promise<{ access_token: string; refresh_token: string }> => {
     const url = `${SPRING_BASE_URL}/api/auth/register`;
-    console.log(body)
+    console.log(body);
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
-  login: async (body: LoginReq): Promise<{ access_token: string, refresh_token: string }> => {
+  login: async (body: LoginReq): Promise<{ access_token: string; refresh_token: string }> => {
     const url = `${SPRING_BASE_URL}/api/auth/login`;
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
-  loginGoogle: async (body: {code: string}): Promise<{ access_token: string, refresh_token: string }> => {
+  loginGoogle: async (body: { code: string }): Promise<{ access_token: string; refresh_token: string }> => {
     const url = `${SPRING_BASE_URL}/api/auth/login/google`;
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
-  
+
   logout: async (): Promise<string> => {
     const url = `${SPRING_BASE_URL}/api/auth/logout`;
     return await (await applyGetRequest(url)).text();
@@ -37,25 +37,22 @@ export const authAPI = {
   },
 
   refreshToken: async (refreshToken: string) => {
-    return authAPI.getAccessToken(refreshToken)
-    .then((data: { access_token: string }) => {
-      localStorage.setItem("access-token", data.access_token);
+    return authAPI.getAccessToken(refreshToken).then((data: { access_token: string }) => {
+      localStorage.setItem('access-token', data.access_token);
       return data;
-    })
+    });
   },
 
   authenticate: async (code: string | null): Promise<boolean> => {
     const tokens = getAllTokens();
 
     if (!tokens.accessToken || !tokens.refreshToken) {
-
-      if(code) {
-        console.log(code)
-        authAPI.loginGoogle({code: code})
-        .then((data) => {
+      if (code) {
+        console.log(code);
+        authAPI.loginGoogle({ code: code }).then((data) => {
           setTokens(data.access_token, data.refresh_token);
-          window.location.href = "/";
-        })
+          window.location.href = '/';
+        });
         return true;
       }
 
@@ -78,10 +75,9 @@ export const authAPI = {
 
     return true;
   }
-
-}
+};
 
 const unAuthorize = () => {
   clearTokens();
   return false;
-}
+};

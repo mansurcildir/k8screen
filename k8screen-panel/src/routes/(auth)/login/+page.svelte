@@ -1,41 +1,39 @@
 <script lang="ts">
-  import { page } from "$app/stores";
-  import { Button } from "$lib/components/ui/button/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
-  import Label from "$lib/components/ui/label/label.svelte";
-  import type { LoginReq } from "$lib/model/user/LoginReq";
-  import { authAPI } from "$lib/service/auth-service";
-  import { setTokens } from "$lib/service/storage-manager";
-  import { onMount } from "svelte";
+  import { page } from '$app/stores';
+  import { Button } from '$lib/components/ui/button/index.js';
+  import { Input } from '$lib/components/ui/input/index.js';
+  import Label from '$lib/components/ui/label/label.svelte';
+  import type { LoginReq } from '$lib/model/user/LoginReq';
+  import { authAPI } from '$lib/service/auth-service';
+  import { setTokens } from '$lib/service/storage-manager';
+  import { onMount } from 'svelte';
 
   let loading = false;
 
-
   onMount(async () => {
     const code = new URLSearchParams(window.location.search).get('code');
-    await authAPI
-      .authenticate(code)
+    await authAPI.authenticate(code);
   });
 
   const userForm: LoginReq = {
-    username: "",
-    password: "",
+    username: '',
+    password: ''
   };
 
   const login = () => {
     loading = true;
     authAPI
       .login(userForm)
-      .then((data: { access_token: string, refresh_token: string }) => {
+      .then((data: { access_token: string; refresh_token: string }) => {
         setTokens(data.access_token, data.refresh_token);
-        window.location.href = "/namespaces";
+        window.location.href = '/namespaces';
       })
       .finally(() => (loading = false));
   };
 
   const loginGoogle = () => {
     loading = true;
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   };
 </script>
 
@@ -46,35 +44,19 @@
         <div class="mx-auto grid w-[350px] gap-6">
           <div class="grid gap-2 text-center">
             <h1 class="text-3xl font-bold">Login</h1>
-            <p class="text-muted-foreground text-balance">
-              Login to your account
-            </p>
+            <p class="text-muted-foreground text-balance">Login to your account</p>
           </div>
           <div class="grid gap-4">
             <div class="grid gap-2">
               <Label for="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                bind:value={userForm.username}
-                placeholder="username"
-                required
-              />
+              <Input id="username" type="text" bind:value={userForm.username} placeholder="username" required />
             </div>
             <div class="grid gap-2">
               <div class="flex items-center">
                 <Label for="password">Password</Label>
-                <a href="##" class="ml-auto inline-block text-sm underline">
-                  Forgot your password?
-                </a>
+                <a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="******"
-                bind:value={userForm.password}
-                required
-              />
+              <Input id="password" type="password" placeholder="******" bind:value={userForm.password} required />
             </div>
             <Button type="submit" class="w-full" onclick={() => login()}>Login</Button>
             <Button variant="outline" class="w-full" onclick={() => loginGoogle()}>Login with Google</Button>
@@ -95,8 +77,8 @@
               stroke="currentColor"
               stroke-width="2"
             >
-              <circle cx="12" cy="12" r="10" class="opacity-25" />
-              <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75" />
+              <circle cx="12" cy="12" r="10" class="opacity-25"></circle>
+              <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75"></path>
             </svg>
           </div>
         </div>

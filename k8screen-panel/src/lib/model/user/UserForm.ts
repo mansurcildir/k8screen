@@ -1,6 +1,6 @@
 export interface UserForm {
-  username: string,
-  email: string,
-  password: string,
-  picture: string
+  username: string;
+  email: string;
+  password: string;
+  picture: string;
 }

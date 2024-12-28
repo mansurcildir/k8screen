@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { authAPI } from "$lib/service/auth-service";
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { authAPI } from '$lib/service/auth-service';
 
   let isAuthenticated: boolean | undefined = false;
   let isLoading = true;

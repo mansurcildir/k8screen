@@ -1,6 +1,10 @@
-import type { Pod } from "$lib/model/Pod";
-import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequestWithBearerHeader, applyPostRequestWithBearerHeader, applyPutRequestWithBearerHeader } from "./http-request";
+import type { Pod } from '$lib/model/Pod';
+import { SPRING_BASE_URL } from '$lib/utils/utils';
+import {
+  applyGetRequestWithBearerHeader,
+  applyPostRequestWithBearerHeader,
+  applyPutRequestWithBearerHeader
+} from './http-request';
 
 export const podAPI = {
   getAllPods: async (namespace: string): Promise<Pod[]> => {
@@ -27,4 +31,4 @@ export const podAPI = {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/pods/${name}/exec`;
     return await (await applyPostRequestWithBearerHeader(url, JSON.stringify(cmd))).text();
   }
-}
+};
