@@ -14,28 +14,28 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class KubernetesConfig {
 
+  private ApiClient apiClient() throws IOException {
+    return Config.defaultClient();
+  }
+
   @Bean
   public CoreV1Api coreV1Api() throws IOException {
-    final ApiClient client = Config.defaultClient();
-    return new CoreV1Api(client);
+    return new CoreV1Api(apiClient());
   }
 
   @Bean
   public AppsV1Api appsV1Api() throws IOException {
-    final ApiClient client = Config.defaultClient();
-    return new AppsV1Api(client);
+    return new AppsV1Api(apiClient());
   }
 
   @Bean
   public PodLogs podLogs() throws IOException {
-    final ApiClient client = Config.defaultClient();
-    return new PodLogs(client);
+    return new PodLogs(apiClient());
   }
 
   @Bean
   public Exec exec() throws IOException {
-    final ApiClient client = Config.defaultClient();
-    return new Exec(client);
+    return new Exec(apiClient());
   }
 
   @Bean
