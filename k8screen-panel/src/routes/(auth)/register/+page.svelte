@@ -78,9 +78,9 @@
         </div>
       {/if}
     </div>
-    <div class="bg-muted hidden lg:block">
+    <div class="bg-muted hidden lg:block p-60">
       <img
-        src="/placeholder.svg"
+        src="/k8s-logo.png"
         alt="placeholder"
         width="1920"
         height="1080"

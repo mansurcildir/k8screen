@@ -1,12 +1,21 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import Label from "$lib/components/ui/label/label.svelte";
   import type { LoginReq } from "$lib/model/user/LoginReq";
   import { authAPI } from "$lib/service/auth-service";
   import { setTokens } from "$lib/service/storage-manager";
+  import { onMount } from "svelte";
 
   let loading = false;
+
+
+  onMount(async () => {
+    const code = new URLSearchParams(window.location.search).get('code');
+    await authAPI
+      .authenticate(code)
+  });
 
   const userForm: LoginReq = {
     username: "",
@@ -23,9 +32,14 @@
       })
       .finally(() => (loading = false));
   };
+
+  const loginGoogle = () => {
+    loading = true;
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
 </script>
 
-<form on:submit|preventDefault={login}>
+<form>
   <div class="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
     <div class="flex items-center justify-center py-12">
       {#if !loading}
@@ -62,8 +76,8 @@
                 required
               />
             </div>
-            <Button type="submit" class="w-full">Login</Button>
-            <Button variant="outline" class="w-full">Login with Google</Button>
+            <Button type="submit" class="w-full" onclick={() => login()}>Login</Button>
+            <Button variant="outline" class="w-full" onclick={() => loginGoogle()}>Login with Google</Button>
           </div>
           <div class="mt-4 text-center text-sm">
             Don&apos;t you have an account?
@@ -88,9 +102,9 @@
         </div>
       {/if}
     </div>
-    <div class="bg-muted hidden lg:block">
+    <div class="bg-muted hidden lg:block p-60">
       <img
-        src="/placeholder.svg"
+        src="/k8s-logo.png"
         alt="placeholder"
         width="1920"
         height="1080"

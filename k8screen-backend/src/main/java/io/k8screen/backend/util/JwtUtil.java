@@ -25,9 +25,9 @@ public class JwtUtil {
       "42DCCF1E0B06EF601CF9DCDA0ED3877F4F0DB32FAE243DC5F0C681DB09AFB454";
 
   public @NotNull Object getClaim(
-      @NotNull final String signKey, final @NotNull String claimKey, final @NotNull String token) {
+      final @NotNull String claimKey, final @NotNull String token) {
 
-    return this.extractClaim(token, signKey, claims -> claims.get(claimKey, String.class));
+    return this.extractClaim(token, claims -> claims.get(claimKey, String.class));
   }
 
   public @NotNull String getAccessClaim(final @NotNull String token) {
@@ -55,6 +55,21 @@ public class JwtUtil {
         .build()
         .parseSignedClaims(token)
         .getPayload();
+  }
+
+  public @NotNull <T> T extractClaim(
+    final @NotNull String token,
+    final @NotNull Function<Claims, T> claimsResolver) {
+    final Claims claims = this.extractAllClaims(token);
+    return claimsResolver.apply(claims);
+  }
+
+  public @NotNull Claims extractAllClaims(
+    final @NotNull String token) {
+    return Jwts.parser()
+      .build()
+      .parseSignedClaims(token)
+      .getPayload();
   }
 
   public @NotNull String generateToken(

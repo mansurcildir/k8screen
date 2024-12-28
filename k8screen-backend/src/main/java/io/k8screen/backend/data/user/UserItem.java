@@ -12,4 +12,5 @@ public record UserItem(
     @NotNull @NotEmpty String username,
     @NotNull @NotEmpty String password,
     @NotNull @NotEmpty String email,
+    String picture,
     @NotNull @NotEmpty Set<Role> roles) {}

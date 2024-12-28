@@ -15,8 +15,8 @@
   import Moon from "lucide-svelte/icons/moon";
   import { toggleMode } from "mode-watcher";
   import { Button } from "$lib/components/ui/button/index.js";
-    import { userAPI } from '$lib/service/user-service';
-    import type { UserItem } from '$lib/model/user/UserItem';
+  import { userAPI } from '$lib/service/user-service';
+  import type { UserItem } from '$lib/model/user/UserItem';
 
 	let breadcrumbs = extractBreadcrumbs($page.url.pathname);
 
@@ -33,7 +33,7 @@
 		.then((user: UserItem) => {
 			data.user.name = user.username;
 			data.user.email = user.email;
-			data.user.avatar = "/k8s-logo.png";
+			data.user.avatar = user.picture || "/k8s-logo.png";
 		})
 	}
 

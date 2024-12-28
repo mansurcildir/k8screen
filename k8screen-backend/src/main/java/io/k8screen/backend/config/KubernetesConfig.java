@@ -9,6 +9,7 @@ import io.kubernetes.client.util.Config;
 import java.io.IOException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class KubernetesConfig {
@@ -35,5 +36,10 @@ public class KubernetesConfig {
   public Exec exec() throws IOException {
     final ApiClient client = Config.defaultClient();
     return new Exec(client);
+  }
+
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
   }
 }

@@ -1,10 +1,12 @@
 package io.k8screen.backend.config;
 
 import io.k8screen.backend.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +29,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
+  @Value("${k8screen-frontend.login-url}")
+  private String loginURL;
+
+  @Value("${k8screen-frontend.success-url}")
+  private String apiSuccessURL;
+
   private final JwtUtil jwtUtil;
   private final CustomUserDetailsService customUserDetailsService;
 
@@ -45,24 +53,38 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login")
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/auth/register",
+                        "/api/auth/login",
+                        "/api/auth/login/google")
+
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/auth/access-token")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-        .logout(logout -> logout
-        .logoutUrl("/api/auth/logout")
-        .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID")
-        .logoutSuccessHandler((request, response, authentication) -> {
-          response.setStatus(HttpServletResponse.SC_OK);
-          response.getWriter().write("Logout successful");
-        }))
+
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/api/auth/logout")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                    .logoutSuccessHandler(
+                        (request, response, authentication) -> {
+                          response.setStatus(HttpServletResponse.SC_OK);
+                          response.getWriter().write("Logout successful");
+                          response.sendRedirect(this.loginURL);
+                        }))
         .authenticationProvider(this.authenticationProvider())
         .addFilterBefore(
             new JwtAuthenticationFilter(this.jwtUtil, this.customUserDetailsService),
-            UsernamePasswordAuthenticationFilter.class);
+            UsernamePasswordAuthenticationFilter.class)
+        .oauth2Login(
+            oauth2 -> {
+              oauth2.defaultSuccessUrl(this.apiSuccessURL);
+            });
 
     return http.build();
   }

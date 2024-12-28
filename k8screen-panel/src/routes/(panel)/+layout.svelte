@@ -8,7 +8,7 @@
 
   onMount(async () => {
     await authAPI
-      .authenticate()
+      .authenticate(null)
       .then((data) => {
         isAuthenticated = data;
       })

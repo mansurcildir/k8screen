@@ -67,21 +67,21 @@
 						<Collapsible.Content>
 							{#if mainItem.items}
 								<Sidebar.MenuSub>
+									{#if (!visible)}
 									<Sidebar.MenuSubItem>
 										<Sidebar.MenuSubButton isActive={$page.params.namespace == "Add namespace"}>
 											{#snippet child({ props })}
-
-											<button onclick={() => visible = true} {...props}>
+											<button style="display: block; width: 100%" onclick={() => visible = true} {...props}>
 												<div class="flex justify-between items-center w-full">
-													{"Add namespace"} 
-													<Plus class="size-5 hidden group-hover:inline-flex"/>
+													<span class="text-left">Add namespace</span> 
+													<Plus class="size-5 hidden group-hover:inline-flex ml-auto"/>
 												</div>
 											</button>
 											{/snippet}
 										</Sidebar.MenuSubButton>
 									</Sidebar.MenuSubItem>
 
-									{#if (visible)}
+									{:else}
 									<Sidebar.MenuSubItem>
 										<Sidebar.MenuSubButton>
 											{#snippet child({ props })}
@@ -105,18 +105,19 @@
 									</Sidebar.MenuSubItem>
 									{/if}
 								
-
 									{#each mainItem.items as subItem (subItem.title)}
-										<Sidebar.MenuSubItem>
-											<Sidebar.MenuSubButton isActive={$page.params.namespace == subItem.title}>
-												{#snippet child({ props })}
-													<a href={subItem.url} {...props}>
-														<span>{subItem.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuSubButton>
-										</Sidebar.MenuSubItem>
-									{/each}
+									<Sidebar.MenuSubItem>
+										<Sidebar.MenuSubButton isActive={$page.params.namespace == subItem.title}>
+											{#snippet child({ props })}
+												<a href={subItem.url} {...props}>
+													<span>{subItem.title}</span>
+												</a>
+											{/snippet}
+										</Sidebar.MenuSubButton>
+									</Sidebar.MenuSubItem>
+							  	{/each}
+
+									
 								</Sidebar.MenuSub>
 							{/if}
 						</Collapsible.Content>

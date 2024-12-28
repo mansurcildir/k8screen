@@ -20,10 +20,8 @@ public class UserController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity<UserItem> getProfile(
-    final @NotNull Authentication authentication) {
+  public ResponseEntity<UserItem> getProfile(final @NotNull Authentication authentication) {
     final var username = authentication.getName();
     return ResponseEntity.status(HttpStatus.OK).body(this.userService.findByUsername(username));
   }
-
 }
