@@ -97,8 +97,8 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => option = OptionTerminal.DETAIL}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => option = OptionTerminal.EDIT}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -112,13 +112,13 @@
   </div>
 
   <Terminal
-    type='deployment'
-    {getDetails}
-    {updateItem}
-    {k8sItem}
-    {option}
-    {details}
-    {loading}
-    {open}
+    type="deployment"
+    getDetails={getDetails}
+    updateItem={updateItem}
+    k8sItem={k8sItem}
+    option={option}
+    details={details}
+    loading={loading}
+    open={open}
   />
 </div>

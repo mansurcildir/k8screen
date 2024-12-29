@@ -120,8 +120,8 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => option = OptionTerminal.DETAIL}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => option = OptionTerminal.EDIT}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -135,16 +135,16 @@
   </div>
 
   <Terminal
-    type='pod'
-    {getDetails}
-    {updateItem}
-    {getLogs}
-    {exec}
-    {k8sItem}
-    {option}
-    {details}
-    {logs}
-    {loading}
-    {open}
+    type="pod"
+    getDetails={getDetails}
+    updateItem={updateItem}
+    getLogs={getLogs}
+    exec={exec}
+    k8sItem={k8sItem}
+    option={option}
+    details={details}
+    logs={logs}
+    loading={loading}
+    open={open}
   />
 </div>

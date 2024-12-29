@@ -101,7 +101,7 @@
   }
 </style>
 
-<Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar" {open}>
+<Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar" open={open}>
   <div class="flex items-center px-3 py-1 gap-2">
     <Collapsible.Trigger>
       <ChevronRight
@@ -128,12 +128,7 @@
           </Button>
         {/if}
 
-        <Button
-          variant="ghost"
-          class="ms-auto bg-muted rounded-lg p-2 h-auto"
-          aria-label="Playground"
-          onclick={detail}
-        >
+        <Button variant="ghost" class="ms-auto bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={detail}>
           <CodeXML class="size-5" />
         </Button>
 

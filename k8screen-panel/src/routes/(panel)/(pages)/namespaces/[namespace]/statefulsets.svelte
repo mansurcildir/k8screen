@@ -25,7 +25,7 @@
   $: if (namespace) {
     getAllStatefulSets();
   }
-  
+
   const load = (service: string) => {
     k8sItem = service;
     open = true;
@@ -98,8 +98,8 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => option = OptionTerminal.DETAIL}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => option = OptionTerminal.EDIT}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -113,13 +113,13 @@
   </div>
 
   <Terminal
-    type='stateful-set'
-    {getDetails}
-    {updateItem}
-    {k8sItem}
-    {option}
-    {details}
-    {loading}
-    {open}
+    type="stateful-set"
+    getDetails={getDetails}
+    updateItem={updateItem}
+    k8sItem={k8sItem}
+    option={option}
+    details={details}
+    loading={loading}
+    open={open}
   />
 </div>

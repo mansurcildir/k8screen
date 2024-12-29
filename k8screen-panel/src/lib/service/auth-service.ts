@@ -47,9 +47,8 @@ export const authAPI = {
     const tokens = getAllTokens();
     if (tokens.accessToken && tokens.refreshToken && isTokenExpired(tokens.accessToken)) {
       if (!isTokenExpired(tokens.refreshToken)) {
-        console.log(await authAPI.refreshToken(tokens.refreshToken))
-      }
-      else {
+        console.log(await authAPI.refreshToken(tokens.refreshToken));
+      } else {
         unAuthorize();
       }
     }
