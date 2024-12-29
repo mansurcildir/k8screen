@@ -11,7 +11,8 @@
   const userForm: UserForm = {
     username: '',
     email: '',
-    password: ''
+    password: '',
+    picture: ''
   };
 
   const register = () => {

@@ -2,10 +2,7 @@
   import { Label as LabelPrimitive } from 'bits-ui';
   import { cn } from '$lib/utils.js';
 
-  type $$Props = LabelPrimitive.Props;
-  type $$Events = LabelPrimitive.Events;
-
-  let className: $$Props['class'] = undefined;
+  let className = undefined;
   export { className as class };
 </script>
 

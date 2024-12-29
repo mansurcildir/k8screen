@@ -7,8 +7,9 @@
   let isLoading = true;
 
   onMount(async () => {
+    const code = new URLSearchParams(window.location.search).get('code');
     await authAPI
-      .authenticate(null)
+      .authenticate(code)
       .then((data) => {
         isAuthenticated = data;
       })
