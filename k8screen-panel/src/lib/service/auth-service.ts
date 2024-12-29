@@ -79,6 +79,6 @@ export const authAPI = {
 
 const unAuthorize = () => {
   clearTokens();
-  window.location.href = "/login";
+  window.location.href = '/login';
   return false;
 };

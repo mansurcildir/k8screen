@@ -23,7 +23,7 @@
 >
   {#snippet children({ checked })}
     <span class="absolute left-2 flex size-3.5 items-center justify-center">
-        <Check class={cn('size-4', !checked && 'text-transparent')} />
+      <Check class={cn('size-4', !checked && 'text-transparent')} />
     </span>
   {/snippet}
 </DropdownMenuPrimitive.CheckboxItem>
