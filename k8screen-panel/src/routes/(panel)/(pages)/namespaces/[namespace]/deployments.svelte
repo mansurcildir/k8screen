@@ -3,13 +3,17 @@
   import Terminal from '$lib/components/terminal.svelte';
   import * as Table from '$lib/components/ui/table';
   import type { Deployment } from '$lib/model/Deployment';
+  import { OptionTerminal } from '$lib/model/enum';
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import { deploymentAPI } from '$lib/service/deployment-service';
   import yaml from 'yaml';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
 
   export let namespace;
   let loading = false;
   let loadingTable = false;
-  let option: string = 'DETAILS';
+  let option: OptionTerminal;
   let details: string;
 
   let deployments: Deployment[] = [];
@@ -20,9 +24,10 @@
     getAllDeployments();
   }
 
-  const handleDeployment = (deployment: string) => {
+  const load = (deployment: string) => {
     k8sItem = deployment;
     open = true;
+    option = OptionTerminal.DETAIL;
     getDetails();
   };
 
@@ -62,6 +67,7 @@
           <Table.Head>UP-TO-DATE</Table.Head>
           <Table.Head>AVAILABLE</Table.Head>
           <Table.Head>AGE</Table.Head>
+          <Table.Head></Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -72,15 +78,32 @@
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
+            <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
           {#each deployments as deployment}
-            <Table.Row on:click={() => handleDeployment(deployment.name)} class="cursor-pointer">
+            <Table.Row on:click={() => load(deployment.name)} class="cursor-pointer">
               <Table.Cell>{deployment.name}</Table.Cell>
               <Table.Cell>{deployment.ready_replicas}/{deployment.total_replicas}</Table.Cell>
               <Table.Cell>{deployment.up_to_date}</Table.Cell>
               <Table.Cell>{deployment.available}</Table.Cell>
               <Table.Cell>{deployment.age}</Table.Cell>
+              <Table.Cell>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button class="p-2 h-auto" variant="ghost">
+                      <IconKebabMenu />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content align="end">
+                    <DropdownMenu.Group>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                    </DropdownMenu.Group>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Table.Cell>
             </Table.Row>
           {/each}
         {/if}
@@ -89,12 +112,13 @@
   </div>
 
   <Terminal
+    type="deployment"
+    getDetails={getDetails}
+    updateItem={updateItem}
     k8sItem={k8sItem}
     option={option}
     details={details}
     loading={loading}
     open={open}
-    getDetails={getDetails}
-    updateItem={updateItem}
   />
 </div>

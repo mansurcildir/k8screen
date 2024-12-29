@@ -1,3 +1,4 @@
+import { authAPI } from './auth-service';
 import { getBearerAccessTokenWithHeaderAttribute } from './storage-manager';
 
 export type HeadersCallback = () => { [key: string]: string };
@@ -79,6 +80,7 @@ const createDeleteRequest = (): RequestInit => {
 
 export const applyGetRequestWithBearerHeader = async (url: string) => {
   try {
+    authAPI.authorize();
     const response = await fetch(url, createGetRequestWithBearerHeader());
 
     if (!response.ok) {
@@ -94,6 +96,7 @@ export const applyGetRequestWithBearerHeader = async (url: string) => {
 
 export const applyPostRequestWithBearerHeader = async (url: string, body: string) => {
   try {
+    authAPI.authorize();
     return await fetch(url, createPostRequestWithBearerHeader(body));
   } catch (error) {
     console.error('Request failed', error);
@@ -103,6 +106,7 @@ export const applyPostRequestWithBearerHeader = async (url: string, body: string
 
 export const applyPutRequestWithBearerHeader = async (url: string, body: string) => {
   try {
+    authAPI.authorize();
     return await fetch(url, createPutRequestWithBearerHeader(body));
   } catch (error) {
     console.error('Request failed', error);
@@ -112,6 +116,7 @@ export const applyPutRequestWithBearerHeader = async (url: string, body: string)
 
 export const applyDeleteRequestWithBearerHeader = async (url: string) => {
   try {
+    authAPI.authorize();
     const response = await fetch(url, createDeleteRequestWithBearerHeader());
 
     if (!response.ok) {

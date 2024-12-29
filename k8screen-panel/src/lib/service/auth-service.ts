@@ -43,12 +43,24 @@ export const authAPI = {
     });
   },
 
+  authorize: async (): Promise<boolean> => {
+    const tokens = getAllTokens();
+    if (tokens.accessToken && tokens.refreshToken && isTokenExpired(tokens.accessToken)) {
+      if (!isTokenExpired(tokens.refreshToken)) {
+        console.log(await authAPI.refreshToken(tokens.refreshToken));
+      } else {
+        unAuthorize();
+      }
+    }
+
+    return true;
+  },
+
   authenticate: async (code: string | null): Promise<boolean> => {
     const tokens = getAllTokens();
 
     if (!tokens.accessToken || !tokens.refreshToken) {
       if (code) {
-        console.log(code);
         authAPI.loginGoogle({ code: code }).then((data) => {
           setTokens(data.access_token, data.refresh_token);
           window.location.href = '/';

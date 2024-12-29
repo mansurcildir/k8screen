@@ -1,16 +1,21 @@
 <script lang="ts">
   import Bar from '$lib/components/bar.svelte';
+  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Terminal from '$lib/components/terminal.svelte';
+  import Button from '$lib/components/ui/button/button.svelte';
 
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Table from '$lib/components/ui/table';
+  import { OptionTerminal } from '$lib/model/enum';
   import type { StatefulSet } from '$lib/model/StatefulSet';
   import { statefulSetAPI } from '$lib/service/statefulset-service';
+  import { onMount } from 'svelte';
   import * as yaml from 'yaml';
 
   export let namespace;
   let loading = true;
   let loadingTable = false;
-  let option: string = 'DETAILS';
+  let option: OptionTerminal;
   let details: string;
 
   let statefulSets: StatefulSet[] = [];
@@ -21,9 +26,10 @@
     getAllStatefulSets();
   }
 
-  const handleStatefulSet = (service: string) => {
+  const load = (service: string) => {
     k8sItem = service;
     open = true;
+    option = OptionTerminal.DETAIL;
     getDetails();
   };
 
@@ -61,6 +67,7 @@
           <Table.Head>NAME</Table.Head>
           <Table.Head>READY</Table.Head>
           <Table.Head>AGE</Table.Head>
+          <Table.Head></Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -69,18 +76,35 @@
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
+            <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
           {#each statefulSets as statefulSet}
             <Table.Row
               on:click={() => {
-                handleStatefulSet(statefulSet.name);
+                load(statefulSet.name);
               }}
               class="cursor-pointer"
             >
               <Table.Cell>{statefulSet.name}</Table.Cell>
               <Table.Cell>{statefulSet.ready_replicas}/{statefulSet.total_replicas}</Table.Cell>
               <Table.Cell>{statefulSet.age}</Table.Cell>
+              <Table.Cell>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button class="p-2 h-auto" variant="ghost">
+                      <IconKebabMenu />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content align="end">
+                    <DropdownMenu.Group>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                    </DropdownMenu.Group>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Table.Cell>
             </Table.Row>
           {/each}
         {/if}
@@ -89,12 +113,13 @@
   </div>
 
   <Terminal
+    type="stateful-set"
+    getDetails={getDetails}
+    updateItem={updateItem}
     k8sItem={k8sItem}
     option={option}
     details={details}
     loading={loading}
     open={open}
-    getDetails={getDetails}
-    updateItem={updateItem}
   />
 </div>

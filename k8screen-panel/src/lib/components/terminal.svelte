@@ -8,24 +8,25 @@
   import Code from 'lucide-svelte/icons/code';
   import Logs from 'lucide-svelte/icons/logs';
   import Save from 'lucide-svelte/icons/save';
+  import { OptionTerminal } from '$lib/model/enum';
 
   export let k8sItem: string;
-  export let option: string;
+  export let option: OptionTerminal = OptionTerminal.DEFAULT;
   export let details: string = '';
   export let logs: string = '';
   export let execReq: string = '';
   export let execRes: string = '';
   export let loading: boolean = false;
   export let open: boolean = false;
-  export let isPod: boolean = false;
   export let containerHeight = 300;
+  export let type: 'deployment' | 'pod' | 'service' | 'secret' | 'stateful-set' | 'none' = 'none';
 
   export let getDetails: () => Promise<string>;
   export let updateItem: (editedItem: string) => Promise<any>;
   export let getLogs: () => Promise<string> = async () => '';
   export let exec: (execReq: string) => Promise<string> = async () => '';
 
-  $: if (details) {
+  $: {
     editedItem = details;
   }
 
@@ -34,21 +35,21 @@
   const maxContainerHeight = 500;
   const minContainerHeight = 100;
 
-  const handleDetails = async () => {
+  const detail = async () => {
     loading = true;
-    option = 'DETAILS';
+    option = OptionTerminal.DETAIL;
     details = await getDetails();
     loading = false;
   };
 
-  const handleEdit = async () => {
+  const edit = async () => {
     loading = true;
-    option = 'EDIT';
+    option = OptionTerminal.EDIT;
     details = await getDetails();
     loading = false;
   };
 
-  const handleSave = async () => {
+  const save = async () => {
     loading = true;
     await updateItem(editedItem);
     details = await getDetails();
@@ -56,9 +57,9 @@
     loading = false;
   };
 
-  const handleLogs = async () => {
+  const log = async () => {
     loading = true;
-    option = 'LOGS';
+    option = OptionTerminal.LOG;
     details = await getLogs();
     loading = false;
   };
@@ -87,7 +88,6 @@
     isResizing = false;
   };
 
-  // Mouse event listener'larını pencereden çıkartıyoruz
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
 </script>
@@ -109,38 +109,35 @@
       />
     </Collapsible.Trigger>
     <h1 style="font-family: 'Courier New', Courier, monospace;">
-      {#if k8sItem && option == 'LOGS'}
+      {#if !k8sItem && option == OptionTerminal.DEFAULT}
+        {type}
+      {:else if k8sItem && option == OptionTerminal.LOG}
         {k8sItem} [logs]
-      {:else if k8sItem && option == 'TERMINAL'}
+      {:else if k8sItem && option == OptionTerminal.BASH}
         {k8sItem} [sh]
-      {:else if (k8sItem && option == 'DETAILS') || option == 'EDIT'}
-        {k8sItem}.yaml {option == 'DETAILS' ? '[view]' : '[edit]'}
+      {:else if (k8sItem && option == OptionTerminal.DETAIL) || option == OptionTerminal.EDIT}
+        {k8sItem}.yaml {option == OptionTerminal.DETAIL ? '[view]' : '[edit]'}
       {/if}
     </h1>
 
     {#if k8sItem}
       <div class="flex ms-auto gap-2">
         {#if editedItem !== details}
-          <Button variant="ghost" class=" bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={handleSave}>
+          <Button variant="ghost" class=" bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={save}>
             <Save class="size-5" />
           </Button>
         {/if}
 
-        <Button
-          variant="ghost"
-          class="ms-auto bg-muted rounded-lg p-2 h-auto"
-          aria-label="Playground"
-          onclick={handleDetails}
-        >
+        <Button variant="ghost" class="ms-auto bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={detail}>
           <CodeXML class="size-5" />
         </Button>
 
-        <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={handleEdit}>
+        <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={edit}>
           <Code class="size-5" />
         </Button>
 
-        {#if isPod}
-          <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={handleLogs}>
+        {#if type == 'pod'}
+          <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={log}>
             <Logs class="size-5" />
           </Button>
 
@@ -149,7 +146,7 @@
             class="bg-muted rounded-lg p-2 h-auto"
             aria-label="Playground"
             onclick={() => {
-              option = 'TERMINAL';
+              option = OptionTerminal.BASH;
             }}
           >
             <SquareTerminal class="size-5" />
@@ -172,13 +169,12 @@
         <div class="flex justify-center items-center h-full">
           <Spinner />
         </div>
-      {:else if option === 'LOGS'}
+      {:else if option === OptionTerminal.LOG}
         <div class="w-full h-full p-5 overflow-auto">{logs}</div>
-      {:else if option === 'TERMINAL'}
+      {:else if option === OptionTerminal.BASH}
         <div class="flex flex-col justify-between h-full p-5">
           {execRes}
           <div class="flex items-center w-full overflow-auto">
-            >
             <form on:submit={async () => (execRes = await exec(execReq))} class="flex items-center w-full">
               <input
                 type="text"
@@ -188,9 +184,9 @@
             </form>
           </div>
         </div>
-      {:else if option === 'DETAILS'}
+      {:else if option === OptionTerminal.DETAIL}
         <div class="w-full h-full p-5 overflow-auto">{details}</div>
-      {:else if option === 'EDIT'}
+      {:else if option === OptionTerminal.EDIT}
         <textarea bind:value={editedItem} class="w-full h-full p-5 bg-black overflow-auto resize-none outline-none"
         ></textarea>
       {/if}
