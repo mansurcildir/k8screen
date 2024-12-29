@@ -1,24 +1,27 @@
 <script lang="ts">
   import Bar from '$lib/components/bar.svelte';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import Pagination from '$lib/components/pagination.svelte';
   import Terminal from '$lib/components/terminal.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
-
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Table from '$lib/components/ui/table';
   import { OptionTerminal } from '$lib/model/enum';
   import type { StatefulSet } from '$lib/model/StatefulSet';
   import { statefulSetAPI } from '$lib/service/statefulset-service';
-  import { onMount } from 'svelte';
   import * as yaml from 'yaml';
 
   export let namespace;
+
+  let size: number = 5;
+
   let loading = true;
   let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
 
   let statefulSets: StatefulSet[] = [];
+  let paginated: StatefulSet[] = [];
   let k8sItem: string;
   let open: boolean;
 
@@ -60,7 +63,7 @@
 </script>
 
 <div class="flex flex-col" style="height: calc(100vh - 150px);">
-  <div class="flex-grow overflow-auto">
+  <div class="flex-grow flex flex-col gap-8 justify-between overflow-auto">
     <Table.Root>
       <Table.Header>
         <Table.Row>
@@ -79,7 +82,7 @@
             <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
-          {#each statefulSets as statefulSet}
+          {#each paginated as statefulSet}
             <Table.Row
               on:click={() => {
                 load(statefulSet.name);
@@ -110,6 +113,9 @@
         {/if}
       </Table.Body>
     </Table.Root>
+    <div class="mb-5">
+      <Pagination bind:pageSize={size} data={statefulSets} bind:paginated={paginated}/>
+    </div>
   </div>
 
   <Terminal

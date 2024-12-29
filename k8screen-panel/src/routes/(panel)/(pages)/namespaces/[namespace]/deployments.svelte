@@ -9,14 +9,19 @@
   import yaml from 'yaml';
   import Button from '$lib/components/ui/button/button.svelte';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import Pagination from '$lib/components/pagination.svelte';
 
   export let namespace;
+
+  let size: number = 5;
+
   let loading = false;
   let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
 
   let deployments: Deployment[] = [];
+  let paginated: Deployment[] = [];
   let k8sItem: string;
   let open: boolean;
 
@@ -57,8 +62,8 @@
   };
 </script>
 
-<div class="flex flex-col" style="height: calc(100vh - 150px);">
-  <div class="flex-grow overflow-auto">
+<div class="flex flex-col justify-between" style="height: calc(100vh - 150px);">
+  <div class="flex-grow flex flex-col gap-8 justify-between overflow-auto">
     <Table.Root>
       <Table.Header>
         <Table.Row>
@@ -81,7 +86,7 @@
             <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
-          {#each deployments as deployment}
+          {#each paginated as deployment}
             <Table.Row on:click={() => load(deployment.name)} class="cursor-pointer">
               <Table.Cell>{deployment.name}</Table.Cell>
               <Table.Cell>{deployment.ready_replicas}/{deployment.total_replicas}</Table.Cell>
@@ -109,6 +114,9 @@
         {/if}
       </Table.Body>
     </Table.Root>
+    <div class="mb-5">
+      <Pagination bind:pageSize={size} data={deployments} bind:paginated={paginated}/>
+    </div>
   </div>
 
   <Terminal

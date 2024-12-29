@@ -5,3 +5,9 @@ export enum OptionTerminal {
   BASH = 'BASH',
   EDIT = 'EDIT'
 }
+
+export enum Status {
+  RUNNING = 'RUNNING',
+  FAILED = 'FAILED',
+  SUCCEEDED = 'SUCCEEDED'
+}
