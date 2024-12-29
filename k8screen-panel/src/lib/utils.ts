@@ -1,11 +1,11 @@
 import { dev } from '$app/environment';
 export const SPRING_BASE_URL = dev ? 'http://localhost:8080' : '';
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
 export interface Breadcrumb {
@@ -27,7 +27,6 @@ export function capitalizeWords(sentence: string): string {
     .join(' ');
 }
 
-
 export function extractBreadcrumbs(pathname: string): Breadcrumb[] {
   if (pathname === '/' || pathname === '') {
     return [];
@@ -37,20 +36,22 @@ export function extractBreadcrumbs(pathname: string): Breadcrumb[] {
   const paths = pathname.replace(/^\/|\/$/g, '').split('/');
   let accumulatedPath = '';
 
-  const breadcrumbs: Breadcrumb[] = paths.map((path) => {
-    // Accumulate the path incrementally
-    accumulatedPath += `/${path}`;
+  const breadcrumbs: Breadcrumb[] = paths
+    .map((path) => {
+      // Accumulate the path incrementally
+      accumulatedPath += `/${path}`;
 
-    // Filter out ULIDs for the text, but keep ULIDs for the link
-    const text = isUlid(path)
-      ? '' // If it's a ULID, keep the text empty
-      : capitalizeWords(decodeURIComponent(path).replace(/[-_]+/g, ' '));
+      // Filter out ULIDs for the text, but keep ULIDs for the link
+      const text = isUlid(path)
+        ? '' // If it's a ULID, keep the text empty
+        : capitalizeWords(decodeURIComponent(path).replace(/[-_]+/g, ' '));
 
-    return {
-      text: text, // ULIDs won't affect the text, only non-ULID paths will
-      link: accumulatedPath // Keep full path (including ULIDs) in the link
-    };
-  }).filter(crumb => crumb.text !== ''); // Filter out breadcrumbs with empty text
+      return {
+        text: text, // ULIDs won't affect the text, only non-ULID paths will
+        link: accumulatedPath // Keep full path (including ULIDs) in the link
+      };
+    })
+    .filter((crumb) => crumb.text !== ''); // Filter out breadcrumbs with empty text
 
   return breadcrumbs;
 }

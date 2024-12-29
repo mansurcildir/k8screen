@@ -30,14 +30,13 @@ export const getRefreshToken = () => {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
-
 /**
  * Function to get all tokens
  */
 export const getAllTokens = () => {
   return {
     accessToken: getAccessToken(),
-    refreshToken: getRefreshToken(),
+    refreshToken: getRefreshToken()
   };
 };
 
@@ -53,7 +52,7 @@ export const checkTokensExist = () => {
  */
 export const getBearerAccessTokenWithHeaderAttribute = () => {
   return {
-    'Authorization': `${TOKEN_PREFIX}${getAccessToken()}`,
+    Authorization: `${TOKEN_PREFIX}${getAccessToken()}`,
     'Content-Type': 'application/json'
   };
 };

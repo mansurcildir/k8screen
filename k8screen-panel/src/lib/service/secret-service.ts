@@ -1,6 +1,6 @@
-import type { Secret } from "$lib/model/Secret";
-import { SPRING_BASE_URL } from "$lib/utils/utils";
-import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from "./http-request";
+import type { Secret } from '$lib/model/Secret';
+import { SPRING_BASE_URL } from '$lib/utils/utils';
+import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from './http-request';
 
 export const secretAPI = {
   getAllSecrets: async (namespace: string): Promise<Secret[]> => {
@@ -17,4 +17,4 @@ export const secretAPI = {
     const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/secrets/${name}`;
     return await (await applyPutRequestWithBearerHeader(url, JSON.stringify(body))).json();
   }
-}
+};

@@ -1,4 +1,4 @@
-import { getBearerAccessTokenWithHeaderAttribute } from "./storage-manager";
+import { getBearerAccessTokenWithHeaderAttribute } from './storage-manager';
 
 export type HeadersCallback = () => { [key: string]: string };
 
@@ -86,7 +86,6 @@ export const applyGetRequestWithBearerHeader = async (url: string) => {
     }
 
     return response;
-
   } catch (error) {
     console.error('Request failed', error);
     throw error;
@@ -100,7 +99,7 @@ export const applyPostRequestWithBearerHeader = async (url: string, body: string
     console.error('Request failed', error);
     throw error;
   }
-}
+};
 
 export const applyPutRequestWithBearerHeader = async (url: string, body: string) => {
   try {
@@ -109,7 +108,7 @@ export const applyPutRequestWithBearerHeader = async (url: string, body: string)
     console.error('Request failed', error);
     throw error;
   }
-}
+};
 
 export const applyDeleteRequestWithBearerHeader = async (url: string) => {
   try {
@@ -120,13 +119,11 @@ export const applyDeleteRequestWithBearerHeader = async (url: string) => {
     }
 
     return response;
-
   } catch (error) {
     console.error('Request failed', error);
     throw error;
   }
 };
-
 
 export const applyGetRequest = async (url: string) => {
   try {
@@ -137,7 +134,6 @@ export const applyGetRequest = async (url: string) => {
     }
 
     return response;
-
   } catch (error) {
     console.error('Request failed', error);
     throw error;
@@ -151,7 +147,7 @@ export const applyPostRequest = async (url: string, body: string) => {
     console.error('Request failed', error);
     throw error;
   }
-}
+};
 
 export const applyPutRequest = async (url: string, body: string) => {
   try {
@@ -160,7 +156,7 @@ export const applyPutRequest = async (url: string, body: string) => {
     console.error('Request failed', error);
     throw error;
   }
-}
+};
 
 export const applyDeleteRequest = async (url: string) => {
   try {
@@ -171,22 +167,15 @@ export const applyDeleteRequest = async (url: string) => {
     }
 
     return response;
-
   } catch (error) {
     console.error('Request failed', error);
     throw error;
   }
 };
 
-export const applyGetRequestOptional = async (
-  url: string,
-  headers: HeadersCallback
-) => {
+export const applyGetRequestOptional = async (url: string, headers: HeadersCallback) => {
   try {
-    const response = await fetch(
-      url,
-      createGetRequestOptions(headers)
-    );
+    const response = await fetch(url, createGetRequestOptions(headers));
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}, url: ${url}`);

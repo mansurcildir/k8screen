@@ -1,34 +1,41 @@
-import js from '@eslint/js';
-import svelte from 'eslint-plugin-svelte';
+import pluginJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
 import globals from 'globals';
-import ts from 'typescript-eslint';
 
-export default ts.config(
-  js.configs.recommended,
-  ...ts.configs.recommended,
-  ...svelte.configs["flat/recommended"],
+const IGNORES = [
+  '.DS_Store',
+  'node_modules',
+  '/build',
+  '.svelte-kit/**',
+  '/package',
+  '.env',
+  '.env.*',
+  '!.env.example',
+  'pnpm-lock.yaml',
+  'package-lock.json',
+  'yarn.lock',
+  'vite.config.js'
+];
+
+const CONFIGS = [
+  { languageOptions: { globals: globals.browser } },
+  { ...pluginJs.configs.recommended },
+  ...tseslint.configs.recommended,
   {
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node
-      }
-    },
     rules: {
-      ...ts.configs.recommended.rules,
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
-  {
-    files: ["**/*.svelte"],
-
-    languageOptions: {
-      parserOptions: {
-        parser: ts.parser
-      }
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/no-explicit-any': 'off'
     }
   },
-  {
-    ignores: ["build/", ".svelte-kit/", "dist/", "src/lib/components/ui"]
+  {}
+];
+
+CONFIGS.map((c) => {
+  if (!c.ignores) {
+    c.ignores = [];
   }
-);
+
+  IGNORES.forEach((i) => c.ignores.push(i));
+});
+
+export default CONFIGS;

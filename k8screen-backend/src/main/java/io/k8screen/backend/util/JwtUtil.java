@@ -24,8 +24,7 @@ public class JwtUtil {
   private final String refreshKey =
       "42DCCF1E0B06EF601CF9DCDA0ED3877F4F0DB32FAE243DC5F0C681DB09AFB454";
 
-  public @NotNull Object getClaim(
-      final @NotNull String claimKey, final @NotNull String token) {
+  public @NotNull Object getClaim(final @NotNull String claimKey, final @NotNull String token) {
 
     return this.extractClaim(token, claims -> claims.get(claimKey, String.class));
   }
@@ -58,18 +57,13 @@ public class JwtUtil {
   }
 
   public @NotNull <T> T extractClaim(
-    final @NotNull String token,
-    final @NotNull Function<Claims, T> claimsResolver) {
+      final @NotNull String token, final @NotNull Function<Claims, T> claimsResolver) {
     final Claims claims = this.extractAllClaims(token);
     return claimsResolver.apply(claims);
   }
 
-  public @NotNull Claims extractAllClaims(
-    final @NotNull String token) {
-    return Jwts.parser()
-      .build()
-      .parseSignedClaims(token)
-      .getPayload();
+  public @NotNull Claims extractAllClaims(final @NotNull String token) {
+    return Jwts.parser().build().parseSignedClaims(token).getPayload();
   }
 
   public @NotNull String generateToken(
@@ -82,17 +76,17 @@ public class JwtUtil {
     final Date expirationDate = Date.from(zonedDateTime.toInstant());
 
     return Jwts.builder()
-      .header()
-      .add(
-        Map.of(
-          "alg", "HS256",
-          "typ", "JWT"))
-      .and()
-      .claims(claims)
-      .issuedAt(new Date(System.currentTimeMillis()))
-      .expiration(expirationDate)
-      .signWith(this.getSignKey(signKey))
-      .compact();
+        .header()
+        .add(
+            Map.of(
+                "alg", "HS256",
+                "typ", "JWT"))
+        .and()
+        .claims(claims)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(expirationDate)
+        .signWith(this.getSignKey(signKey))
+        .compact();
   }
 
   public @NotNull String generateAccessToken(final @NotNull String username) {

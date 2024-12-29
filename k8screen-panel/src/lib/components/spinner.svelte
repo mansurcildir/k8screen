@@ -11,7 +11,7 @@
     stroke="currentColor"
     stroke-width="2"
   >
-    <circle cx="12" cy="12" r="10" class="opacity-25" />
-    <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75" />
+    <circle cx="12" cy="12" r="10" class="opacity-25"></circle>
+    <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75"></path>
   </svg>
 </div>
