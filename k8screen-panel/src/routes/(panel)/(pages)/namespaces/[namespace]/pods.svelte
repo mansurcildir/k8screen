@@ -7,11 +7,14 @@
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import Terminal from '$lib/components/terminal.svelte';
   import * as yaml from 'yaml';
-  import { OptionTerminal } from '$lib/model/enum';
+  import { OptionTerminal, Status } from '$lib/model/enum';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
-  import { onMount } from 'svelte';
+  import Pagination from '$lib/components/pagination.svelte';
 
   export let namespace;
+
+  let size: number = 5;
+
   let loading = false;
   let loadingTable = false;
   let option: OptionTerminal;
@@ -20,6 +23,7 @@
   let execRes: string;
 
   let pods: Pod[] = [];
+  let paginated: Pod[] = [];
   let k8sItem: string;
   let open: boolean;
 
@@ -75,8 +79,8 @@
   };
 </script>
 
-<div class="flex flex-col justify-between" style="height: calc(100vh - 150px);">
-  <div class="flex-grow mb-8 overflow-auto">
+<div class="flex flex-col" style="height: calc(100vh - 150px);">
+  <div class="flex-grow flex flex-col gap-8 justify-between overflow-auto">
     <Table.Root>
       <Table.Header>
         <Table.Row>
@@ -99,7 +103,7 @@
             <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
-          {#each pods as pod}
+          {#each paginated as pod}
             <Table.Row
               on:click={() => {
                 load(pod.name);
@@ -108,7 +112,15 @@
             >
               <Table.Cell>{pod.name}</Table.Cell>
               <Table.Cell>{pod.ready_containers}</Table.Cell>
-              <Table.Cell>{pod.status}</Table.Cell>
+              <Table.Cell>
+                <button
+                  class={pod.status.toUpperCase() == Status.RUNNING || pod.status.toUpperCase() == Status.SUCCEEDED
+                    ? 'rounded-3xl border bg-green-500 border-1 p-1 w-20 text-white'
+                    : 'rounded-3xl border bg-red-500 border-1 p-1 w-20 text-white'}
+                >
+                  {pod.status}
+                </button>
+              </Table.Cell>
               <Table.Cell>{pod.restarts}</Table.Cell>
               <Table.Cell>{pod.age}</Table.Cell>
               <Table.Cell>
@@ -132,6 +144,9 @@
         {/if}
       </Table.Body>
     </Table.Root>
+    <div class="mb-5">
+      <Pagination bind:pageSize={size} data={pods} bind:paginated={paginated} />
+    </div>
   </div>
 
   <Terminal

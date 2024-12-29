@@ -37,6 +37,7 @@
 
   const detail = async () => {
     loading = true;
+    open = true;
     option = OptionTerminal.DETAIL;
     details = await getDetails();
     loading = false;
@@ -44,6 +45,7 @@
 
   const edit = async () => {
     loading = true;
+    open = true;
     option = OptionTerminal.EDIT;
     details = await getDetails();
     loading = false;
@@ -51,6 +53,7 @@
 
   const save = async () => {
     loading = true;
+    open = true;
     await updateItem(editedItem);
     details = await getDetails();
     editedItem = details;
@@ -59,6 +62,7 @@
 
   const log = async () => {
     loading = true;
+    open = true;
     option = OptionTerminal.LOG;
     details = await getLogs();
     loading = false;
@@ -175,6 +179,7 @@
         <div class="flex flex-col justify-between h-full p-5">
           {execRes}
           <div class="flex items-center w-full overflow-auto">
+            >
             <form on:submit={async () => (execRes = await exec(execReq))} class="flex items-center w-full">
               <input
                 type="text"
