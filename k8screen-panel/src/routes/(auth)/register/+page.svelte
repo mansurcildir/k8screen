@@ -52,6 +52,9 @@
               <Input id="password" type="password" bind:value={userForm.password} placeholder="******" required />
             </div>
             <Button type="submit" class="w-full">Register</Button>
+            <div class="relative flex justify-center text-xs uppercase">
+              <span class="bg-background text-muted-foreground px-2"> Or continue with </span>
+            </div>
             <Button variant="outline" class="w-full">Login with Google</Button>
           </div>
           <div class="mt-4 text-center text-sm">

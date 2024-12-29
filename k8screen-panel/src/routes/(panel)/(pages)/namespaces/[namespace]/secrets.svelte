@@ -2,14 +2,19 @@
   import Bar from '$lib/components/bar.svelte';
   import Terminal from '$lib/components/terminal.svelte';
   import * as Table from '$lib/components/ui/table';
+  import { OptionTerminal } from '$lib/model/enum';
   import type { Secret } from '$lib/model/Secret';
   import { secretAPI } from '$lib/service/secret-service';
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as yaml from 'yaml';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import { onMount } from 'svelte';
 
   export let namespace;
   let loading = false;
   let loadingTable = false;
-  let option: string = 'DETAILS';
+  let option: OptionTerminal;
   let details: string;
 
   let secrets: Secret[] = [];
@@ -20,9 +25,10 @@
     getAllSecrets();
   }
 
-  const handleSecret = (secret: string) => {
+  const load = (secret: string) => {
     k8sItem = secret;
     open = true;
+    option = OptionTerminal.DETAIL;
     getDetails();
   };
 
@@ -61,6 +67,7 @@
           <Table.Head>TYPE</Table.Head>
           <Table.Head>DATA</Table.Head>
           <Table.Head>AGE</Table.Head>
+          <Table.Head>Options</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -70,12 +77,13 @@
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
+            <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
           {#each secrets as secret}
             <Table.Row
               on:click={() => {
-                handleSecret(secret.name);
+                load(secret.name);
               }}
               class="cursor-pointer"
             >
@@ -83,19 +91,37 @@
               <Table.Cell>{secret.type}</Table.Cell>
               <Table.Cell>{secret.data_size}</Table.Cell>
               <Table.Cell>{secret.age}</Table.Cell>
+              <Table.Cell>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button class="p-2 h-auto" variant="ghost">
+                      <IconKebabMenu />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content align="end">
+                    <DropdownMenu.Group>
+                      <DropdownMenu.Item onclick={() => option = OptionTerminal.DETAIL}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => option = OptionTerminal.EDIT}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                    </DropdownMenu.Group>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Table.Cell>
             </Table.Row>
           {/each}
         {/if}
       </Table.Body>
     </Table.Root>
   </div>
+  
   <Terminal
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    loading={loading}
-    open={open}
-    getDetails={getDetails}
-    updateItem={updateItem}
+    type='secret'
+    {getDetails}
+    {updateItem}
+    {k8sItem}
+    {option}
+    {details}
+    {loading}
+    {open}
   />
 </div>

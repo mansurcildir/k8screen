@@ -2,14 +2,19 @@
   import Bar from '$lib/components/bar.svelte';
   import Terminal from '$lib/components/terminal.svelte';
   import * as Table from '$lib/components/ui/table';
+  import { OptionTerminal } from '$lib/model/enum';
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import type { Service } from '$lib/model/Service';
   import { serviceAPI } from '$lib/service/service-service';
   import * as yaml from 'yaml';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import { onMount } from 'svelte';
 
   export let namespace;
   let loading = true;
   let loadingTable = false;
-  let option: string = 'DETAILS';
+  let option: OptionTerminal;
   let details: string;
 
   let services: Service[] = [];
@@ -20,9 +25,10 @@
     getAllServices();
   }
 
-  const handleService = (service: string) => {
+  const load = (service: string) => {
     k8sItem = service;
     open = true;
+    option = OptionTerminal.DETAIL;
     getDetails();
   };
 
@@ -78,7 +84,7 @@
           {#each services as service}
             <Table.Row
               on:click={() => {
-                handleService(service.name);
+                load(service.name);
               }}
               class="cursor-pointer"
             >
@@ -88,6 +94,22 @@
               <Table.Cell>{service.external_ip}</Table.Cell>
               <Table.Cell>{service.ports}</Table.Cell>
               <Table.Cell>{service.age}</Table.Cell>
+              <Table.Cell>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button class="p-2 h-auto" variant="ghost">
+                      <IconKebabMenu />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content align="end">
+                    <DropdownMenu.Group>
+                      <DropdownMenu.Item onclick={() => option = OptionTerminal.DETAIL}>View</DropdownMenu.Item>
+                      <DropdownMenu.Item onclick={() => option = OptionTerminal.EDIT}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                    </DropdownMenu.Group>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              </Table.Cell>
             </Table.Row>
           {/each}
         {/if}
@@ -96,12 +118,13 @@
   </div>
 
   <Terminal
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    loading={loading}
-    open={open}
-    getDetails={getDetails}
-    updateItem={updateItem}
+    type='service'
+    {getDetails}
+    {updateItem}
+    {k8sItem}
+    {option}
+    {details}
+    {loading}
+    {open}
   />
 </div>
