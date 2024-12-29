@@ -118,7 +118,7 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={secrets} bind:paginated={paginated}/>
+      <Pagination bind:pageSize={size} data={secrets} bind:paginated={paginated} />
     </div>
   </div>
 

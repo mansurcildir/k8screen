@@ -114,7 +114,7 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={statefulSets} bind:paginated={paginated}/>
+      <Pagination bind:pageSize={size} data={statefulSets} bind:paginated={paginated} />
     </div>
   </div>
 

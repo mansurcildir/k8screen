@@ -113,10 +113,11 @@
               <Table.Cell>{pod.name}</Table.Cell>
               <Table.Cell>{pod.ready_containers}</Table.Cell>
               <Table.Cell>
-                <button class={ pod.status.toUpperCase() == Status.RUNNING || pod.status.toUpperCase() == Status.SUCCEEDED ? 
-                  "rounded-3xl border bg-green-500 border-1 p-1 w-20 text-white" : 
-                  "rounded-3xl border bg-red-500 border-1 p-1 w-20 text-white"
-                  }>
+                <button
+                  class={pod.status.toUpperCase() == Status.RUNNING || pod.status.toUpperCase() == Status.SUCCEEDED
+                    ? 'rounded-3xl border bg-green-500 border-1 p-1 w-20 text-white'
+                    : 'rounded-3xl border bg-red-500 border-1 p-1 w-20 text-white'}
+                >
                   {pod.status}
                 </button>
               </Table.Cell>
@@ -144,7 +145,7 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={pods} bind:paginated={paginated}/>
+      <Pagination bind:pageSize={size} data={pods} bind:paginated={paginated} />
     </div>
   </div>
 

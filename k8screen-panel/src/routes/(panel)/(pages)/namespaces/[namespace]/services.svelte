@@ -120,7 +120,7 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={services} bind:paginated={paginated}/>
+      <Pagination bind:pageSize={size} data={services} bind:paginated={paginated} />
     </div>
   </div>
 
