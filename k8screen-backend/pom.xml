@@ -45,7 +45,7 @@
     <spotbugs-maven-plugin.version>4.8.6.6</spotbugs-maven-plugin.version>
     <fmt-maven-plugin.version>2.23</fmt-maven-plugin.version>
     <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <error-prone.version>2.27.1</error-prone.version>
+    <error-prone.version>2.36.0</error-prone.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <org.mapstruct.version>1.6.3</org.mapstruct.version>
@@ -174,13 +174,14 @@
           <encoding>UTF-8</encoding>
           <compilerArgs>
             <arg>-XDcompilePolicy=simple</arg>
-            <arg>-Xplugin:ErrorProne</arg>
+            <arg>-Xplugin:ErrorProne -Xep:UnicodeInCode:OFF -XepExcludedPaths:.*/src/test/.*</arg>
+            <arg>--should-stop=ifError=FLOW</arg>
           </compilerArgs>
           <annotationProcessorPaths>
             <path>
               <groupId>com.google.errorprone</groupId>
               <artifactId>error_prone_core</artifactId>
-              <version>2.36.0</version>
+              <version>${error-prone.version}</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
