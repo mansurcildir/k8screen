@@ -7,7 +7,6 @@ Frontend web application of k8screen for panel
 - lightweight dashboard which you can manage your kubernetes environments
 - light/dark mode toggle
 
-
 ## Tech Stack
 
 **Language:** TyspeScript
@@ -17,7 +16,6 @@ Frontend web application of k8screen for panel
 **UI:** Shadcn-Svelte
 
 **CSS Frameworks:** TailwindCSS
-
 
 ## Run Locally
 
@@ -39,6 +37,7 @@ Frontend web application of k8screen for panel
    #pnpm
    pnpm install
 ```
+
 ```bash
    #npm
    npm install
@@ -50,6 +49,7 @@ Frontend web application of k8screen for panel
    #pnpm
    pnpm run dev
 ```
+
 ```bash
    #npm
    npm run dev
