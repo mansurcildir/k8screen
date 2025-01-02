@@ -3,12 +3,9 @@ package io.k8screen.backend.controller;
 import io.k8screen.backend.data.user.UserForm;
 import io.k8screen.backend.data.user.UserLoginReq;
 import io.k8screen.backend.service.AuthService;
-import io.k8screen.backend.service.UserService;
-import io.k8screen.backend.util.JwtUtil;
 import jakarta.validation.Valid;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,29 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
-  @Value("${spring.security.oauth2.client.registration.google.client-id}")
-  private String clientId;
-
-  @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-  private String clientSecret;
-
-  @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-  private String redirectUri;
-
   private final @NotNull AuthService authService;
-  private final @NotNull UserService userService;
-  private final @NotNull JwtUtil jwtUtil;
 
-  public AuthController(
-      final @NotNull AuthService authService,
-      final @NotNull JwtUtil jwtUtil,
-      final @NotNull UserService userService) {
+  public AuthController(final @NotNull AuthService authService) {
     this.authService = authService;
-    this.jwtUtil = jwtUtil;
-    this.userService = userService;
   }
 
   @PostMapping("/login")

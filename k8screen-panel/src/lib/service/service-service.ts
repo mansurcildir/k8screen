@@ -4,17 +4,17 @@ import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from
 
 export const serviceAPI = {
   getAllServices: async (namespace: string): Promise<Service[]> => {
-    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/services`;
+    const url = `${SPRING_BASE_URL}/api/v1/namespaces/${namespace}/services`;
     return await (await applyGetRequestWithBearerHeader(url)).json();
   },
 
   getServiceDetails: async (namespace: string, name: string): Promise<string> => {
-    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/services/${name}/details`;
+    const url = `${SPRING_BASE_URL}/api/v1/namespaces/${namespace}/services/${name}/details`;
     return await (await applyGetRequestWithBearerHeader(url)).text();
   },
 
   updateService: async (namespace: string, name: string, body: any): Promise<any> => {
-    const url = `${SPRING_BASE_URL}/api/kubernetes/namespaces/${namespace}/services/${name}`;
+    const url = `${SPRING_BASE_URL}/api/v1/namespaces/${namespace}/services/${name}`;
     return await (await applyPutRequestWithBearerHeader(url, JSON.stringify(body))).json();
   }
 };

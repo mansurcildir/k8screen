@@ -1,11 +1,10 @@
 package io.k8screen.backend.config;
 
-import io.k8screen.backend.data.user.UserItem;
-import io.k8screen.backend.service.UserService;
+import io.k8screen.backend.data.entity.User;
+import io.k8screen.backend.repository.UserRepository;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,25 +12,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
-  private final UserService userService;
+  private final UserRepository userRepository;
 
-  public CustomUserDetailsService(final @NotNull UserService userService) {
-    this.userService = userService;
+  public CustomUserDetailsService(final @NotNull UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 
   @Override
   public UserDetails loadUserByUsername(final @NotNull String username)
       throws UsernameNotFoundException {
-    final UserItem userItem = this.userService.findByUsername(username);
-    if (userItem != null) {
-      return new User(
-          userItem.username(),
-          userItem.password(),
-          userItem.roles().stream()
-              .map((role) -> new SimpleGrantedAuthority(role.getName().toUpperCase()))
-              .collect(Collectors.toList()));
-    } else {
-      throw new UsernameNotFoundException("Invalid username or password!");
-    }
+    final User user = this.userRepository.findByUsername(username).orElseThrow();
+
+    return new CustomUserDetails(
+        user.getId(),
+        user.getUsername(),
+        user.getPassword(),
+        user.getRoles().stream()
+            .map((role) -> new SimpleGrantedAuthority(role.getName().toUpperCase()))
+            .collect(Collectors.toList()));
   }
 }

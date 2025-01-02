@@ -10,6 +10,7 @@
   import { OptionTerminal, Status } from '$lib/model/enum';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import { Badge } from '$lib/components/ui/badge/index.js';
 
   export let namespace;
 
@@ -113,13 +114,12 @@
               <Table.Cell>{pod.name}</Table.Cell>
               <Table.Cell>{pod.ready_containers}</Table.Cell>
               <Table.Cell>
-                <button
-                  class={pod.status.toUpperCase() == Status.RUNNING || pod.status.toUpperCase() == Status.SUCCEEDED
-                    ? 'rounded-3xl border bg-green-500 border-1 p-1 w-20 text-white'
-                    : 'rounded-3xl border bg-red-500 border-1 p-1 w-20 text-white'}
+                <Badge
+                  class="w-20 flex justify-center"
+                  variant={pod.status.toUpperCase() == Status.FAILED ? 'destructive' : 'default'}
                 >
                   {pod.status}
-                </button>
+                </Badge>
               </Table.Cell>
               <Table.Cell>{pod.restarts}</Table.Cell>
               <Table.Cell>{pod.age}</Table.Cell>

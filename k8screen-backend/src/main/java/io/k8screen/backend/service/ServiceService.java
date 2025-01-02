@@ -1,6 +1,8 @@
 package io.k8screen.backend.service;
 
+import io.k8screen.backend.config.ApiClientFactory;
 import io.k8screen.backend.data.dto.ServiceDTO;
+import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.ServiceConverter;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
@@ -13,49 +15,74 @@ import org.springframework.stereotype.Service;
 @Service
 public class ServiceService {
 
-  private final @NotNull CoreV1Api coreV1Api;
+  private final @NotNull UserService userService;
+  private final @NotNull ApiClientFactory apiClientFactory;
   private final @NotNull ServiceConverter serviceConverter;
 
   public ServiceService(
-      final @NotNull CoreV1Api coreV1Api, final @NotNull ServiceConverter serviceConverter) {
-    this.coreV1Api = coreV1Api;
+      final @NotNull UserService userService,
+      final @NotNull ApiClientFactory apiClientFactory,
+      final @NotNull ServiceConverter serviceConverter) {
+    this.userService = userService;
+    this.apiClientFactory = apiClientFactory;
     this.serviceConverter = serviceConverter;
   }
 
-  public V1Service create(final @NotNull String namespace, final @NotNull V1Service secret)
+  public V1Service create(
+      final @NotNull String namespace,
+      final @NotNull V1Service secret,
+      final @NotNull String userId)
       throws Exception {
-    return this.coreV1Api.createNamespacedService(namespace, secret).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    return coreV1Api.createNamespacedService(namespace, secret).execute();
   }
 
   public V1Service update(
-      final @NotNull String namespace, final @NotNull String name, final @NotNull V1Service service)
+      final @NotNull String namespace,
+      final @NotNull String name,
+      final @NotNull V1Service service,
+      final @NotNull String userId)
       throws Exception {
-    return this.coreV1Api.replaceNamespacedService(name, namespace, service).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    return coreV1Api.replaceNamespacedService(name, namespace, service).execute();
   }
 
-  public List<ServiceDTO> findAll(final @NotNull String namespace) throws Exception {
-    final V1ServiceList serviceList = this.coreV1Api.listNamespacedService(namespace).execute();
+  public List<ServiceDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
+      throws Exception {
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    final V1ServiceList serviceList = coreV1Api.listNamespacedService(namespace).execute();
     return serviceList.getItems().stream().map(this.serviceConverter::toServiceDTO).toList();
   }
 
-  public ServiceDTO findByName(final @NotNull String namespace, final @NotNull String name)
+  public ServiceDTO findByName(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-
-    final V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    final V1Service service = coreV1Api.readNamespacedService(name, namespace).execute();
     return this.serviceConverter.toServiceDTO(service);
   }
 
-  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+  public String getDetailByName(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final V1Service service = this.coreV1Api.readNamespacedService(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    final V1Service service = coreV1Api.readNamespacedService(name, namespace).execute();
     if (service.getMetadata() != null && service.getMetadata().getManagedFields() != null) {
       service.getMetadata().setManagedFields(null);
     }
     return Yaml.dump(service);
   }
 
-  public V1Service deleteByName(final @NotNull String namespace, final @NotNull String name)
+  public V1Service deleteByName(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    return this.coreV1Api.deleteNamespacedService(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    return coreV1Api.deleteNamespacedService(name, namespace).execute();
   }
 }

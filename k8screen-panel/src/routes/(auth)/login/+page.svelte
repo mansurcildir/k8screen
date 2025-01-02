@@ -51,7 +51,7 @@
               </div>
               <Input id="password" type="password" placeholder="******" bind:value={userForm.password} required />
             </div>
-            <Button type="submit" class="w-full" onclick={() => login()}>Login</Button>
+            <Button class="w-full" onclick={() => login()}>Login</Button>
             <div class="relative flex justify-center text-xs uppercase">
               <span class="bg-background text-muted-foreground px-2"> Or continue with </span>
             </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import '../../../app.css';
   import BookOpen from 'lucide-svelte/icons/book-open';
-  import GalleryVerticalEnd from 'lucide-svelte/icons/gallery-vertical-end';
   import AppSidebar from '$lib/components/app-sidebar.svelte';
   import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
   import { Separator } from '$lib/components/ui/separator/index.js';
@@ -17,6 +16,10 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import { userAPI } from '$lib/service/user-service';
   import type { UserItem } from '$lib/model/user/UserItem';
+  import { configAPI } from '$lib/service/config-service';
+  import type { ConfigItem } from '$lib/model/config/ConfigItem';
+  import type { UserConfig } from '$lib/model/user/UserConfig';
+  import { getAccessToken } from '$lib/service/storage-manager';
 
   let breadcrumbs = extractBreadcrumbs($page.url.pathname);
 
@@ -27,29 +30,72 @@
   }
 
   let namespaces: { title: string; url: string }[] = [];
+  let user: UserItem;
+  let configs: ConfigItem[] = [];
 
-  const getProfile = () => {
-    userAPI.getProfile().then((user: UserItem) => {
-      data.user.name = user.username;
-      data.user.email = user.email;
-      data.user.avatar = user.picture || '/k8s-logo.png';
+  const getNamespaces = () => {
+    namespaceAPI.getAllNamespaces().then((data) => {
+      namespaces = data.map((ns) => ({
+        title: ns,
+        url: `/namespaces/${ns}`
+      }));
     });
   };
 
-  // Data will be updated reactively
-  let data = {
-    user: {
-      name: 'shadcn',
-      email: 'm@example.com',
-      avatar: '/k8s-logo.png'
-    },
-    teams: [
-      {
-        name: 'default',
-        logo: GalleryVerticalEnd,
-        plan: 'config'
+  const getProfile = () => {
+    userAPI.getProfile().then((data: UserItem) => {
+      user = data;
+    });
+  };
+
+  const updateConfig = (config: string) => {
+    const userConfig: UserConfig = {
+      config
+    };
+    userAPI.updateConfig(userConfig).then(() => {
+      getNamespaces();
+      getProfile();
+    });
+  };
+
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append('config', file);
+
+    const response = await fetch('http://localhost:8080/api/v1/configs/upload', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`
       }
-    ],
+    });
+
+    if (response.ok) {
+      const userConfig: UserConfig = {
+        config: file.name
+      };
+      userAPI.updateConfig(userConfig).then(() => {
+        window.location.href = '/namespaces';
+      });
+    }
+  };
+
+  onMount(() => {
+    configAPI.getAllConfigs().then((d) => {
+      configs = d;
+    });
+  });
+
+  $: data = {
+    user: {
+      name: user?.username,
+      email: user?.email,
+      avatar: user?.picture || '/k8s-logo.png',
+      config: user?.config
+    },
+    updateConfig: updateConfig,
+    uploadFile: uploadFile,
+    configs: configs,
     navMain: [
       {
         title: 'Namespaces',
@@ -63,12 +109,7 @@
   // Fetch namespaces on mount and update `navMain`
   onMount(async () => {
     try {
-      const fetchedNamespaces: string[] = await namespaceAPI.getAllNamespaces();
-      namespaces = fetchedNamespaces.map((ns) => ({
-        title: ns,
-        url: `/namespaces/${ns}`
-      }));
-
+      getNamespaces();
       getProfile();
 
       // Update navMain with the fetched namespaces

@@ -1,7 +1,6 @@
 package io.k8screen.backend.service;
 
 import io.k8screen.backend.data.user.UserForm;
-import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.data.user.UserLoginReq;
 import io.k8screen.backend.util.JwtUtil;
 import java.net.URLDecoder;
@@ -94,18 +93,17 @@ public class AuthService {
 
   private void createUserIfNotExists(
       final @NotNull String email, final @NotNull String username, final @NotNull String picture) {
-    final UserForm userForm =
-        UserForm.builder()
-            .email(email)
-            .username(username)
-            .password("dummy")
-            .picture(picture)
-            .build();
-
     try {
+      this.userService.findByUsername(username);
+    } catch (NoSuchElementException e) {
+      final UserForm userForm =
+          UserForm.builder()
+              .email(email)
+              .username(username)
+              .password("dummy")
+              .picture(picture)
+              .build();
       this.userService.create(userForm);
-    } catch (RuntimeException e) {
-      throw new RuntimeException("User creation failed", e);
     }
   }
 
@@ -157,10 +155,10 @@ public class AuthService {
   public Map<String, String> register(final @NotNull UserForm userForm) {
     final String encoded = this.passwordEncoder.encode(userForm.getPassword());
     userForm.setPassword(encoded);
-    final UserItem createdUser = this.userService.create(userForm);
+    this.userService.create(userForm);
 
-    final String accessToken = this.jwtUtil.generateAccessToken(createdUser.username());
-    final String refreshToken = this.jwtUtil.generateAccessToken(createdUser.username());
+    final String accessToken = this.jwtUtil.generateAccessToken(userForm.getUsername());
+    final String refreshToken = this.jwtUtil.generateAccessToken(userForm.getUsername());
 
     return Map.of(
         "access_token", accessToken,

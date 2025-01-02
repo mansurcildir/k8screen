@@ -14,6 +14,10 @@ k8screen-frontend:
   login-url: ${k8screen-frontend.base-url}/login
   success-url: ${k8screen-frontend.base-url}/login
 
+k8screen:
+  config:
+    path: ${user.home}/.k8screen/configs
+
 spring:
   datasource:
     url: ${k8screen-db.url}
