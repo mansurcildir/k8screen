@@ -46,7 +46,7 @@ Backend application of k8screen
 
 - Open ``Project Structure...`` on File menu, add ``k8screen-backend`` as module on  ``Modules`` session, apply changes and save
 
-- Change OAuth 2.0 Client ID informations with your Google ClientId and Clint Secret informations(If you don't have, you should create k8screen application and OAuth 2.0 Client ID)
+- Change OAuth 2.0 Client ID credentials with your Google ClientId and Clint Secret credentials (If you don't have, you should create ``k8screen`` application and ``OAuth 2.0 Client ID`` credentials on ``https://console.cloud.google.com``)
 ```
    client-id: YOUR_GOOGLE_CLIENT_ID
    client-secret: YOUR_GOOGLE_CLIENT_SECRET
