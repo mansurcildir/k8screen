@@ -109,7 +109,7 @@
                   <Dialog.Title>Upload your config file</Dialog.Title>
                   <Dialog.Description>
                     <br />
-                    <form on:submit|preventDefault={submit}>
+                    <form onsubmit={submit}>
                       <div class="grid gap-4">
                         <div class="grid gap-2">
                           <Input type="file" id="name" class="col-span-3" onchange={handleFileChange} />
