@@ -19,4 +19,5 @@ public class UserForm {
   private @NotNull @NotEmpty String password;
   private @NotNull @NotEmpty @Email String email;
   private String picture;
+  private String config;
 }

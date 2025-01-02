@@ -174,7 +174,7 @@
           <encoding>UTF-8</encoding>
           <compilerArgs>
             <arg>-XDcompilePolicy=simple</arg>
-            <arg>-Xplugin:ErrorProne -Xep:UnicodeInCode:OFF -XepExcludedPaths:.*/src/test/.*</arg>
+            <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/src/test/.*</arg>
             <arg>--should-stop=ifError=FLOW</arg>
           </compilerArgs>
           <annotationProcessorPaths>

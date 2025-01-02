@@ -53,18 +53,18 @@ public class SecurityConfig {
                 authorizeRequests
                     .requestMatchers(
                         HttpMethod.POST,
-                        "/api/auth/register",
-                        "/api/auth/login",
-                        "/api/auth/login/google")
+                        "/api/v1/auth/register",
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/login/google")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/auth/access-token")
+                    .requestMatchers(HttpMethod.GET, "/api/v1/auth/access-token")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
         .logout(
             logout ->
                 logout
-                    .logoutUrl("/api/auth/logout")
+                    .logoutUrl("/api/v1/auth/logout")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .logoutSuccessHandler(

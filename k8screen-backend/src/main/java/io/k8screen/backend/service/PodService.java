@@ -1,6 +1,8 @@
 package io.k8screen.backend.service;
 
+import io.k8screen.backend.config.ApiClientFactory;
 import io.k8screen.backend.data.dto.PodDTO;
+import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.PodConverter;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
@@ -18,54 +20,75 @@ import org.springframework.stereotype.Service;
 @Service
 public class PodService {
 
-  private final @NotNull CoreV1Api coreV1Api;
-  private final @NotNull Exec exec;
+  private final @NotNull UserService userService;
+  private final @NotNull ApiClientFactory apiClientFactory;
   private final @NotNull PodConverter podConverter;
 
   public PodService(
-      final @NotNull CoreV1Api coreV1Api,
-      final @NotNull Exec exec,
+      final @NotNull UserService userService,
+      final @NotNull ApiClientFactory apiClientFactory,
       final @NotNull PodConverter podConverter) {
-    this.coreV1Api = coreV1Api;
-    this.exec = exec;
+    this.userService = userService;
+    this.apiClientFactory = apiClientFactory;
     this.podConverter = podConverter;
   }
 
-  public List<PodDTO> findAll(final @NotNull String namespace) throws Exception {
-    final V1PodList podList = this.coreV1Api.listNamespacedPod(namespace).execute();
+  public List<PodDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
+      throws Exception {
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    final V1PodList podList = coreV1Api.listNamespacedPod(namespace).execute();
     return podList.getItems().stream().map(this.podConverter::toPodDTO).toList();
   }
 
-  public PodDTO findByName(final @NotNull String namespace, final @NotNull String name)
+  public PodDTO findByName(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    final V1Pod pod = coreV1Api.readNamespacedPod(name, namespace).execute();
     return this.podConverter.toPodDTO(pod);
   }
 
-  public String getDetailByName(final @NotNull String namespace, final @NotNull String name)
+  public String getDetailByName(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final V1Pod pod = this.coreV1Api.readNamespacedPod(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    final V1Pod pod = coreV1Api.readNamespacedPod(name, namespace).execute();
     if (pod.getMetadata() != null && pod.getMetadata().getManagedFields() != null) {
       pod.getMetadata().setManagedFields(null);
     }
     return Yaml.dump(pod);
   }
 
-  public V1Pod deleteByName(final @NotNull String namespace, final @NotNull String name)
+  public V1Pod deleteByName(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    return this.coreV1Api.deleteNamespacedPod(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    return coreV1Api.deleteNamespacedPod(name, namespace).execute();
   }
 
-  public String findLogs(final @NotNull String namespace, final @NotNull String name)
+  public String findLogs(
+      final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    return this.coreV1Api.readNamespacedPodLog(name, namespace).execute();
+    final UserItem user = this.userService.findById(userId);
+    final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
+    return coreV1Api.readNamespacedPodLog(name, namespace).execute();
   }
 
   public String exec(
-      final @NotNull String namespace, final @NotNull String name, final @NotNull String[] command)
+      final @NotNull String namespace,
+      final @NotNull String name,
+      final @NotNull String[] command,
+      final @NotNull String userId)
       throws IOException, InterruptedException, ApiException {
 
-    final Process proc = this.exec.exec(namespace, name, command, true, true);
+    final UserItem user = this.userService.findById(userId);
+    final Exec exec = this.apiClientFactory.exec(user.config(), userId);
+
+    final Process proc = exec.exec(namespace, name, command, true, true);
     final StringBuilder outputBuilder = new StringBuilder();
 
     final Thread inputThread =

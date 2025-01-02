@@ -7,23 +7,23 @@ import { isTokenExpired } from './token-decoder';
 
 export const authAPI = {
   register: async (body: UserForm): Promise<{ access_token: string; refresh_token: string }> => {
-    const url = `${SPRING_BASE_URL}/api/auth/register`;
+    const url = `${SPRING_BASE_URL}/api/v1/auth/register`;
     console.log(body);
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
   login: async (body: LoginReq): Promise<{ access_token: string; refresh_token: string }> => {
-    const url = `${SPRING_BASE_URL}/api/auth/login`;
+    const url = `${SPRING_BASE_URL}/api/v1/auth/login`;
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
   loginGoogle: async (body: { code: string }): Promise<{ access_token: string; refresh_token: string }> => {
-    const url = `${SPRING_BASE_URL}/api/auth/login/google`;
+    const url = `${SPRING_BASE_URL}/api/v1/auth/login/google`;
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
   logout: async (): Promise<string> => {
-    const url = `${SPRING_BASE_URL}/api/auth/logout`;
+    const url = `${SPRING_BASE_URL}/api/v1/auth/logout`;
     return await (await applyGetRequest(url)).text();
   },
 
@@ -33,7 +33,7 @@ export const authAPI = {
       'Refresh-Token': body
     });
 
-    return await (await applyGetRequestOptional(`${SPRING_BASE_URL}/api/auth/access-token`, headers)).json();
+    return await (await applyGetRequestOptional(`${SPRING_BASE_URL}/api/v1/auth/access-token`, headers)).json();
   },
 
   refreshToken: async (refreshToken: string) => {
@@ -62,7 +62,7 @@ export const authAPI = {
     if (!tokens.accessToken || !tokens.refreshToken) {
       if (code) {
         authAPI.loginGoogle({ code: code }).then((data) => {
-          setTokens(data.access_token, data.refresh_token);
+          setTokens(data?.access_token, data?.refresh_token);
           window.location.href = '/';
         });
         return true;

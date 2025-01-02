@@ -9,9 +9,17 @@ CREATE TABLE "users" (
     id VARCHAR(26) PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
     picture TEXT,
-    enabled BOOLEAN DEFAULT TRUE NOT NULL
+    config VARCHAR(255)
+);
+
+-- Config table
+CREATE TABLE "configs" (
+    id VARCHAR(26) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    user_id VARCHAR(26) NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
 );
 
 -- User-Roles relationship table

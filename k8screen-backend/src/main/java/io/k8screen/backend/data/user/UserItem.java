@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public record UserItem(
     @NotNull @NotEmpty String id,
     @NotNull @NotEmpty String username,
-    @NotNull @NotEmpty String password,
     @NotNull @NotEmpty String email,
     String picture,
+    String config,
     @NotNull @NotEmpty Set<Role> roles) {}

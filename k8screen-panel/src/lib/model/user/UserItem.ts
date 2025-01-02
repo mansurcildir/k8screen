@@ -4,7 +4,7 @@ export interface UserItem {
   id: string;
   username: string;
   email: string;
-  password: string;
   picture: string;
+  config: string;
   roles: Role[];
 }
