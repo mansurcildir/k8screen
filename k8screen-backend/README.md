@@ -31,7 +31,7 @@ Backend application of k8screen
 - Go to the project directory
 
 ```bash
-   k8screen
+  cd k8screen/k8screen-backend
 ```
 
 - Deploy the docker containers

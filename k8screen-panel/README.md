@@ -28,7 +28,7 @@ Frontend web application of k8screen for panel
 - Go to the project directory
 
 ```bash
-  cd k8screen-panel
+  cd k8screen/k8screen-panel
 ```
 
 - Install dependencies
