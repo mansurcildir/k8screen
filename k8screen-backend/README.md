@@ -1,23 +1,23 @@
-# k8screen-panel
+# k8screen-backend
 
-Frontend web application of k8screen for panel
-
-
-## Features
-
-- lightweight dashboard which you can manage your kubernetes environments
-- light/dark mode toggle
+Backend application of k8screen
 
 
 ## Tech Stack
 
-**Language:** TyspeScript
+**Language:** Java
 
-**Framework:** Svelte
+**Framework:** Spring
 
-**UI:** Shadcn-Svelte
+**Security**: Spring Security, JWT, Google OAuth2 Authentication
 
-**CSS Frameworks:** TailwindCSS
+**Database**: PostgreSQL
+
+**Migration**: Flyway
+
+
+**API and Clients:**
+- https://github.com/kubernetes-client/java/
 
 
 ## Run Locally
@@ -25,33 +25,31 @@ Frontend web application of k8screen for panel
 - Clone the project
 
 ```bash
-  git clone https://mansur74/k8screen
+   git clone https://mansur74/k8screen
 ```
 
 - Go to the project directory
 
 ```bash
-  cd k8screen-panel
+   k8screen
 ```
 
-- Install dependencies
+- Deploy the docker containers
 
 ```bash
-   #pnpm
-   pnpm install
-```
-```bash
-   #npm
-   npm install
+   docker compose up
 ```
 
-- Run application in development
+- Open ``k8screen`` project directory with Intellij IDEA
 
-```bash
-   #pnpm
-   pnpm run dev
+- Open ``application.yml`` on ``k8screen-backend`` project directory
+
+- Open ``Project Structure...`` on File menu, add ``k8screen-backend`` as module on  ``Modules`` session, apply changes and save
+
+- Change OAuth 2.0 Client ID informations with your Google ClientId and Clint Secret informations(If you don't have, you should create k8screen application and OAuth 2.0 Client ID)
 ```
-```bash
-   #npm
-   npm run dev
+   client-id: YOUR_GOOGLE_CLIENT_ID
+   client-secret: YOUR_GOOGLE_CLIENT_SECRET
 ```
+
+- Run K8screenBackendApplication.java on ``k8screen/k8screen-backend/src/main/java/io/k8screen/backend/K8screenBackendApplication.java``
