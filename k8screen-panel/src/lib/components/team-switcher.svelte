@@ -7,19 +7,41 @@
   import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
   import GalleryVerticalEnd from 'lucide-svelte/icons/gallery-vertical-end';
   import Plus from 'lucide-svelte/icons/plus';
+  import * as Dialog from '$lib/components/ui/dialog';
+  import { onMount } from 'svelte';
+  import { configAPI } from '$lib/service/config-service';
+  import { Input } from '$lib/components/ui/input/index.js';
+  import { Button } from '$lib/components/ui/button/index.js';
 
   // This should be `Component` after lucide-svelte updates types
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let {
     configs,
     user,
-    updateConfig
+    updateConfig,
+    uploadFile
   }: {
     configs: ConfigItem[];
     user: { name: string; email: string; avatar: string; config: string };
     updateConfig: (config: string) => void;
+    uploadFile: (file: File) => Promise<void>;
   } = $props();
   const sidebar = useSidebar();
+  let file: File;
+
+  function handleFileChange(event: any) {
+    file = event.target.files[0];
+  }
+
+  const submit = () => {
+    uploadFile(file);
+  };
+
+  onMount(() => {
+    configAPI.getAllConfigs().then((data: ConfigItem[]) => {
+      configs = data;
+    });
+  });
 </script>
 
 <Sidebar.Menu>
@@ -73,12 +95,34 @@
           </DropdownMenu.Item>
         {/each}
         <DropdownMenu.Separator />
-        <DropdownMenu.Item class="gap-2 p-2">
-          <div class="bg-background flex size-6 items-center justify-center rounded-md border">
-            <Plus class="size-4" />
+        <div class="flex justify-between w-full">
+          <div class="text-muted-foreground font-medium w-full">
+            <Dialog.Root>
+              <Dialog.Trigger class="w-full">
+                <div class="bg-background flex items-center justify-start gap-2 p-2 rounded-md border">
+                  <Plus class="size-4" />
+                  <div class="text-muted-foreground font-medium">Upload config file</div>
+                </div>
+              </Dialog.Trigger>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>Upload your config file</Dialog.Title>
+                  <Dialog.Description>
+                    <br />
+                    <form on:submit|preventDefault={submit}>
+                      <div class="grid gap-4">
+                        <div class="grid gap-2">
+                          <Input type="file" id="name" class="col-span-3" onchange={handleFileChange} />
+                        </div>
+                        <Button type="submit" class="w-full">Upload</Button>
+                      </div>
+                    </form>
+                  </Dialog.Description>
+                </Dialog.Header>
+              </Dialog.Content>
+            </Dialog.Root>
           </div>
-          <div class="text-muted-foreground font-medium">Add config file</div>
-        </DropdownMenu.Item>
+        </div>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   </Sidebar.MenuItem>

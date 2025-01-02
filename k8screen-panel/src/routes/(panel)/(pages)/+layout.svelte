@@ -19,6 +19,7 @@
   import { configAPI } from '$lib/service/config-service';
   import type { ConfigItem } from '$lib/model/config/ConfigItem';
   import type { UserConfig } from '$lib/model/user/UserConfig';
+  import { getAccessToken } from '$lib/service/storage-manager';
 
   let breadcrumbs = extractBreadcrumbs($page.url.pathname);
 
@@ -57,6 +58,28 @@
     });
   };
 
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append('config', file);
+
+    const response = await fetch('http://localhost:8080/api/v1/configs/upload', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`
+      }
+    });
+
+    if (response.ok) {
+      const userConfig: UserConfig = {
+        config: file.name
+      };
+      userAPI.updateConfig(userConfig).then(() => {
+        window.location.href = '/namespaces';
+      });
+    }
+  };
+
   onMount(() => {
     configAPI.getAllConfigs().then((d) => {
       configs = d;
@@ -71,6 +94,7 @@
       config: user?.config
     },
     updateConfig: updateConfig,
+    uploadFile: uploadFile,
     configs: configs,
     navMain: [
       {

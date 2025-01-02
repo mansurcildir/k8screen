@@ -10,7 +10,12 @@
 
 <Sidebar.Root>
   <Sidebar.Header>
-    <TeamSwitcher configs={data.configs} user={data.user} updateConfig={data.updateConfig} />
+    <TeamSwitcher
+      configs={data.configs}
+      user={data.user}
+      updateConfig={data.updateConfig}
+      uploadFile={data.uploadFile}
+    />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={data.navMain} />
