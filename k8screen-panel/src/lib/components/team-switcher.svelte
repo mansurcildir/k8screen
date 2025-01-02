@@ -96,32 +96,30 @@
         {/each}
         <DropdownMenu.Separator />
         <div class="flex justify-between w-full">
-          <div class="text-muted-foreground font-medium w-full">
-            <Dialog.Root>
-              <Dialog.Trigger class="w-full">
-                <div class="bg-background flex items-center justify-start gap-2 p-2 rounded-md border">
-                  <Plus class="size-4" />
-                  <div class="text-muted-foreground font-medium">Upload config file</div>
-                </div>
-              </Dialog.Trigger>
-              <Dialog.Content>
-                <Dialog.Header>
-                  <Dialog.Title>Upload your config file</Dialog.Title>
-                  <Dialog.Description>
-                    <br />
-                    <form onsubmit={submit}>
-                      <div class="grid gap-4">
-                        <div class="grid gap-2">
-                          <Input type="file" id="name" class="col-span-3" onchange={handleFileChange} />
-                        </div>
-                        <Button type="submit" class="w-full">Upload</Button>
+          <Dialog.Root>
+            <Dialog.Trigger class="w-full">
+              <div class="bg-background flex items-center justify-start gap-2 p-2 rounded-md border">
+                <Plus class="size-4" />
+                <div class="text-muted-foreground font-medium">Upload config file</div>
+              </div>
+            </Dialog.Trigger>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Upload your config file</Dialog.Title>
+                <Dialog.Description>
+                  <br />
+                  <form onsubmit={submit}>
+                    <div class="grid gap-4">
+                      <div class="grid gap-2">
+                        <Input type="file" id="name" class="col-span-3" onchange={handleFileChange} />
                       </div>
-                    </form>
-                  </Dialog.Description>
-                </Dialog.Header>
-              </Dialog.Content>
-            </Dialog.Root>
-          </div>
+                      <Button type="submit" class="w-full">Upload</Button>
+                    </div>
+                  </form>
+                </Dialog.Description>
+              </Dialog.Header>
+            </Dialog.Content>
+          </Dialog.Root>
         </div>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
