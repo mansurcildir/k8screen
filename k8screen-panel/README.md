@@ -1,38 +1,56 @@
-# sv
+# k8screen-panel
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Frontend web application of k8screen for panel
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- lightweight dashboard which you can manage your kubernetes environments
+- light/dark mode toggle
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Tech Stack
 
-# create a new project in my-app
-npx sv create my-app
-```
+**Language:** TyspeScript
 
-## Developing
+**Framework:** Svelte
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+**UI:** Shadcn-Svelte
 
-```bash
-npm run dev
+**CSS Frameworks:** TailwindCSS
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## Run Locally
 
-## Building
-
-To create a production version of your app:
+- Clone the project
 
 ```bash
-npm run build
+  git clone https://mansur74/k8screen
 ```
 
-You can preview the production build with `npm run preview`.
+- Go to the project directory
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+  cd k8screen/k8screen-panel
+```
+
+- Install dependencies
+
+```bash
+   #pnpm
+   pnpm install
+```
+
+```bash
+   #npm
+   npm install
+```
+
+- Run application in development
+
+```bash
+   #pnpm
+   pnpm run dev
+```
+
+```bash
+   #npm
+   npm run dev
+```
