@@ -147,7 +147,11 @@ export const applyGetRequest = async (url: string) => {
 
 export const applyPostRequest = async (url: string, body: string) => {
   try {
-    return await fetch(url, createPostRequest(body));
+    const response = await fetch(url, createPostRequest(body));
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response;
   } catch (error) {
     console.error('Request failed', error);
     throw error;

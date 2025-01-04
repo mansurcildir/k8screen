@@ -20,6 +20,10 @@
   import type { ConfigItem } from '$lib/model/config/ConfigItem';
   import type { UserConfig } from '$lib/model/user/UserConfig';
   import { getAccessToken } from '$lib/service/storage-manager';
+  import RefreshCw from 'lucide-svelte/icons/refresh-cw';
+  import { refresh } from '$lib/store';
+
+  $: namespace = $page.params.namespace;
 
   let breadcrumbs = extractBreadcrumbs($page.url.pathname);
 
@@ -27,6 +31,13 @@
     if (breadcrumbs) {
       breadcrumbs = extractBreadcrumbs($page.url.pathname);
     }
+  }
+
+  let showRefreshButton = false;
+
+  $: {
+    const urlPattern = /^\/namespaces\/[^/]+$/;
+    showRefreshButton = urlPattern.test($page.url.pathname);
   }
 
   let namespaces: { title: string; url: string }[] = [];
@@ -153,7 +164,13 @@
             </Breadcrumb.List>
           </Breadcrumb.Root>
         </div>
-        <Button class="ms-auto" variant="outline" size="icon" onclick={toggleMode}>
+        {#if showRefreshButton}
+          <Button class="ms-auto" variant="outline" size="icon" onclick={() => refresh(namespace)}>
+            <RefreshCw />
+            <span class="sr-only">Refresh</span>
+          </Button>
+        {/if}
+        <Button variant="outline" size="icon" onclick={toggleMode}>
           <Sun class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span class="sr-only">Toggle theme</span>

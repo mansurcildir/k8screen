@@ -17,8 +17,9 @@ CREATE TABLE "users" (
 -- Config table
 CREATE TABLE "configs" (
     id VARCHAR(26) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
     user_id VARCHAR(26) NOT NULL,
+    CONSTRAINT unique_user_id_name UNIQUE (user_id, name),
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "users" (id) ON DELETE CASCADE
 );
 

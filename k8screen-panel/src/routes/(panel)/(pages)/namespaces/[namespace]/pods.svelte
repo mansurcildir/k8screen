@@ -11,70 +11,55 @@
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import { Badge } from '$lib/components/ui/badge/index.js';
+  import { pods, getAllPods, loadingPod } from '$lib/store';
 
   export let namespace;
 
   let size: number = 5;
 
   let loading = false;
-  let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
   let logs: string;
   let execRes: string;
 
-  let pods: Pod[] = [];
   let paginated: Pod[] = [];
   let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllPods();
+    getAllPods(namespace);
   }
 
-  const load = (pod: string) => {
-    k8sItem = pod;
+  const getDetails = async (pod: string, opt: OptionTerminal): Promise<string> => {
+    loading = true;
     open = true;
-    option = OptionTerminal.DETAIL;
-    getDetails();
-    getLogs();
-  };
-
-  const getAllPods = async () => {
-    try {
-      loadingTable = true;
-      pods = await podAPI.getAllPods(namespace);
-    } finally {
-      loadingTable = false;
-    }
-  };
-
-  const getLogs = async (): Promise<string> => {
-    loading = true;
-    logs = await podAPI.getPodLogs(namespace, k8sItem);
-    loading = false;
-    return logs;
-  };
-
-  const getDetails = async (): Promise<string> => {
-    loading = true;
-    details = await podAPI.getPodDetails(namespace, k8sItem);
+    k8sItem = pod;
+    option = opt;
+    details = await podAPI.getPodDetails(namespace, pod);
     loading = false;
     return details;
   };
 
-  const updateItem = async (editedPod: string) => {
-    try {
-      loading = true;
-      return podAPI.updatePod(namespace, k8sItem, yaml.parse(editedPod));
-    } finally {
-      loading = false;
-    }
+  const getLogs = async (pod: string, opt: OptionTerminal): Promise<string> => {
+    open = true;
+    k8sItem = pod;
+    option = opt;
+    logs = await podAPI.getPodLogs(namespace, pod);
+    return logs;
   };
 
-  const exec = async (execReq: string): Promise<string> => {
+  const updateItem = async (pod: string) => {
     loading = true;
-    execRes = await podAPI.exec(namespace, k8sItem, ['sh', '-c', execReq]);
+    details = await podAPI.updatePod(namespace, pod, yaml.parse(pod));
+    loading = false;
+    return details;
+  };
+
+  const exec = async (req: string): Promise<string> => {
+    loading = true;
+    open = true;
+    execRes = await podAPI.exec(namespace, k8sItem, ['sh', '-c', req]);
     loading = false;
     return execRes;
   };
@@ -94,7 +79,7 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if loadingTable}
+        {#if $loadingPod}
           <Table.Row>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -107,12 +92,19 @@
           {#each paginated as pod}
             <Table.Row
               on:click={() => {
-                load(pod.name);
+                getDetails(pod.name, OptionTerminal.DETAIL);
               }}
               class="cursor-pointer"
             >
               <Table.Cell>{pod.name}</Table.Cell>
-              <Table.Cell>{pod.ready_containers}</Table.Cell>
+              <Table.Cell>
+                <Badge
+                  class="w-20 flex justify-center"
+                  variant={pod.ready_containers < pod.total_containers ? 'destructive' : 'default'}
+                >
+                  {pod.ready_containers}/{pod.total_containers}
+                </Badge></Table.Cell
+              >
               <Table.Cell>
                 <Badge
                   class="w-20 flex justify-center"
@@ -132,8 +124,16 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(pod.name, OptionTerminal.DETAIL);
+                        }}>View</DropdownMenu.Item
+                      >
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(pod.name, OptionTerminal.EDIT);
+                        }}>Edit</DropdownMenu.Item
+                      >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -145,21 +145,23 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={pods} bind:paginated={paginated} />
+      <Pagination bind:pageSize={size} data={$pods} bind:paginated={paginated} />
     </div>
   </div>
 
-  <Terminal
-    type="pod"
-    getDetails={getDetails}
-    updateItem={updateItem}
-    getLogs={getLogs}
-    exec={exec}
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    logs={logs}
-    loading={loading}
-    open={open}
-  />
+  {#if k8sItem}
+    <Terminal
+      type="pod"
+      getDetails={getDetails}
+      updateItem={updateItem}
+      getLogs={getLogs}
+      exec={exec}
+      k8sItem={k8sItem}
+      option={option}
+      details={details}
+      logs={logs}
+      loading={loading}
+      bind:open={open}
+    />
+  {/if}
 </div>

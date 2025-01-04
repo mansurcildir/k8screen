@@ -10,55 +10,39 @@
   import Button from '$lib/components/ui/button/button.svelte';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import { services, getAllServices, loadingService } from '$lib/store';
 
   export let namespace;
 
   let size: number = 5;
 
   let loading = true;
-  let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
 
-  let services: Service[] = [];
   let paginated: Service[] = [];
   let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllServices();
+    getAllServices(namespace);
   }
 
-  const load = (service: string) => {
-    k8sItem = service;
-    open = true;
-    option = OptionTerminal.DETAIL;
-    getDetails();
-  };
-
-  const getAllServices = async () => {
-    try {
-      loadingTable = true;
-      services = await serviceAPI.getAllServices(namespace);
-    } finally {
-      loadingTable = false;
-    }
-  };
-
-  const getDetails = async (): Promise<string> => {
+  const getDetails = async (service: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
+    open = true;
+    k8sItem = service;
+    option = opt;
     details = await serviceAPI.getServiceDetails(namespace, k8sItem);
     loading = false;
     return details;
   };
 
-  const updateItem = async (editedService: string) => {
-    try {
-      loading = true;
-      return serviceAPI.updateService(namespace, k8sItem, yaml.parse(editedService));
-    } finally {
-      loading = false;
-    }
+  const updateItem = async (service: string) => {
+    loading = true;
+    details = await serviceAPI.updateService(namespace, k8sItem, yaml.parse(service));
+    loading = false;
+    return details;
   };
 </script>
 
@@ -76,7 +60,7 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if loadingTable}
+        {#if $loadingService}
           <Table.Row>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -88,7 +72,7 @@
           {#each paginated as service}
             <Table.Row
               on:click={() => {
-                load(service.name);
+                getDetails(service.name, OptionTerminal.DETAIL);
               }}
               class="cursor-pointer"
             >
@@ -107,8 +91,16 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(service.name, OptionTerminal.DETAIL);
+                        }}>View</DropdownMenu.Item
+                      >
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(service.name, OptionTerminal.EDIT);
+                        }}>Edit</DropdownMenu.Item
+                      >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -120,18 +112,20 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={services} bind:paginated={paginated} />
+      <Pagination bind:pageSize={size} data={$services} bind:paginated={paginated} />
     </div>
   </div>
 
-  <Terminal
-    type="service"
-    getDetails={getDetails}
-    updateItem={updateItem}
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    loading={loading}
-    open={open}
-  />
+  {#if k8sItem}
+    <Terminal
+      type="service"
+      getDetails={getDetails}
+      updateItem={updateItem}
+      k8sItem={k8sItem}
+      option={option}
+      details={details}
+      loading={loading}
+      bind:open={open}
+    />
+  {/if}
 </div>

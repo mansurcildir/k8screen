@@ -10,7 +10,7 @@
   $: namespace = $page.params.namespace;
 </script>
 
-<Tabs.Root value="deployments">
+<Tabs.Root>
   <Tabs.List class="grid w-full grid-cols-5">
     <Tabs.Trigger value="deployments">Deployments</Tabs.Trigger>
     <Tabs.Trigger value="pods">Pods</Tabs.Trigger>

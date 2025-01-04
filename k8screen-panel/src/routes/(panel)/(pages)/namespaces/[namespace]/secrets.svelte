@@ -9,55 +9,38 @@
   import * as yaml from 'yaml';
   import Button from '$lib/components/ui/button/button.svelte';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
-  import { onMount } from 'svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import { secrets, getAllSecrets, loadingSecret } from '$lib/store';
 
   export let namespace;
 
   let size: number = 5;
 
   let loading = false;
-  let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
 
-  let secrets: Secret[] = [];
   let paginated: Secret[] = [];
   let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllSecrets();
+    getAllSecrets(namespace);
   }
 
-  const load = (secret: string) => {
-    k8sItem = secret;
-    open = true;
-    option = OptionTerminal.DETAIL;
-    getDetails();
-  };
-
-  const getAllSecrets = async () => {
-    try {
-      loadingTable = true;
-      secrets = await secretAPI.getAllSecrets(namespace);
-    } finally {
-      loadingTable = false;
-    }
-  };
-
-  const updateItem = async (editedSecret: string) => {
-    try {
-      loading = true;
-      return secretAPI.updateSecret(namespace, k8sItem, yaml.parse(editedSecret));
-    } finally {
-      loading = false;
-    }
-  };
-
-  const getDetails = async (): Promise<string> => {
+  const getDetails = async (secret: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
+    open = true;
+    k8sItem = secret;
+    option = opt;
     details = await secretAPI.getSecretDetails(namespace, k8sItem);
+    loading = false;
+    return details;
+  };
+
+  const updateItem = async (secret: string) => {
+    loading = true;
+    details = await secretAPI.updateSecret(namespace, k8sItem, yaml.parse(secret));
     loading = false;
     return details;
   };
@@ -76,7 +59,7 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if loadingTable}
+        {#if $loadingSecret}
           <Table.Row>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -88,7 +71,7 @@
           {#each paginated as secret}
             <Table.Row
               on:click={() => {
-                load(secret.name);
+                getDetails(secret.name, OptionTerminal.DETAIL);
               }}
               class="cursor-pointer"
             >
@@ -105,8 +88,16 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(secret.name, OptionTerminal.DETAIL);
+                        }}>View</DropdownMenu.Item
+                      >
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(secret.name, OptionTerminal.EDIT);
+                        }}>Edit</DropdownMenu.Item
+                      >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -118,18 +109,20 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={secrets} bind:paginated={paginated} />
+      <Pagination bind:pageSize={size} data={$secrets} bind:paginated={paginated} />
     </div>
   </div>
 
-  <Terminal
-    type="secret"
-    getDetails={getDetails}
-    updateItem={updateItem}
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    loading={loading}
-    open={open}
-  />
+  {#if k8sItem}
+    <Terminal
+      type="secret"
+      getDetails={getDetails}
+      updateItem={updateItem}
+      k8sItem={k8sItem}
+      option={option}
+      details={details}
+      loading={loading}
+      bind:open={open}
+    />
+  {/if}
 </div>

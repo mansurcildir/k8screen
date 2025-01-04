@@ -25,6 +25,11 @@
       })
       .finally(() => (loading = false));
   };
+
+  const loginGoogle = () => {
+    loading = true;
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  };
 </script>
 
 <form on:submit|preventDefault={register}>
@@ -55,7 +60,7 @@
             <div class="relative flex justify-center text-xs uppercase">
               <span class="bg-background text-muted-foreground px-2"> Or continue with </span>
             </div>
-            <Button variant="outline" class="w-full">Login with Google</Button>
+            <Button variant="outline" class="w-full" onclick={() => loginGoogle()}>Google</Button>
           </div>
           <div class="mt-4 text-center text-sm">
             Do you have an account?
