@@ -8,7 +8,6 @@ import { isTokenExpired } from './token-decoder';
 export const authAPI = {
   register: async (body: UserForm): Promise<{ access_token: string; refresh_token: string }> => {
     const url = `${SPRING_BASE_URL}/api/v1/auth/register`;
-    console.log(body);
     return await (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
@@ -47,7 +46,7 @@ export const authAPI = {
     const tokens = getAllTokens();
     if (tokens.accessToken && tokens.refreshToken && isTokenExpired(tokens.accessToken)) {
       if (!isTokenExpired(tokens.refreshToken)) {
-        console.log(await authAPI.refreshToken(tokens.refreshToken));
+        await authAPI.refreshToken(tokens.refreshToken);
       } else {
         unAuthorize();
       }

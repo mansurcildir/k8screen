@@ -9,6 +9,7 @@
   import Bell from 'lucide-svelte/icons/bell';
   import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
   import CreditCard from 'lucide-svelte/icons/credit-card';
+  import LogOut from 'lucide-svelte/icons/log-out';
   import Sparkles from 'lucide-svelte/icons/sparkles';
 
   let { user }: { user: { name: string; email: string; avatar: string } } = $props();
@@ -85,15 +86,14 @@
           </DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
-        <DropdownMenu.Item>
-          <!-- <LogOut /> Log out -->
-          <button
-            class="w-full text-start"
-            type="button"
-            onclick={() => {
-              logout();
-            }}>Log out</button
-          >
+        <DropdownMenu.Item
+          class="cursor-pointer"
+          onclick={() => {
+            logout();
+          }}
+        >
+          <LogOut />
+          Log out
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

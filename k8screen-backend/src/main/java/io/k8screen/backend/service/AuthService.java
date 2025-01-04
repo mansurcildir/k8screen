@@ -100,7 +100,7 @@ public class AuthService {
           UserForm.builder()
               .email(email)
               .username(username)
-              .password("dummy")
+              .password("google")
               .picture(picture)
               .build();
       this.userService.create(userForm);

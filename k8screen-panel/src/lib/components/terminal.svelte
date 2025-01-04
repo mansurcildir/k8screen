@@ -9,22 +9,24 @@
   import Logs from 'lucide-svelte/icons/logs';
   import Save from 'lucide-svelte/icons/save';
   import { OptionTerminal } from '$lib/model/enum';
+  import { onMount } from 'svelte';
+  import { stringTag } from 'yaml/util';
 
   export let k8sItem: string;
-  export let option: OptionTerminal = OptionTerminal.DEFAULT;
-  export let details: string = '';
+  export let option: OptionTerminal;
+  export let details: string;
   export let logs: string = '';
   export let execReq: string = '';
   export let execRes: string = '';
-  export let loading: boolean = false;
-  export let open: boolean = false;
+  export let loading: boolean;
+  export let open: boolean;
   export let containerHeight = 300;
   export let type: 'deployment' | 'pod' | 'service' | 'secret' | 'stateful-set' | 'none' = 'none';
 
-  export let getDetails: () => Promise<string>;
-  export let updateItem: (editedItem: string) => Promise<any>;
-  export let getLogs: () => Promise<string> = async () => '';
-  export let exec: (execReq: string) => Promise<string> = async () => '';
+  export let getDetails: (pod: string, opt: OptionTerminal) => Promise<string>;
+  export let getLogs: (pod: string, opt: OptionTerminal) => Promise<string> = async () => '';
+  export let updateItem: (pod: string) => Promise<string>;
+  export let exec: (req: string) => Promise<string> = async () => '';
 
   $: {
     editedItem = details;
@@ -36,36 +38,27 @@
   const minContainerHeight = 100;
 
   const detail = async () => {
-    loading = true;
-    open = true;
-    option = OptionTerminal.DETAIL;
-    details = await getDetails();
-    loading = false;
+    details = await getDetails(k8sItem, OptionTerminal.DETAIL);
   };
 
   const edit = async () => {
-    loading = true;
-    open = true;
-    option = OptionTerminal.EDIT;
-    details = await getDetails();
-    loading = false;
+    details = await getDetails(k8sItem, OptionTerminal.EDIT);
   };
 
   const save = async () => {
-    loading = true;
-    open = true;
-    await updateItem(editedItem);
-    details = await getDetails();
-    editedItem = details;
-    loading = false;
+    editedItem = await updateItem(k8sItem);
   };
 
   const log = async () => {
     loading = true;
     open = true;
-    option = OptionTerminal.LOG;
-    details = await getLogs();
+    logs = await getLogs(k8sItem, OptionTerminal.LOG);
     loading = false;
+  };
+
+  const terminal = async () => {
+    open = true;
+    option = OptionTerminal.BASH;
   };
 
   const handleMouseDown = () => {
@@ -94,6 +87,14 @@
 
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
+
+  onMount(() => {
+    setInterval(async () => {
+      if (option === OptionTerminal.LOG) {
+        logs = await getLogs(k8sItem, OptionTerminal.LOG);
+      }
+    }, 5000);
+  });
 </script>
 
 <style>
@@ -107,22 +108,22 @@
 
 <Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar" open={open}>
   <div class="flex items-center px-3 py-1 gap-2">
-    <Collapsible.Trigger>
-      <ChevronRight
-        class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
-      />
-    </Collapsible.Trigger>
-    <h1 style="font-family: 'Courier New', Courier, monospace;">
-      {#if !k8sItem && option == OptionTerminal.DEFAULT}
-        {type}
-      {:else if k8sItem && option == OptionTerminal.LOG}
-        {k8sItem} [logs]
-      {:else if k8sItem && option == OptionTerminal.BASH}
-        {k8sItem} [sh]
-      {:else if (k8sItem && option == OptionTerminal.DETAIL) || option == OptionTerminal.EDIT}
-        {k8sItem}.yaml {option == OptionTerminal.DETAIL ? '[view]' : '[edit]'}
-      {/if}
-    </h1>
+    <div class="flex justify-center items-center gap-2">
+      <button on:click={() => (open = !open)}>
+        <ChevronRight
+          class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
+        />
+      </button>
+      <h1 style="font-family: 'Courier New', Courier, monospace;">
+        {#if k8sItem && option == OptionTerminal.LOG}
+          {k8sItem} [logs]
+        {:else if k8sItem && option == OptionTerminal.BASH}
+          {k8sItem} [sh]
+        {:else if (k8sItem && option == OptionTerminal.DETAIL) || option == OptionTerminal.EDIT}
+          {k8sItem}.yaml {option == OptionTerminal.DETAIL ? '[view]' : '[edit]'}
+        {/if}
+      </h1>
+    </div>
 
     {#if k8sItem}
       <div class="flex ms-auto gap-2">
@@ -145,14 +146,7 @@
             <Logs class="size-5" />
           </Button>
 
-          <Button
-            variant="ghost"
-            class="bg-muted rounded-lg p-2 h-auto"
-            aria-label="Playground"
-            onclick={() => {
-              option = OptionTerminal.BASH;
-            }}
-          >
+          <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={terminal}>
             <SquareTerminal class="size-5" />
           </Button>
         {/if}

@@ -10,6 +10,7 @@
   import Button from '$lib/components/ui/button/button.svelte';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import Badge from '$lib/components/ui/badge/badge.svelte';
 
   export let namespace;
 
@@ -29,36 +30,27 @@
     getAllDeployments();
   }
 
-  const load = (deployment: string) => {
-    k8sItem = deployment;
-    open = true;
-    option = OptionTerminal.DETAIL;
-    getDetails();
-  };
-
   const getAllDeployments = async () => {
-    try {
-      loadingTable = true;
-      deployments = await deploymentAPI.getAllDeployments(namespace);
-    } finally {
-      loadingTable = false;
-    }
+    loadingTable = true;
+    deployments = await deploymentAPI.getAllDeployments(namespace);
+    loadingTable = false;
   };
 
-  const getDetails = async (): Promise<string> => {
+  const getDetails = async (deployment: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
-    details = await deploymentAPI.getDeploymentDetails(namespace, k8sItem);
+    open = true;
+    k8sItem = deployment;
+    option = opt;
+    details = await deploymentAPI.getDeploymentDetails(namespace, deployment);
     loading = false;
     return details;
   };
 
-  const updateItem = async (editedDeployment: string) => {
-    try {
-      loading = true;
-      return deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(editedDeployment));
-    } finally {
-      loading = false;
-    }
+  const updateItem = async (deployment: string) => {
+    loading = true;
+    details = await deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(deployment));
+    loading = false;
+    return details;
   };
 </script>
 
@@ -87,9 +79,16 @@
           </Table.Row>
         {:else}
           {#each paginated as deployment}
-            <Table.Row on:click={() => load(deployment.name)} class="cursor-pointer">
+            <Table.Row on:click={() => getDetails(deployment.name, OptionTerminal.DETAIL)} class="cursor-pointer">
               <Table.Cell>{deployment.name}</Table.Cell>
-              <Table.Cell>{deployment.ready_replicas}/{deployment.total_replicas}</Table.Cell>
+              <Table.Cell>
+                <Badge
+                  class="w-20 flex justify-center"
+                  variant={deployment.ready_replicas < deployment.total_replicas ? 'destructive' : 'default'}
+                >
+                  {deployment.ready_replicas}/{deployment.total_replicas}
+                </Badge>
+              </Table.Cell>
               <Table.Cell>{deployment.up_to_date}</Table.Cell>
               <Table.Cell>{deployment.available}</Table.Cell>
               <Table.Cell>{deployment.age}</Table.Cell>
@@ -102,9 +101,19 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
-                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                      <DropdownMenu.Group>
+                        <DropdownMenu.Item
+                          onclick={() => {
+                            getDetails(deployment.name, OptionTerminal.DETAIL);
+                          }}>View</DropdownMenu.Item
+                        >
+                        <DropdownMenu.Item
+                          onclick={() => {
+                            getDetails(deployment.name, OptionTerminal.EDIT);
+                          }}>Edit</DropdownMenu.Item
+                        >
+                        <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                      </DropdownMenu.Group>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
@@ -119,14 +128,16 @@
     </div>
   </div>
 
-  <Terminal
-    type="deployment"
-    getDetails={getDetails}
-    updateItem={updateItem}
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    loading={loading}
-    open={open}
-  />
+  {#if k8sItem}
+    <Terminal
+      type="deployment"
+      getDetails={getDetails}
+      updateItem={updateItem}
+      k8sItem={k8sItem}
+      option={option}
+      details={details}
+      loading={loading}
+      bind:open={open}
+    />
+  {/if}
 </div>

@@ -6,29 +6,44 @@ import org.jetbrains.annotations.NotNull;
 
 public class Util {
 
-  public static String formatDate(final @NotNull OffsetDateTime creationTimestamp) {
-    final Duration duration = Duration.between(creationTimestamp, OffsetDateTime.now());
+  public static String formatAge(final @NotNull OffsetDateTime creationTimestamp) {
+    Duration duration = Duration.between(creationTimestamp, OffsetDateTime.now());
 
-    final long days = duration.toDays();
-    final long hours = duration.toHours() % 24;
-    final long minutes = duration.toMinutes() % 60;
-    final long seconds = duration.getSeconds() % 60;
+    long days = duration.toDays();
+    long hours = duration.toHours() % 24;
+    long minutes = duration.toMinutes() % 60;
+    long seconds = duration.getSeconds() % 60;
 
-    final StringBuilder ageBuilder = new StringBuilder();
+    long years = days / 365;
+    days = days % 365;
 
-    if (days > 0) {
-      ageBuilder.append(days).append("d");
-    }
-    if (hours > 0 || !ageBuilder.isEmpty()) {
-      ageBuilder.append(hours).append("h");
-    }
-    if (days <= 0 && (minutes > 0 || !ageBuilder.isEmpty())) {
-      ageBuilder.append(minutes).append("m");
-    }
-    if (minutes <= 0 && (seconds > 0 || ageBuilder.isEmpty())) {
-      ageBuilder.append(seconds).append("s");
+    StringBuilder age = new StringBuilder();
+
+    if (years > 0) {
+      age.append(years).append("y");
+      if (days > 0) {
+        age.append(days).append("d");
+      }
+    } else if (days > 0) {
+      age.append(days).append("d");
+      if (hours > 0) {
+        age.append(hours).append("h");
+      }
+    } else if (hours > 0) {
+      age.append(hours).append("h");
+      if (minutes > 0) {
+        age.append(minutes).append("m");
+      }
+    } else if (minutes > 0) {
+      age.append(minutes).append("m");
+      if (seconds > 0) {
+        age.append(seconds).append("s");
+      }
+    } else {
+      age.append(seconds).append("s");
     }
 
-    return ageBuilder.toString();
+    return age.toString().trim();
   }
+
 }

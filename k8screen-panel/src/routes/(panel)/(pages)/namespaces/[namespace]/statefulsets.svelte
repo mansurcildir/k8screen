@@ -3,6 +3,7 @@
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Terminal from '$lib/components/terminal.svelte';
+  import Badge from '$lib/components/ui/badge/badge.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Table from '$lib/components/ui/table';
@@ -29,36 +30,27 @@
     getAllStatefulSets();
   }
 
-  const load = (service: string) => {
-    k8sItem = service;
-    open = true;
-    option = OptionTerminal.DETAIL;
-    getDetails();
-  };
-
   const getAllStatefulSets = async () => {
-    try {
-      loadingTable = true;
-      statefulSets = await statefulSetAPI.getAllStatefulSets(namespace);
-    } finally {
-      loadingTable = false;
-    }
+    loadingTable = true;
+    statefulSets = await statefulSetAPI.getAllStatefulSets(namespace);
+    loadingTable = false;
   };
 
-  const getDetails = async (): Promise<string> => {
+  const getDetails = async (statefulSet: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
+    open = true;
+    k8sItem = statefulSet;
+    option = opt;
     details = await statefulSetAPI.getStatefulSetDetails(namespace, k8sItem);
     loading = false;
     return details;
   };
 
-  const updateItem = async (editedStatefulSet: string) => {
-    try {
-      loading = true;
-      return statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(editedStatefulSet));
-    } finally {
-      loading = false;
-    }
+  const updateItem = async (statefulSet: string) => {
+    loading = true;
+    details = await statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(statefulSet));
+    loading = false;
+    return details;
   };
 </script>
 
@@ -85,12 +77,19 @@
           {#each paginated as statefulSet}
             <Table.Row
               on:click={() => {
-                load(statefulSet.name);
+                getDetails(statefulSet.name, OptionTerminal.DETAIL);
               }}
               class="cursor-pointer"
             >
               <Table.Cell>{statefulSet.name}</Table.Cell>
-              <Table.Cell>{statefulSet.ready_replicas}/{statefulSet.total_replicas}</Table.Cell>
+              <Table.Cell>
+                <Badge
+                  class="w-20 flex justify-center"
+                  variant={statefulSet.ready_replicas < statefulSet.total_replicas ? 'destructive' : 'default'}
+                >
+                  {statefulSet.ready_replicas}/{statefulSet.total_replicas}
+                </Badge>
+              </Table.Cell>
               <Table.Cell>{statefulSet.age}</Table.Cell>
               <Table.Cell>
                 <DropdownMenu.Root>
@@ -101,8 +100,16 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.DETAIL)}>View</DropdownMenu.Item>
-                      <DropdownMenu.Item onclick={() => (option = OptionTerminal.EDIT)}>Edit</DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(statefulSet.name, OptionTerminal.DETAIL);
+                        }}>View</DropdownMenu.Item
+                      >
+                      <DropdownMenu.Item
+                        onclick={() => {
+                          getDetails(statefulSet.name, OptionTerminal.EDIT);
+                        }}>Edit</DropdownMenu.Item
+                      >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
@@ -118,14 +125,16 @@
     </div>
   </div>
 
-  <Terminal
-    type="stateful-set"
-    getDetails={getDetails}
-    updateItem={updateItem}
-    k8sItem={k8sItem}
-    option={option}
-    details={details}
-    loading={loading}
-    open={open}
-  />
+  {#if k8sItem}
+    <Terminal
+      type="stateful-set"
+      getDetails={getDetails}
+      updateItem={updateItem}
+      k8sItem={k8sItem}
+      option={option}
+      details={details}
+      loading={loading}
+      bind:open={open}
+    />
+  {/if}
 </div>
