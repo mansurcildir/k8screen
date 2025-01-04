@@ -7,17 +7,17 @@ import org.jetbrains.annotations.NotNull;
 public class Util {
 
   public static String formatAge(final @NotNull OffsetDateTime creationTimestamp) {
-    Duration duration = Duration.between(creationTimestamp, OffsetDateTime.now());
+    final Duration duration = Duration.between(creationTimestamp, OffsetDateTime.now());
 
     long days = duration.toDays();
-    long hours = duration.toHours() % 24;
-    long minutes = duration.toMinutes() % 60;
-    long seconds = duration.getSeconds() % 60;
+    final long hours = duration.toHours() % 24;
+    final long minutes = duration.toMinutes() % 60;
+    final long seconds = duration.getSeconds() % 60;
 
-    long years = days / 365;
+    final long years = days / 365;
     days = days % 365;
 
-    StringBuilder age = new StringBuilder();
+    final StringBuilder age = new StringBuilder();
 
     if (years > 0) {
       age.append(years).append("y");
