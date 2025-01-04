@@ -1,0 +1,78 @@
+name: k8screen CD
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  k8screen-backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+      - name: Create jar files and run unit tests
+        run: ./mvnw -ntp -B package
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: registry.gitlab.com
+          username: ${{ secrets.GITLAB_USERNAME }}
+          password: ${{ secrets.GITLAB_TOKEN }}
+      - name: Detect Image Tag
+        id: image-version
+        run: |
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            DOCKER_IMAGE_TAG="${GITHUB_REF_NAME#v}"
+          else
+            DOCKER_IMAGE_TAG="`echo ${GITHUB_SHA::7}`"
+          fi
+          echo "DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG" >> $GITHUB_ENV
+      - name: Build and push panel-backend
+        uses: docker/build-push-action@v6.10.0
+        with:
+          context: panel-backend
+          push: true
+          tags: registry.gitlab.com/mansurcildir/reg/k8screen-backend:${{ env.DOCKER_IMAGE_TAG }},registry.gitlab.com/mansurcildir/reg/k8screen-backend:latest
+
+  helm-update:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - k8screen-backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect Image Tag
+        id: image-version
+        run: echo "DOCKER_IMAGE_TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+      - name: Update values file
+        uses: mikefarah/yq@master
+        with:
+          cmd: ""
+      - name: Clone helm repo
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HELM_DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no"
+          cd ${{ runner.temp }}
+          git clone git@github.com:mansur74/k8screen-helm.git
+          cd k8screen-helm
+          git config user.name "k8screen bot"
+          git config user.email "k8screen-bot@k8screen.io"
+          yq -i e '.imageTag |= "${{ env.DOCKER_IMAGE_TAG }}"' prod.yml
+          git add .
+          git status
+          git commit -m "New Release '${{ env.DOCKER_IMAGE_TAG }}'"
+          git push origin main
