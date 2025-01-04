@@ -10,6 +10,7 @@
   import { OptionTerminal } from '$lib/model/enum';
   import type { StatefulSet } from '$lib/model/StatefulSet';
   import { statefulSetAPI } from '$lib/service/statefulset-service';
+  import { statefulsets, getAllStatefulSets, loadingStatefulSet } from '$lib/store';
   import * as yaml from 'yaml';
 
   export let namespace;
@@ -27,14 +28,8 @@
   let open: boolean;
 
   $: if (namespace) {
-    getAllStatefulSets();
+    getAllStatefulSets(namespace);
   }
-
-  const getAllStatefulSets = async () => {
-    loadingTable = true;
-    statefulSets = await statefulSetAPI.getAllStatefulSets(namespace);
-    loadingTable = false;
-  };
 
   const getDetails = async (statefulSet: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
@@ -66,7 +61,7 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if loadingTable}
+        {#if $loadingStatefulSet}
           <Table.Row>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>

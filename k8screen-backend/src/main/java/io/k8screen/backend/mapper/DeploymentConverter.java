@@ -5,7 +5,6 @@ import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,9 @@ public class DeploymentConverter {
             ? deployment.getStatus().getReadyReplicas()
             : 0;
     final int totalReplicas =
-        Objects.requireNonNull(deployment.getSpec()).getReplicas() != null ? deployment.getSpec().getReplicas() : 0;
+        Objects.requireNonNull(deployment.getSpec()).getReplicas() != null
+            ? deployment.getSpec().getReplicas()
+            : 0;
 
     final int upToDate =
         deployment.getStatus().getUpdatedReplicas() != null

@@ -5,7 +5,6 @@ import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,9 @@ public class StatefulSetConverter {
     final String name = Objects.requireNonNull(statefulSet.getMetadata()).getName();
 
     final int totalReplicas =
-        Objects.requireNonNull(statefulSet.getSpec()).getReplicas() != null ? statefulSet.getSpec().getReplicas() : 0;
+        Objects.requireNonNull(statefulSet.getSpec()).getReplicas() != null
+            ? statefulSet.getSpec().getReplicas()
+            : 0;
 
     final int readyReplicas =
         Objects.requireNonNull(statefulSet.getStatus()).getReadyReplicas() != null

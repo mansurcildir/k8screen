@@ -5,7 +5,6 @@ import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1Service;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 

@@ -10,30 +10,23 @@
   import Button from '$lib/components/ui/button/button.svelte';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import { services, getAllServices, loadingService } from '$lib/store';
 
   export let namespace;
 
   let size: number = 5;
 
   let loading = true;
-  let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
 
-  let services: Service[] = [];
   let paginated: Service[] = [];
   let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllServices();
+    getAllServices(namespace);
   }
-
-  const getAllServices = async () => {
-    loadingTable = true;
-    services = await serviceAPI.getAllServices(namespace);
-    loadingTable = false;
-  };
 
   const getDetails = async (service: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
@@ -67,7 +60,7 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if loadingTable}
+        {#if $loadingService}
           <Table.Row>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -119,7 +112,7 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={services} bind:paginated={paginated} />
+      <Pagination bind:pageSize={size} data={$services} bind:paginated={paginated} />
     </div>
   </div>
 

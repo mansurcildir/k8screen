@@ -11,30 +11,23 @@
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/ui/badge/badge.svelte';
+  import { deployments, getAllDeployments, loadingDeployment } from '$lib/store';
 
   export let namespace;
 
   let size: number = 5;
 
   let loading = false;
-  let loadingTable = false;
   let option: OptionTerminal;
   let details: string;
 
-  let deployments: Deployment[] = [];
   let paginated: Deployment[] = [];
   let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllDeployments();
+    getAllDeployments(namespace);
   }
-
-  const getAllDeployments = async () => {
-    loadingTable = true;
-    deployments = await deploymentAPI.getAllDeployments(namespace);
-    loadingTable = false;
-  };
 
   const getDetails = async (deployment: string, opt: OptionTerminal): Promise<string> => {
     loading = true;
@@ -68,7 +61,7 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if loadingTable}
+        {#if $loadingDeployment}
           <Table.Row>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -124,7 +117,7 @@
       </Table.Body>
     </Table.Root>
     <div class="mb-5">
-      <Pagination bind:pageSize={size} data={deployments} bind:paginated={paginated} />
+      <Pagination bind:pageSize={size} data={$deployments} bind:paginated={paginated} />
     </div>
   </div>
 
