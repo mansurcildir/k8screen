@@ -86,7 +86,7 @@ jobs:
           cd k8screen-helm
           git config user.name "k8screen bot"
           git config user.email "k8screen-bot@k8screen.io"
-          yq -i e '.imageTag |= "${{ env.DOCKER_IMAGE_TAG }}"' prod.yml
+          yq -i e '.imageTag |= "${{ env.DOCKER_IMAGE_TAG }}"' values.yaml
           git add .
           git status
           git commit -m "New Release '${{ env.DOCKER_IMAGE_TAG }}'"
