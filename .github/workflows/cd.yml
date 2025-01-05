@@ -1,7 +1,6 @@
 name: k8screen CD
 
 on:
-  workflow_dispatch:
   pull-request:
   push:
     tags:
