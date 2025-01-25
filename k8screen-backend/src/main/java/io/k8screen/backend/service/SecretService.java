@@ -1,6 +1,6 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.k8screen.backend.data.dto.SecretDTO;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.SecretConverter;
@@ -10,24 +10,20 @@ import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.util.Yaml;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class SecretService {
 
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
   private final @NotNull SecretConverter secretConverter;
-
-  public SecretService(
-      final @NotNull UserService userService,
-      final @NotNull ApiClientFactory apiClientFactory,
-      final @NotNull SecretConverter secretConverter) {
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-    this.secretConverter = secretConverter;
-  }
 
   public V1Secret create(
       final @NotNull String namespace, final @NotNull V1Secret secret, final @NotNull String userId)

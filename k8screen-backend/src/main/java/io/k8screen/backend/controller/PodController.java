@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.WebSocketSession;
 
 @RestController
 @RequestMapping("/api/v1/namespaces/{namespace}/pods")
@@ -73,16 +74,17 @@ public class PodController {
     return ResponseEntity.status(HttpStatus.OK).body(pod);
   }
 
-  @GetMapping("/{name}/logs")
-  public ResponseEntity<String> getLogs(
-      final @NotNull Authentication authentication,
-      @PathVariable final @NotNull String namespace,
-      @PathVariable final @NotNull String name)
-      throws Exception {
+  @GetMapping("/{namespace}/{name}/logs")
+  public void getLogs(
+          final @NotNull Authentication authentication,
+          @PathVariable final @NotNull String namespace,
+          @PathVariable final @NotNull String name,
+          WebSocketSession webSocketSession
+  ) throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final String pod = this.podService.findLogs(namespace, name, userId);
-    return ResponseEntity.status(HttpStatus.OK).body(pod);
+
+    this.podService.findLogs(namespace, name, userId, webSocketSession);
   }
 
   @PostMapping("/{name}/exec")

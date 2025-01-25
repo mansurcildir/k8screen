@@ -1,6 +1,6 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.k8screen.backend.data.dto.ServiceDTO;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.ServiceConverter;
@@ -9,24 +9,20 @@ import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.Yaml;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class ServiceService {
 
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
   private final @NotNull ServiceConverter serviceConverter;
-
-  public ServiceService(
-      final @NotNull UserService userService,
-      final @NotNull ApiClientFactory apiClientFactory,
-      final @NotNull ServiceConverter serviceConverter) {
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-    this.serviceConverter = serviceConverter;
-  }
 
   public V1Service create(
       final @NotNull String namespace,

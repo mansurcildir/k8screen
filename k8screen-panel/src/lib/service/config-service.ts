@@ -1,10 +1,26 @@
 import type { ConfigItem } from '$lib/model/config/ConfigItem';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
-import { applyGetRequestWithBearerHeader } from './http-request';
+import { applyDeleteRequestWithBearerHeader, applyGetRequestWithBearerHeader } from './http-request';
+import { getAccessToken } from './storage-manager';
 
 export const configAPI = {
   getAllConfigs: async (): Promise<ConfigItem[]> => {
     const url = `${SPRING_BASE_URL}/api/v1/configs`;
     return await (await applyGetRequestWithBearerHeader(url)).json();
+  },
+
+  uploadConfig: async (formData: FormData) => {
+    return await fetch(`${SPRING_BASE_URL}/api/v1/configs/upload`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`
+      }
+    });
+  },
+
+  deleteConfig: async (fileName: string) => {
+    const url = `${SPRING_BASE_URL}/api/v1/configs/delete?name=${fileName}`;
+    return await (await applyDeleteRequestWithBearerHeader(url)).json();
   }
 };

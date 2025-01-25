@@ -12,6 +12,9 @@
   import { configAPI } from '$lib/service/config-service';
   import { Input } from '$lib/components/ui/input/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
+  import X from 'lucide-svelte/icons/x';
+  import { z } from 'zod';
+  import { writable } from 'svelte/store';
 
   // This should be `Component` after lucide-svelte updates types
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,22 +22,43 @@
     configs,
     user,
     updateConfig,
-    uploadFile
+    uploadFile,
+    deleteFile
   }: {
     configs: ConfigItem[];
     user: { name: string; email: string; avatar: string; config: string };
     updateConfig: (config: string) => void;
     uploadFile: (file: File) => Promise<void>;
+    deleteFile: (fileName: string) => Promise<void>;
   } = $props();
+
   const sidebar = useSidebar();
+  const fileError = writable<string | null>(null);
   let file: File;
+    
+  const fileSchema = z.instanceof(File, {
+    message: 'You must upload a valid file.'
+  });
 
   function handleFileChange(event: any) {
     file = event.target.files[0];
+
+    const validation = fileSchema.safeParse(file);
+    if (!validation.success) {
+      fileError.set(validation.error.errors[0].message);
+    } else {
+      fileError.set(null);
+    }
   }
 
   const submit = () => {
-    uploadFile(file);
+    const validation = fileSchema.safeParse(file);
+    if (!validation.success) {
+      fileError.set(validation.error.errors[0].message);
+    } else {
+      fileError.set(null);
+      uploadFile(file);
+    }
   };
 
   onMount(() => {
@@ -79,21 +103,49 @@
         sideOffset={4}
       >
         <DropdownMenu.Label class="text-muted-foreground text-xs">Configs</DropdownMenu.Label>
+        <style>
+          .dropdown-item {
+            display: flex;
+            align-items: center;
+            position: relative;
+          }
+
+          .dropdown-item button {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+          }
+
+          .dropdown-item:hover button {
+            opacity: 1;
+          }
+        </style>
+
         {#each configs as config, index (config.name)}
           <DropdownMenu.Item
             onSelect={() => {
               updateConfig(config.name);
               user.config != config.name && goto('/namespaces');
             }}
-            class="gap-2 p-2"
+            class="dropdown-item"
           >
             <div class="flex size-6 items-center justify-center rounded-sm border">
               <GalleryVerticalEnd class="size-4 shrink-0" />
             </div>
             {config.name}
-            <DropdownMenu.Shortcut>{index + 1}</DropdownMenu.Shortcut>
+            <Button
+              onclick={() => {
+                deleteFile(config.name);
+              }}
+              type="button"
+              class="ms-auto h-8 w-5"
+              variant="outline"
+              size="sm"
+            >
+              <X />
+            </Button>
           </DropdownMenu.Item>
         {/each}
+
         <DropdownMenu.Separator />
         <div class="flex justify-between w-full">
           <Dialog.Root>
@@ -111,7 +163,10 @@
                   <form onsubmit={submit}>
                     <div class="grid gap-4">
                       <div class="grid gap-2">
-                        <Input type="file" id="name" class="col-span-3" onchange={handleFileChange} />
+                        <Input type="file" id="name" class="col-span-3 cursor-pointer" onchange={handleFileChange} />
+                        {#if $fileError}
+                          <div class="text-red-400 text-sm mt-2">{$fileError}</div>
+                        {/if}
                       </div>
                       <Button type="submit" class="w-full">Upload</Button>
                     </div>

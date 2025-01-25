@@ -7,6 +7,9 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -25,6 +28,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class AuthService {
 
   @Value("${spring.security.oauth2.client.registration.google.client-id}")
@@ -40,17 +45,6 @@ public class AuthService {
   private final @NotNull JwtUtil jwtUtil;
   private final @NotNull PasswordEncoder passwordEncoder;
   private final @NotNull UserService userService;
-
-  public AuthService(
-      final @NotNull AuthenticationManager authManager,
-      final @NotNull JwtUtil jwtUtil,
-      final @NotNull PasswordEncoder passwordEncoder,
-      final @NotNull UserService userService) {
-    this.authManager = authManager;
-    this.jwtUtil = jwtUtil;
-    this.passwordEncoder = passwordEncoder;
-    this.userService = userService;
-  }
 
   public Map<String, String> login(final @NotNull UserLoginReq loginRequest) {
     final Authentication authentication =

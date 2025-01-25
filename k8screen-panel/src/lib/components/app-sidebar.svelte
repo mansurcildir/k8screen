@@ -3,9 +3,12 @@
   import NavUser from '$lib/components/nav-user.svelte';
   import TeamSwitcher from '$lib/components/config-switcher.svelte';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-
-  // Data will be updated reactively
+  import { theme } from 'mode-watcher';
+  
   export let data;
+  export let loading: boolean;
+
+  $: color = $theme ? $theme : 'light';
 </script>
 
 <Sidebar.Root>
@@ -15,10 +18,11 @@
       user={data.user}
       updateConfig={data.updateConfig}
       uploadFile={data.uploadFile}
+      deleteFile={data.deleteFile}
     />
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavMain items={data.navMain} />
+    <NavMain items={data.navMain} loading={loading}/>
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser user={data.user} />

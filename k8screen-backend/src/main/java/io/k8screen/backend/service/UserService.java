@@ -10,24 +10,20 @@ import io.k8screen.backend.mapper.UserConverter;
 import io.k8screen.backend.repository.RoleRepository;
 import io.k8screen.backend.repository.UserRepository;
 import java.util.Set;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class UserService {
 
   private final @NotNull UserRepository userRepository;
   private final @NotNull RoleRepository roleRepository;
   private final @NotNull UserConverter userConverter;
-
-  public UserService(
-      final @NotNull UserRepository userRepository,
-      final @NotNull UserConverter userConverter,
-      final @NotNull RoleRepository roleRepository) {
-    this.userRepository = userRepository;
-    this.userConverter = userConverter;
-    this.roleRepository = roleRepository;
-  }
 
   public void create(final @NotNull UserForm userForm) {
     final User user = this.userConverter.toUser(userForm);

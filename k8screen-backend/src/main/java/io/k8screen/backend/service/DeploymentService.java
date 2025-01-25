@@ -1,6 +1,6 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.k8screen.backend.data.dto.DeploymentDTO;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.DeploymentConverter;
@@ -10,24 +10,20 @@ import io.kubernetes.client.openapi.models.V1DeploymentList;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.util.Yaml;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class DeploymentService {
 
   private final @NotNull DeploymentConverter deploymentConverter;
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
-
-  public DeploymentService(
-      final @NotNull DeploymentConverter deploymentConverter,
-      final @NotNull UserService userService,
-      final @NotNull ApiClientFactory apiClientFactory) {
-    this.deploymentConverter = deploymentConverter;
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-  }
 
   public V1Deployment create(
       final @NotNull String namespace,

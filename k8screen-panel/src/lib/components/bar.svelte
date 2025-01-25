@@ -5,7 +5,6 @@
 </script>
 
 <style>
-  /* Dalga etkisi için her çubuğa farklı bir gecikme ekleyelim */
   .delay-0 {
     animation-delay: 0s;
   }
@@ -17,8 +16,10 @@
   }
 </style>
 
-<div class="flex space-x-0.5">
-  <div class={`${width} ${height} ${color} rounded-sm animate-bounce delay-0`}></div>
-  <div class={`${width} ${height} ${color} rounded-sm animate-bounce delay-150`}></div>
-  <div class={`${width} ${height} ${color} rounded-sm animate-bounce delay-300`}></div>
+<div {...$$props}>
+  <div class="flex space-x-0.5">
+    <div class={`${width} ${height} ${color} rounded-sm animate-bounce delay-0`}></div>
+    <div class={`${width} ${height} ${color} rounded-sm animate-bounce delay-150`}></div>
+    <div class={`${width} ${height} ${color} rounded-sm animate-bounce delay-300`}></div>
+  </div>
 </div>

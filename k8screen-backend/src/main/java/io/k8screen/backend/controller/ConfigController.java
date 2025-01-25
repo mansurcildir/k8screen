@@ -8,10 +8,14 @@ import io.k8screen.backend.service.FileSystemService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,17 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/configs")
+@RequiredArgsConstructor
 public class ConfigController {
 
-  private final ConfigService configService;
-  private final @NotNull FileSystemService fileSystemService;
-
-  public ConfigController(
-      final @NotNull ConfigService configService,
-      final @NotNull FileSystemService fileSystemService) {
-    this.configService = configService;
-    this.fileSystemService = fileSystemService;
-  }
+  private final @NotNull ConfigService configService;
 
   @GetMapping({"", "/"})
   public ResponseEntity<List<ConfigItem>> getAllConfigs(
@@ -53,27 +50,26 @@ public class ConfigController {
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
-  @PostMapping({"", "/"})
-  public ResponseEntity<Boolean> createConfig(
+  @PostMapping({"/upload", "/upload/"})
+  public ResponseEntity<Boolean> uploadConfigFile(
       final @NotNull Authentication authentication,
-      @Valid @RequestBody final @NotNull ConfigForm configForm) {
+      @RequestParam("config") final @NotNull MultipartFile file)
+      throws IOException {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    this.configService.createConfig(configForm, userId);
+    this.configService.createConfig(file, userId);
 
     return ResponseEntity.status(HttpStatus.OK).body(true);
   }
 
-  @PostMapping({"/upload", "/upload/"})
-  public ResponseEntity<Boolean> uploadConfigFile(
-      final @NotNull Authentication authentication,
-      @RequestParam("config") final MultipartFile file)
-      throws IOException {
+  @DeleteMapping({"/delete", "/delete/"})
+  public ResponseEntity<Boolean> deleteConfigFile(
+          final @NotNull Authentication authentication,
+          @RequestParam final @NotNull String name)
+          throws IOException {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final ConfigForm configForm = ConfigForm.builder().name(file.getOriginalFilename()).build();
-    this.fileSystemService.uploadConfig(file, userId);
-    this.configService.createConfig(configForm, userId);
+    this.configService.deleteConfigByName(name, userId);
 
     return ResponseEntity.status(HttpStatus.OK).body(true);
   }

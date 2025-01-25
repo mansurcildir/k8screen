@@ -1,6 +1,6 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.k8screen.backend.data.dto.PodDTO;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.PodConverter;
@@ -14,24 +14,20 @@ import io.kubernetes.client.util.Yaml;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class PodService {
 
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
   private final @NotNull PodConverter podConverter;
-
-  public PodService(
-      final @NotNull UserService userService,
-      final @NotNull ApiClientFactory apiClientFactory,
-      final @NotNull PodConverter podConverter) {
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-    this.podConverter = podConverter;
-  }
 
   public List<PodDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {

@@ -43,7 +43,7 @@ spring:
         registration:
           google:
             client-id: ${GOOGLE_CLIENT_ID:YOUR_GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET:YOUR_GOOGLE_CLIENT_SECRET}
+            client-secret: ${GOOGLE_CLIENT_SECRET:GOCSPX-YOUR_GOOGLE_CLIENT_SECRET}
             scope: openid,profile,email
             redirect-uri: http://localhost:5173
             authorization-grant-type: authorization_code

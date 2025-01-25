@@ -19,19 +19,12 @@
   import { configAPI } from '$lib/service/config-service';
   import type { ConfigItem } from '$lib/model/config/ConfigItem';
   import type { UserConfig } from '$lib/model/user/UserConfig';
-  import { getAccessToken } from '$lib/service/storage-manager';
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';
   import { refresh } from '$lib/store';
 
   $: namespace = $page.params.namespace;
 
-  let breadcrumbs = extractBreadcrumbs($page.url.pathname);
-
-  $: {
-    if (breadcrumbs) {
-      breadcrumbs = extractBreadcrumbs($page.url.pathname);
-    }
-  }
+  $: breadcrumbs = extractBreadcrumbs($page.url.pathname);
 
   let showRefreshButton = false;
 
@@ -40,17 +33,22 @@
     showRefreshButton = urlPattern.test($page.url.pathname);
   }
 
+  let loading = false;
   let namespaces: { title: string; url: string }[] = [];
   let user: UserItem;
   let configs: ConfigItem[] = [];
 
   const getNamespaces = () => {
-    namespaceAPI.getAllNamespaces().then((data) => {
-      namespaces = data.map((ns) => ({
-        title: ns,
-        url: `/namespaces/${ns}`
-      }));
-    });
+    loading = true;
+    namespaceAPI
+      .getAllNamespaces()
+      .then((data) => {
+        namespaces = data.map((ns) => ({
+          title: ns,
+          url: `/namespaces/${ns}`
+        }));
+      })
+      .finally(() => (loading = false));
   };
 
   const getProfile = () => {
@@ -60,12 +58,21 @@
   };
 
   const updateConfig = (config: string) => {
+    loading = true;
     const userConfig: UserConfig = {
       config
     };
+    
     userAPI.updateConfig(userConfig).then(() => {
-      getNamespaces();
-      getProfile();
+      namespaceAPI
+      .getAllNamespaces()
+      .then((data) => {
+        namespaces = data.map((ns) => ({
+          title: ns,
+          url: `/namespaces/${ns}`
+        }));
+      })
+      .finally(() => (loading = false));
     });
   };
 
@@ -73,22 +80,23 @@
     const formData = new FormData();
     formData.append('config', file);
 
-    const response = await fetch('http://localhost:8080/api/v1/configs/upload', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${getAccessToken()}`
-      }
-    });
-
-    if (response.ok) {
+    configAPI.uploadConfig(formData).then(() => {
       const userConfig: UserConfig = {
         config: file.name
       };
       userAPI.updateConfig(userConfig).then(() => {
         window.location.href = '/namespaces';
       });
-    }
+    });
+  };
+
+  const deleteFile = async (fileName: string) => {
+    configAPI.deleteConfig(fileName).then(() => {
+      configAPI.getAllConfigs()
+      .then((d) => {
+        configs = d;
+      });
+    });
   };
 
   onMount(() => {
@@ -106,6 +114,7 @@
     },
     updateConfig: updateConfig,
     uploadFile: uploadFile,
+    deleteFile: deleteFile,
     configs: configs,
     navMain: [
       {
@@ -142,7 +151,7 @@
 </script>
 
 <Sidebar.Provider>
-  <AppSidebar data={data} />
+  <AppSidebar data={data} loading={loading} />
   <Sidebar.Inset>
     <header
       class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12"

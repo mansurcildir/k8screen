@@ -10,7 +10,7 @@
   import Save from 'lucide-svelte/icons/save';
   import { OptionTerminal } from '$lib/model/enum';
   import { onMount } from 'svelte';
-  import { stringTag } from 'yaml/util';
+  import { theme } from 'mode-watcher';
 
   export let k8sItem: string;
   export let option: OptionTerminal;
@@ -31,6 +31,8 @@
   $: {
     editedItem = details;
   }
+
+  $: color = $theme ? $theme : 'light';
 
   let editedItem: string;
   let isResizing = false;
@@ -66,7 +68,7 @@
   };
 
   const handleMouseMove = (event: MouseEvent) => {
-    if (isResizing) {
+    if (open && isResizing) {
       const newHeight = containerHeight - event.movementY;
       if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
         if (newHeight < containerHeight) {
@@ -106,7 +108,7 @@
   }
 </style>
 
-<Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar" open={open}>
+<Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar absolute bottom-0 left-0 right-0 mx-4" open={open}>
   <div class="flex items-center px-3 py-1 gap-2">
     <div class="flex justify-center items-center gap-2">
       <button on:click={() => (open = !open)}>
@@ -154,18 +156,18 @@
     {/if}
   </div>
 
+  <div
+  class="resize-handle"
+  role="button"
+  tabindex="0"
+  on:mousedown={handleMouseDown}
+  style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
+></div>
   <Collapsible.Content>
-    <div
-      class="resize-handle"
-      role="button"
-      tabindex="0"
-      on:mousedown={handleMouseDown}
-      style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
-    ></div>
-    <div class="relative text-white log-container rounded-b-md bg-black" style="height: {containerHeight}px;">
+    <div class="relative text-white log-container bg-black" style="height: {containerHeight}px;">
       {#if loading}
         <div class="flex justify-center items-center h-full">
-          <Spinner />
+          <Spinner class="m-auto h-10 w-10"/>
         </div>
       {:else if option === OptionTerminal.LOG}
         <div class="w-full h-full p-5 overflow-auto">{logs}</div>
