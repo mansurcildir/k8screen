@@ -9,8 +9,6 @@
   import Logs from 'lucide-svelte/icons/logs';
   import Save from 'lucide-svelte/icons/save';
   import { OptionTerminal } from '$lib/model/enum';
-  import { onMount } from 'svelte';
-  import { theme } from 'mode-watcher';
 
   export let k8sItem: string;
   export let option: OptionTerminal;
@@ -27,12 +25,14 @@
   export let getLogs: (pod: string, opt: OptionTerminal) => Promise<string> = async () => '';
   export let updateItem: (pod: string) => Promise<string>;
   export let exec: (req: string) => Promise<string> = async () => '';
+  let socket: WebSocket;
 
   $: {
     editedItem = details;
+    if (option != OptionTerminal.LOG) {
+      closeSocket();
+    }
   }
-
-  $: color = $theme ? $theme : 'light';
 
   let editedItem: string;
   let isResizing = false;
@@ -54,8 +54,31 @@
   const log = async () => {
     loading = true;
     open = true;
-    logs = await getLogs(k8sItem, OptionTerminal.LOG);
+    const url = await getLogs(k8sItem, OptionTerminal.LOG);
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      socket = new WebSocket(url);
+    }
+
+    socket.onopen = function () {
+      console.log('WebSocket connection opened!');
+    };
+
+    socket.onmessage = function (event) {
+      logs = event.data;
+    };
+
+    socket.onclose = function () {
+      console.log('WebSocket connection closed!');
+    };
+
     loading = false;
+  };
+
+  const closeSocket = () => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.close();
+    }
   };
 
   const terminal = async () => {
@@ -89,14 +112,6 @@
 
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
-
-  onMount(() => {
-    setInterval(async () => {
-      if (option === OptionTerminal.LOG) {
-        logs = await getLogs(k8sItem, OptionTerminal.LOG);
-      }
-    }, 5000);
-  });
 </script>
 
 <style>
@@ -157,17 +172,17 @@
   </div>
 
   <div
-  class="resize-handle"
-  role="button"
-  tabindex="0"
-  on:mousedown={handleMouseDown}
-  style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
-></div>
+    class="resize-handle"
+    role="button"
+    tabindex="0"
+    on:mousedown={handleMouseDown}
+    style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
+  ></div>
   <Collapsible.Content>
     <div class="relative text-white log-container bg-black" style="height: {containerHeight}px;">
       {#if loading}
         <div class="flex justify-center items-center h-full">
-          <Spinner class="m-auto h-10 w-10"/>
+          <Spinner class="m-auto h-10 w-10" />
         </div>
       {:else if option === OptionTerminal.LOG}
         <div class="w-full h-full p-5 overflow-auto">{logs}</div>

@@ -1,20 +1,29 @@
 package io.k8screen.backend.config;
 
+import io.k8screen.backend.websocket.PodExecHandler;
+import io.k8screen.backend.websocket.PodLogHandler;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketHandler(), "/ws/pod/logs")
-                .setAllowedOrigins("*");  // Gerekli originleri buraya ekleyebilirsiniz.
-    }
+  private final @NotNull PodLogHandler podLogHandler;
+  private final @NotNull PodExecHandler podExecHandler;
+
+  public WebSocketConfig(
+      final @NotNull PodLogHandler podLogHandler, final @NotNull PodExecHandler podExecHandler) {
+    this.podLogHandler = podLogHandler;
+    this.podExecHandler = podExecHandler;
+  }
+
+  @Override
+  public void registerWebSocketHandlers(final @NotNull WebSocketHandlerRegistry registry) {
+    registry.addHandler(this.podLogHandler, "/ws/logs").setAllowedOrigins("*");
+    registry.addHandler(this.podExecHandler, "/ws/exec").setAllowedOrigins("*");
+  }
 }

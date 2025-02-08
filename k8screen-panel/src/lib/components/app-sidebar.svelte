@@ -4,7 +4,7 @@
   import TeamSwitcher from '$lib/components/config-switcher.svelte';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import { theme } from 'mode-watcher';
-  
+
   export let data;
   export let loading: boolean;
 
@@ -22,7 +22,7 @@
     />
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavMain items={data.navMain} loading={loading}/>
+    <NavMain items={data.navMain} loading={loading} />
   </Sidebar.Content>
   <Sidebar.Footer>
     <NavUser user={data.user} />

@@ -1,17 +1,16 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.util.ApiClientFactory;
-import io.k8screen.backend.data.dto.SecretDTO;
+import io.k8screen.backend.data.dto.SecretInfo;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.SecretConverter;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.util.Yaml;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -44,7 +43,7 @@ public class SecretService {
     return coreV1Api.replaceNamespacedSecret(name, namespace, secret).execute();
   }
 
-  public SecretDTO findByName(
+  public SecretInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
     final UserItem user = this.userService.findById(userId);
@@ -65,7 +64,7 @@ public class SecretService {
     return Yaml.dump(secret);
   }
 
-  public List<SecretDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
+  public List<SecretInfo> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {
     final UserItem user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);

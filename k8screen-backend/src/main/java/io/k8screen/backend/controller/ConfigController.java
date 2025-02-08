@@ -1,15 +1,10 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.config.ConfigForm;
 import io.k8screen.backend.data.config.ConfigItem;
 import io.k8screen.backend.service.ConfigService;
-import io.k8screen.backend.service.FileSystemService;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -19,7 +14,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,9 +58,8 @@ public class ConfigController {
 
   @DeleteMapping({"/delete", "/delete/"})
   public ResponseEntity<Boolean> deleteConfigFile(
-          final @NotNull Authentication authentication,
-          @RequestParam final @NotNull String name)
-          throws IOException {
+      final @NotNull Authentication authentication, @RequestParam final @NotNull String name)
+      throws IOException {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
     this.configService.deleteConfigByName(name, userId);

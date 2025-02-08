@@ -1,10 +1,9 @@
 package io.k8screen.backend.service;
 
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +34,7 @@ public class FileSystemService {
   }
 
   public void deleteConfig(final @NotNull String fileName, final @NotNull String userId)
-          throws IOException {
+      throws IOException {
     final File targetDirectory = new File(this.configPath + File.separator + userId);
     if (!targetDirectory.exists()) {
       throw new IOException("Directory not found for user: " + userId);
@@ -51,5 +50,4 @@ public class FileSystemService {
       throw new IOException("Failed to delete file: " + fileName);
     }
   }
-
 }

@@ -9,9 +9,8 @@ import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.UserConverter;
 import io.k8screen.backend.repository.RoleRepository;
 import io.k8screen.backend.repository.UserRepository;
-import java.util.Set;
-
 import jakarta.transaction.Transactional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;

@@ -1,17 +1,16 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.util.ApiClientFactory;
-import io.k8screen.backend.data.dto.DeploymentDTO;
+import io.k8screen.backend.data.dto.DeploymentInfo;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.DeploymentConverter;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1DeploymentList;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.util.Yaml;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,7 @@ public class DeploymentService {
     return appsV1Api.replaceNamespacedDeployment(name, namespace, deployment).execute();
   }
 
-  public List<DeploymentDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
+  public List<DeploymentInfo> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {
     final UserItem user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
@@ -56,7 +55,7 @@ public class DeploymentService {
         .toList();
   }
 
-  public DeploymentDTO findByName(
+  public DeploymentInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
     final UserItem user = this.userService.findById(userId);

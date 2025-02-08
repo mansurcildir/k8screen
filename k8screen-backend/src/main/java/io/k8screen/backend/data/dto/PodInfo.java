@@ -5,10 +5,10 @@ import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
 @Builder
-public record DeploymentDTO(
+public record PodInfo(
     @NotNull String name,
-    @JsonProperty("total_replicas") int totalReplicas,
-    @JsonProperty("ready_replicas") int readyReplicas,
-    @JsonProperty("up_to_date") int upToDate,
-    int available,
+    @JsonProperty("total_containers") int totalContainers,
+    @JsonProperty("ready_containers") int readyContainers,
+    @NotNull String status,
+    int restarts,
     @NotNull String age) {}

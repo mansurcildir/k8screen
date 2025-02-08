@@ -1,18 +1,15 @@
 package io.k8screen.backend.service;
 
 import com.github.f4b6a3.ulid.UlidCreator;
-import io.k8screen.backend.data.config.ConfigForm;
 import io.k8screen.backend.data.config.ConfigItem;
 import io.k8screen.backend.data.entity.Config;
 import io.k8screen.backend.data.entity.User;
 import io.k8screen.backend.mapper.ConfigConverter;
 import io.k8screen.backend.repository.ConfigRepository;
 import io.k8screen.backend.repository.UserRepository;
-
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -38,7 +35,8 @@ public class ConfigService {
     return ConfigItem.builder().id(config.getId()).name(config.getName()).build();
   }
 
-  public void createConfig(final @NotNull MultipartFile file, final @NotNull String userId) throws IOException {
+  public void createConfig(final @NotNull MultipartFile file, final @NotNull String userId)
+      throws IOException {
     final User user = this.userRepository.findById(userId).orElseThrow();
 
     final Config config = Config.builder().name(file.getOriginalFilename()).build();
@@ -50,8 +48,9 @@ public class ConfigService {
     this.fileSystemService.uploadConfig(file, userId);
   }
 
-  public void deleteConfigByName(final @NotNull String name, final @NotNull String userId) throws IOException {
+  public void deleteConfigByName(final @NotNull String name, final @NotNull String userId)
+      throws IOException {
     this.configRepository.deleteByName(name).orElseThrow();
-      this.fileSystemService.deleteConfig(name, userId);
+    this.fileSystemService.deleteConfig(name, userId);
   }
 }

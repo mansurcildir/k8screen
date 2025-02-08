@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.DeploymentDTO;
+import io.k8screen.backend.data.dto.DeploymentInfo;
 import io.k8screen.backend.service.DeploymentService;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Status;
@@ -43,24 +43,24 @@ public class DeploymentController {
   }
 
   @GetMapping
-  public ResponseEntity<List<DeploymentDTO>> listDeployments(
+  public ResponseEntity<List<DeploymentInfo>> listDeployments(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final List<DeploymentDTO> deployment = this.deploymentService.findAll(namespace, userId);
+    final List<DeploymentInfo> deployment = this.deploymentService.findAll(namespace, userId);
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<DeploymentDTO> getDeployment(
+  public ResponseEntity<DeploymentInfo> getDeployment(
       final @NotNull Authentication authentication,
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final DeploymentDTO deployment = this.deploymentService.findByName(namespace, name, userId);
+    final DeploymentInfo deployment = this.deploymentService.findByName(namespace, name, userId);
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 

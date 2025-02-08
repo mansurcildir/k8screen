@@ -5,8 +5,8 @@ import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
 @Builder
-public record StatefulSetDTO(
+public record SecretInfo(
     @NotNull String name,
-    @JsonProperty("total_replicas") int totalReplicas,
-    @JsonProperty("ready_replicas") int readyReplicas,
+    @NotNull String type,
+    @JsonProperty("data_size") int dataSize,
     @NotNull String age) {}

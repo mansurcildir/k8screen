@@ -1,6 +1,6 @@
 package io.k8screen.backend.mapper;
 
-import io.k8screen.backend.data.dto.StatefulSetDTO;
+import io.k8screen.backend.data.dto.StatefulSetInfo;
 import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import java.time.OffsetDateTime;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StatefulSetConverter {
-  public StatefulSetDTO toStatefulSetDTO(final @NotNull V1StatefulSet statefulSet) {
+  public StatefulSetInfo toStatefulSetDTO(final @NotNull V1StatefulSet statefulSet) {
     final String name = Objects.requireNonNull(statefulSet.getMetadata()).getName();
 
     final int totalReplicas =
@@ -29,7 +29,7 @@ public class StatefulSetConverter {
       age = Util.formatAge(creationTimestamp);
     }
 
-    return StatefulSetDTO.builder()
+    return StatefulSetInfo.builder()
         .name(name)
         .totalReplicas(totalReplicas)
         .readyReplicas(readyReplicas)

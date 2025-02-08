@@ -35,7 +35,7 @@
   const sidebar = useSidebar();
   const fileError = writable<string | null>(null);
   let file: File;
-    
+
   const fileSchema = z.instanceof(File, {
     message: 'You must upload a valid file.'
   });

@@ -62,17 +62,17 @@
     const userConfig: UserConfig = {
       config
     };
-    
+
     userAPI.updateConfig(userConfig).then(() => {
       namespaceAPI
-      .getAllNamespaces()
-      .then((data) => {
-        namespaces = data.map((ns) => ({
-          title: ns,
-          url: `/namespaces/${ns}`
-        }));
-      })
-      .finally(() => (loading = false));
+        .getAllNamespaces()
+        .then((data) => {
+          namespaces = data.map((ns) => ({
+            title: ns,
+            url: `/namespaces/${ns}`
+          }));
+        })
+        .finally(() => (loading = false));
     });
   };
 
@@ -92,8 +92,7 @@
 
   const deleteFile = async (fileName: string) => {
     configAPI.deleteConfig(fileName).then(() => {
-      configAPI.getAllConfigs()
-      .then((d) => {
+      configAPI.getAllConfigs().then((d) => {
         configs = d;
       });
     });

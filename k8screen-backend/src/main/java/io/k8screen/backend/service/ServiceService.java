@@ -1,16 +1,15 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.util.ApiClientFactory;
-import io.k8screen.backend.data.dto.ServiceDTO;
+import io.k8screen.backend.data.dto.ServiceInfo;
 import io.k8screen.backend.data.user.UserItem;
 import io.k8screen.backend.mapper.ServiceConverter;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.Yaml;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class ServiceService {
     return coreV1Api.replaceNamespacedService(name, namespace, service).execute();
   }
 
-  public List<ServiceDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
+  public List<ServiceInfo> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {
     final UserItem user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
@@ -53,7 +52,7 @@ public class ServiceService {
     return serviceList.getItems().stream().map(this.serviceConverter::toServiceDTO).toList();
   }
 
-  public ServiceDTO findByName(
+  public ServiceInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
     final UserItem user = this.userService.findById(userId);

@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.StatefulSetDTO;
+import io.k8screen.backend.data.dto.StatefulSetInfo;
 import io.k8screen.backend.service.StatefulSetService;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import io.kubernetes.client.openapi.models.V1Status;
@@ -56,24 +56,24 @@ public class StatefulSetController {
   }
 
   @GetMapping
-  public ResponseEntity<List<StatefulSetDTO>> listStatefulSet(
+  public ResponseEntity<List<StatefulSetInfo>> listStatefulSet(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final List<StatefulSetDTO> service = this.statefulSetService.findAll(namespace, userId);
+    final List<StatefulSetInfo> service = this.statefulSetService.findAll(namespace, userId);
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<StatefulSetDTO> getStatefulSet(
+  public ResponseEntity<StatefulSetInfo> getStatefulSet(
       final @NotNull Authentication authentication,
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final StatefulSetDTO service = this.statefulSetService.findByName(namespace, name, userId);
+    final StatefulSetInfo service = this.statefulSetService.findByName(namespace, name, userId);
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 

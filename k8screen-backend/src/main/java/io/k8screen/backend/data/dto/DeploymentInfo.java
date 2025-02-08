@@ -5,10 +5,10 @@ import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
 @Builder
-public record ServiceDTO(
+public record DeploymentInfo(
     @NotNull String name,
-    @NotNull String type,
-    @NotNull @JsonProperty("cluster_ip") String clusterIp,
-    @NotNull @JsonProperty("external_ip") String externalIp,
-    @NotNull String[] ports,
+    @JsonProperty("total_replicas") int totalReplicas,
+    @JsonProperty("ready_replicas") int readyReplicas,
+    @JsonProperty("up_to_date") int upToDate,
+    int available,
     @NotNull String age) {}

@@ -12,6 +12,8 @@
   import Pagination from '$lib/components/pagination.svelte';
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { pods, getAllPods, loadingPod } from '$lib/store';
+  import { userAPI } from '$lib/service/user-service';
+  import type { UserItem } from '$lib/model/user/UserItem';
 
   export let namespace;
 
@@ -20,7 +22,7 @@
   let loading = false;
   let option: OptionTerminal;
   let details: string;
-  let logs: string;
+  let logs: string = '';
   let execRes: string;
 
   let paginated: Pod[] = [];
@@ -45,8 +47,13 @@
     open = true;
     k8sItem = pod;
     option = opt;
-    logs = await podAPI.getPodLogs(namespace, pod);
-    return logs;
+    let user: UserItem;
+    user = await userAPI.getProfile();
+    if (user && user.id) {
+      const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${pod}&userId=${user.id}`;
+      return wsUrl;
+    }
+    return '';
   };
 
   const updateItem = async (pod: string) => {
