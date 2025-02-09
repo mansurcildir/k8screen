@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.StatefulSetInfo;
+import io.k8screen.backend.data.dto.k8s.StatefulSetInfo;
 import io.k8screen.backend.service.StatefulSetService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;

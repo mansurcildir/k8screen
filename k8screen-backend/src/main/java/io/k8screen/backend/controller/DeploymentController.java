@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.DeploymentInfo;
+import io.k8screen.backend.data.dto.k8s.DeploymentInfo;
 import io.k8screen.backend.service.DeploymentService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;

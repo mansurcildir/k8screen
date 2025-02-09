@@ -1,6 +1,6 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Node;
@@ -22,7 +22,7 @@ public class KubernetesService {
   private final @NotNull ApiClientFactory apiClientFactory;
 
   public List<String> getNodes(final @NotNull String userId) throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     final V1NodeList nodeList = coreV1Api.listNode().execute();
     return nodeList.getItems().stream()

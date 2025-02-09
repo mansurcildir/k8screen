@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.SecretInfo;
+import io.k8screen.backend.data.dto.k8s.SecretInfo;
 import io.k8screen.backend.service.SecretService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;

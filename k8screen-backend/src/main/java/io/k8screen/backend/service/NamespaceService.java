@@ -1,6 +1,6 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Namespace;
@@ -27,7 +27,7 @@ public class NamespaceService {
   private final @NotNull ApiClientFactory apiClientFactory;
 
   public List<String> getAllNamespaces(final @NotNull String userId) throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
 
     final V1NamespaceList namespaceList = coreV1Api.listNamespace().execute();
@@ -40,7 +40,7 @@ public class NamespaceService {
 
   public V1Namespace createNamespace(final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
 
     final V1Namespace namespace = new V1Namespace();
@@ -53,7 +53,7 @@ public class NamespaceService {
 
   public V1Status deleteNamespace(final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
 
     return coreV1Api.deleteNamespace(name).execute();

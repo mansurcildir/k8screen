@@ -1,5 +1,7 @@
 package io.k8screen.backend.config;
 
+import io.k8screen.backend.util.CustomUserDetailsService;
+import io.k8screen.backend.util.JwtAuthenticationFilter;
 import io.k8screen.backend.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;

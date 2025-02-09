@@ -1,7 +1,7 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.dto.StatefulSetInfo;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.k8s.StatefulSetInfo;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.mapper.StatefulSetConverter;
 import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
@@ -29,7 +29,7 @@ public class StatefulSetService {
       final @NotNull V1StatefulSet statefulSet,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.createNamespacedStatefulSet(namespace, statefulSet).execute();
   }
@@ -40,14 +40,14 @@ public class StatefulSetService {
       final @NotNull V1StatefulSet statefulSet,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.replaceNamespacedStatefulSet(name, namespace, statefulSet).execute();
   }
 
   public List<StatefulSetInfo> findAll(
       final @NotNull String namespace, final @NotNull String userId) throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1StatefulSetList serviceList = appsV1Api.listNamespacedStatefulSet(namespace).execute();
     return serviceList.getItems().stream()
@@ -58,7 +58,7 @@ public class StatefulSetService {
   public StatefulSetInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1StatefulSet statefulSet =
         appsV1Api.readNamespacedStatefulSet(name, namespace).execute();
@@ -68,7 +68,7 @@ public class StatefulSetService {
   public String getDetailByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1StatefulSet statefulSet =
         appsV1Api.readNamespacedStatefulSet(name, namespace).execute();
@@ -81,7 +81,7 @@ public class StatefulSetService {
   public V1Status deleteByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.deleteNamespacedStatefulSet(name, namespace).execute();
   }

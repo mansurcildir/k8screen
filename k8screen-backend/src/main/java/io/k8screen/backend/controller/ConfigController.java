@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.config.ConfigItem;
+import io.k8screen.backend.data.dto.config.ConfigInfo;
 import io.k8screen.backend.service.ConfigService;
+import io.k8screen.backend.util.CustomUserDetails;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,20 +27,20 @@ public class ConfigController {
   private final @NotNull ConfigService configService;
 
   @GetMapping({"", "/"})
-  public ResponseEntity<List<ConfigItem>> getAllConfigs(
+  public ResponseEntity<List<ConfigInfo>> getAllConfigs(
       final @NotNull Authentication authentication) {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final List<ConfigItem> result = this.configService.findAllConfigs(userId);
+    final List<ConfigInfo> result = this.configService.findAllConfigs(userId);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
   @GetMapping({"/{name}", "/{name}/"})
-  public ResponseEntity<ConfigItem> getConfig(
+  public ResponseEntity<ConfigInfo> getConfig(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String name) {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final ConfigItem result = this.configService.findConfigByName(name, userId);
+    final ConfigInfo result = this.configService.findConfigByName(name, userId);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 

@@ -1,7 +1,7 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.dto.DeploymentInfo;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.k8s.DeploymentInfo;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.mapper.DeploymentConverter;
 import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
@@ -29,7 +29,7 @@ public class DeploymentService {
       final @NotNull V1Deployment deployment,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.createNamespacedDeployment(namespace, deployment).execute();
   }
@@ -40,14 +40,14 @@ public class DeploymentService {
       final @NotNull V1Deployment deployment,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.replaceNamespacedDeployment(name, namespace, deployment).execute();
   }
 
   public List<DeploymentInfo> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1DeploymentList deploymentList = appsV1Api.listNamespacedDeployment(namespace).execute();
     return deploymentList.getItems().stream()
@@ -58,7 +58,7 @@ public class DeploymentService {
   public DeploymentInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1Deployment deployment = appsV1Api.readNamespacedDeployment(name, namespace).execute();
     return this.deploymentConverter.toDeploymentDTO(deployment);
@@ -67,7 +67,7 @@ public class DeploymentService {
   public String getDetailByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1Deployment deployment = appsV1Api.readNamespacedDeployment(name, namespace).execute();
     if (deployment.getMetadata() != null && deployment.getMetadata().getManagedFields() != null) {
@@ -79,7 +79,7 @@ public class DeploymentService {
   public V1Status deleteByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.deleteNamespacedDeployment(name, namespace).execute();
   }

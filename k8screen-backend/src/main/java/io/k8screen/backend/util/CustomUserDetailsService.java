@@ -1,5 +1,6 @@
-package io.k8screen.backend.config;
+package io.k8screen.backend.util;
 
+import io.k8screen.backend.core.exception.ItemNotFoundException;
 import io.k8screen.backend.data.entity.User;
 import io.k8screen.backend.repository.UserRepository;
 import java.util.stream.Collectors;
@@ -21,7 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(final @NotNull String username)
       throws UsernameNotFoundException {
-    final User user = this.userRepository.findByUsername(username).orElseThrow();
+    final User user =
+        this.userRepository
+            .findByUsername(username)
+            .orElseThrow(() -> new ItemNotFoundException("User not found"));
 
     return new CustomUserDetails(
         user.getId(),

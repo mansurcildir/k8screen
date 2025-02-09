@@ -7,68 +7,57 @@
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import Terminal from '$lib/components/terminal.svelte';
   import * as yaml from 'yaml';
-  import { OptionTerminal, Status } from '$lib/model/enum';
+  import { Status } from '$lib/model/enum';
   import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { pods, getAllPods, loadingPod } from '$lib/store';
   import { userAPI } from '$lib/service/user-service';
-  import type { UserItem } from '$lib/model/user/UserItem';
 
   export let namespace;
 
   let size: number = 5;
-
-  let loading = false;
-  let option: OptionTerminal;
+  let k8sItem: string = '';
   let details: string;
   let logs: string = '';
-  let execRes: string;
-
   let paginated: Pod[] = [];
-  let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
     getAllPods(namespace);
   }
 
-  const getDetails = async (pod: string, opt: OptionTerminal): Promise<string> => {
-    loading = true;
+  const getDetails = async (): Promise<string> => {
     open = true;
-    k8sItem = pod;
-    option = opt;
-    details = await podAPI.getPodDetails(namespace, pod);
-    loading = false;
+    details = await podAPI.getPodDetails(namespace, k8sItem);
     return details;
   };
 
-  const getLogs = async (pod: string, opt: OptionTerminal): Promise<string> => {
+  const getLogs = async (): Promise<string> => {
     open = true;
-    k8sItem = pod;
-    option = opt;
-    let user: UserItem;
-    user = await userAPI.getProfile();
+
+    const user = await userAPI.getProfile();
     if (user && user.id) {
-      const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${pod}&userId=${user.id}`;
+      const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userId=${user.id}`;
       return wsUrl;
     }
     return '';
   };
 
-  const updateItem = async (pod: string) => {
-    loading = true;
-    details = await podAPI.updatePod(namespace, pod, yaml.parse(pod));
-    loading = false;
+  const updateItem = async () => {
+    details = await podAPI.updatePod(namespace, k8sItem, yaml.parse(k8sItem));
     return details;
   };
 
-  const exec = async (req: string): Promise<string> => {
-    loading = true;
+  const getExec = async (): Promise<string> => {
     open = true;
-    execRes = await podAPI.exec(namespace, k8sItem, ['sh', '-c', req]);
-    loading = false;
-    return execRes;
+
+    const user = await userAPI.getProfile();
+    if (user && user.id) {
+      const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userId=${user.id}`;
+      return wsUrl;
+    }
+    return '';
   };
 </script>
 
@@ -99,7 +88,8 @@
           {#each paginated as pod}
             <Table.Row
               on:click={() => {
-                getDetails(pod.name, OptionTerminal.DETAIL);
+                k8sItem = pod.name;
+                open = true;
               }}
               class="cursor-pointer"
             >
@@ -133,13 +123,9 @@
                     <DropdownMenu.Group>
                       <DropdownMenu.Item
                         onclick={() => {
-                          getDetails(pod.name, OptionTerminal.DETAIL);
+                          k8sItem = pod.name;
+                          getDetails();
                         }}>View</DropdownMenu.Item
-                      >
-                      <DropdownMenu.Item
-                        onclick={() => {
-                          getDetails(pod.name, OptionTerminal.EDIT);
-                        }}>Edit</DropdownMenu.Item
                       >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
@@ -162,12 +148,10 @@
       getDetails={getDetails}
       updateItem={updateItem}
       getLogs={getLogs}
-      exec={exec}
+      getExec={getExec}
       k8sItem={k8sItem}
-      option={option}
       details={details}
       logs={logs}
-      loading={loading}
       bind:open={open}
     />
   {/if}

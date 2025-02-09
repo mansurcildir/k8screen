@@ -1,7 +1,7 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.dto.SecretInfo;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.k8s.SecretInfo;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.mapper.SecretConverter;
 import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
@@ -27,7 +27,7 @@ public class SecretService {
   public V1Secret create(
       final @NotNull String namespace, final @NotNull V1Secret secret, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     return coreV1Api.createNamespacedSecret(namespace, secret).execute();
   }
@@ -38,7 +38,7 @@ public class SecretService {
       final @NotNull V1Secret secret,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     return coreV1Api.replaceNamespacedSecret(name, namespace, secret).execute();
   }
@@ -46,7 +46,7 @@ public class SecretService {
   public SecretInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     final V1Secret secret = coreV1Api.readNamespacedSecret(name, namespace).execute();
     return this.secretConverter.toSecretDTO(secret);
@@ -55,7 +55,7 @@ public class SecretService {
   public String getDetailByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     final V1Secret secret = coreV1Api.readNamespacedSecret(name, namespace).execute();
     if (secret.getMetadata() != null && secret.getMetadata().getManagedFields() != null) {
@@ -66,7 +66,7 @@ public class SecretService {
 
   public List<SecretInfo> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     final V1SecretList secretList = coreV1Api.listNamespacedSecret(namespace).execute();
     return secretList.getItems().stream().map(this.secretConverter::toSecretDTO).toList();
@@ -75,7 +75,7 @@ public class SecretService {
   public V1Status deleteByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
     return coreV1Api.deleteNamespacedSecret(name, namespace).execute();
   }

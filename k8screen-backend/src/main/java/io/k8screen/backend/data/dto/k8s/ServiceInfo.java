@@ -1,4 +1,4 @@
-package io.k8screen.backend.data.dto;
+package io.k8screen.backend.data.dto.k8s;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

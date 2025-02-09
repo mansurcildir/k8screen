@@ -1,14 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { userAPI } from '$lib/service/user-service';
-  import type { UserItem } from '$lib/model/user/UserItem';
+  import type { UserInfo } from '$lib/model/user/UserInfo';
 
-  let user: UserItem;
+  let user: UserInfo;
   let socket: WebSocket;
   let namespace = 'imentis';
   let podName = 'imentis-backend-b86c48bd5-4dcxq';
 
-  let terminalOutput: string[] = [];
   let userInput: string = '';
 
   // Kullanıcı profilini al
@@ -25,7 +24,7 @@
 
     socket.onmessage = (event) => {
       const message = event.data;
-      terminalOutput.push(message);
+      console.log('Mesaj:', message);
     };
 
     socket.onerror = (error) => {
@@ -37,11 +36,9 @@
     };
   });
 
-  // Kullanıcıdan gelen komutu WebSocket'e gönder
   const sendCommand = () => {
     if (socket && socket.readyState === WebSocket.OPEN && userInput.trim() !== '') {
       socket.send(userInput);
-      terminalOutput.push(`> ${userInput}`);
       userInput = '';
     }
   };
@@ -80,11 +77,7 @@
 
 <main>
   <div class="terminal">
-    <div class="output">
-      {#each terminalOutput as line}
-        <div>{line}</div>
-      {/each}
-    </div>
+    <div class="output"></div>
     <input
       type="text"
       bind:value={userInput}

@@ -3,7 +3,7 @@
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import { useSidebar } from '$lib/components/ui/sidebar/index.js';
-  import type { ConfigItem } from '$lib/model/config/ConfigItem';
+  import type { ConfigInfo } from '$lib/model/config/ConfigInfo';
   import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
   import GalleryVerticalEnd from 'lucide-svelte/icons/gallery-vertical-end';
   import Plus from 'lucide-svelte/icons/plus';
@@ -25,7 +25,7 @@
     uploadFile,
     deleteFile
   }: {
-    configs: ConfigItem[];
+    configs: ConfigInfo[];
     user: { name: string; email: string; avatar: string; config: string };
     updateConfig: (config: string) => void;
     uploadFile: (file: File) => Promise<void>;
@@ -62,7 +62,7 @@
   };
 
   onMount(() => {
-    configAPI.getAllConfigs().then((data: ConfigItem[]) => {
+    configAPI.getAllConfigs().then((data: ConfigInfo[]) => {
       configs = data;
     });
   });

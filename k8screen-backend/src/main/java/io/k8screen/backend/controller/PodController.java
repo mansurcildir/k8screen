@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.PodInfo;
+import io.k8screen.backend.data.dto.k8s.PodInfo;
 import io.k8screen.backend.service.PodService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Pod;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,8 @@
 package io.k8screen.backend.service;
 
 import com.github.f4b6a3.ulid.UlidCreator;
-import io.k8screen.backend.data.config.ConfigItem;
+import io.k8screen.backend.core.exception.ItemNotFoundException;
+import io.k8screen.backend.data.dto.config.ConfigInfo;
 import io.k8screen.backend.data.entity.Config;
 import io.k8screen.backend.data.entity.User;
 import io.k8screen.backend.mapper.ConfigConverter;
@@ -25,19 +26,25 @@ public class ConfigService {
   private final @NotNull ConfigConverter configConverter;
   private final @NotNull FileSystemService fileSystemService;
 
-  public List<ConfigItem> findAllConfigs(final @NotNull String userId) {
+  public List<ConfigInfo> findAllConfigs(final @NotNull String userId) {
     final List<Config> configs = this.configRepository.findAllByUserId(userId);
     return configs.stream().map(this.configConverter::toConfigItem).toList();
   }
 
-  public ConfigItem findConfigByName(final @NotNull String name, final @NotNull String userId) {
-    final Config config = this.configRepository.findByNameAndUserId(name, userId).orElseThrow();
-    return ConfigItem.builder().id(config.getId()).name(config.getName()).build();
+  public ConfigInfo findConfigByName(final @NotNull String name, final @NotNull String userId) {
+    final Config config =
+        this.configRepository
+            .findByNameAndUserId(name, userId)
+            .orElseThrow(() -> new ItemNotFoundException("Config not found"));
+    return ConfigInfo.builder().id(config.getId()).name(config.getName()).build();
   }
 
   public void createConfig(final @NotNull MultipartFile file, final @NotNull String userId)
       throws IOException {
-    final User user = this.userRepository.findById(userId).orElseThrow();
+    final User user =
+        this.userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ItemNotFoundException("User not found"));
 
     final Config config = Config.builder().name(file.getOriginalFilename()).build();
     config.setId(UlidCreator.getUlid().toString());
@@ -50,7 +57,9 @@ public class ConfigService {
 
   public void deleteConfigByName(final @NotNull String name, final @NotNull String userId)
       throws IOException {
-    this.configRepository.deleteByName(name).orElseThrow();
+    this.configRepository
+        .deleteByName(name)
+        .orElseThrow(() -> new ItemNotFoundException("Config not found"));
     this.fileSystemService.deleteConfig(name, userId);
   }
 }

@@ -1,6 +1,6 @@
 package io.k8screen.backend.mapper;
 
-import io.k8screen.backend.data.dto.DeploymentInfo;
+import io.k8screen.backend.data.dto.k8s.DeploymentInfo;
 import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import java.time.OffsetDateTime;

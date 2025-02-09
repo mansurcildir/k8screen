@@ -1,6 +1,6 @@
 package io.k8screen.backend.mapper;
 
-import io.k8screen.backend.data.dto.StatefulSetInfo;
+import io.k8screen.backend.data.dto.k8s.StatefulSetInfo;
 import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import java.time.OffsetDateTime;

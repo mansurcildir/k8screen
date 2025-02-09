@@ -1,9 +1,9 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.user.UserConfig;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.user.UserConfig;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.service.UserService;
+import io.k8screen.backend.util.CustomUserDetails;
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ public class UserController {
   }
 
   @GetMapping("/profile")
-  public ResponseEntity<UserItem> getProfile(final @NotNull Authentication authentication) {
+  public ResponseEntity<UserInfo> getProfile(final @NotNull Authentication authentication) {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
     return ResponseEntity.status(HttpStatus.OK).body(this.userService.findById(userId));

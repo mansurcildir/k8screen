@@ -7,21 +7,15 @@
   import Button from '$lib/components/ui/button/button.svelte';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as Table from '$lib/components/ui/table';
-  import { OptionTerminal } from '$lib/model/enum';
   import type { StatefulSet } from '$lib/model/StatefulSet';
   import { statefulSetAPI } from '$lib/service/statefulset-service';
-  import { statefulsets, getAllStatefulSets, loadingStatefulSet } from '$lib/store';
+  import { getAllStatefulSets, loadingStatefulSet } from '$lib/store';
   import * as yaml from 'yaml';
 
   export let namespace;
 
   let size: number = 5;
-
-  let loading = true;
-  let loadingTable = false;
-  let option: OptionTerminal;
   let details: string;
-
   let statefulSets: StatefulSet[] = [];
   let paginated: StatefulSet[] = [];
   let k8sItem: string;
@@ -31,20 +25,14 @@
     getAllStatefulSets(namespace);
   }
 
-  const getDetails = async (statefulSet: string, opt: OptionTerminal): Promise<string> => {
-    loading = true;
+  const getDetails = async (): Promise<string> => {
     open = true;
-    k8sItem = statefulSet;
-    option = opt;
     details = await statefulSetAPI.getStatefulSetDetails(namespace, k8sItem);
-    loading = false;
     return details;
   };
 
-  const updateItem = async (statefulSet: string) => {
-    loading = true;
-    details = await statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(statefulSet));
-    loading = false;
+  const updateItem = async () => {
+    details = await statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(k8sItem));
     return details;
   };
 </script>
@@ -72,7 +60,8 @@
           {#each paginated as statefulSet}
             <Table.Row
               on:click={() => {
-                getDetails(statefulSet.name, OptionTerminal.DETAIL);
+                k8sItem = statefulSet.name;
+                open = true;
               }}
               class="cursor-pointer"
             >
@@ -97,13 +86,9 @@
                     <DropdownMenu.Group>
                       <DropdownMenu.Item
                         onclick={() => {
-                          getDetails(statefulSet.name, OptionTerminal.DETAIL);
+                          k8sItem = statefulSet.name;
+                          getDetails();
                         }}>View</DropdownMenu.Item
-                      >
-                      <DropdownMenu.Item
-                        onclick={() => {
-                          getDetails(statefulSet.name, OptionTerminal.EDIT);
-                        }}>Edit</DropdownMenu.Item
                       >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
@@ -126,9 +111,7 @@
       getDetails={getDetails}
       updateItem={updateItem}
       k8sItem={k8sItem}
-      option={option}
       details={details}
-      loading={loading}
       bind:open={open}
     />
   {/if}

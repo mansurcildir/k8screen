@@ -31,4 +31,11 @@ public class GlobalExceptionHandler {
 
     return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(ItemNotFoundException.class)
+  public @NotNull ResponseEntity<Object> handleItemNotFoundException(
+      final @NotNull ItemNotFoundException exception) {
+    log.error(exception.getMessage());
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+  }
 }

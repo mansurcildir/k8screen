@@ -1,6 +1,6 @@
 package io.k8screen.backend.mapper;
 
-import io.k8screen.backend.data.dto.PodInfo;
+import io.k8screen.backend.data.dto.k8s.PodInfo;
 import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1ContainerStatus;
 import io.kubernetes.client.openapi.models.V1Pod;

@@ -45,7 +45,15 @@ public class PodLogHandler extends TextWebSocketHandler {
     log.info(
         "Received parameters: namespace={}, podName={}, userId={}", namespace, podName, userId);
 
-    new Thread(() -> this.streamPodLogs(namespace, podName, userId, session)).start();
+    new Thread(
+            () -> {
+              try {
+                this.streamPodLogs(namespace, podName, userId, session);
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .start();
   }
 
   @Override
@@ -64,15 +72,9 @@ public class PodLogHandler extends TextWebSocketHandler {
       final @NotNull String namespace,
       final @NotNull String podName,
       final @NotNull String userId,
-      final @NotNull WebSocketSession session) {
-    try {
-      this.podService.streamPodLogs(namespace, podName, userId, session);
-    } catch (Exception e) {
-      log.error(
-          "Error while streaming logs with namespace: {}, podName: {}, userId: {}",
-          namespace,
-          podName,
-          userId);
-    }
+      final @NotNull WebSocketSession session)
+      throws Exception {
+
+    this.podService.streamPodLogs(namespace, podName, userId, session);
   }
 }
