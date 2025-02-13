@@ -79,7 +79,7 @@
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <div
-              class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
+              class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
             >
               <GalleryVerticalEnd class="size-4" />
             </div>
@@ -102,7 +102,7 @@
         side={sidebar.isMobile ? 'bottom' : 'right'}
         sideOffset={4}
       >
-        <DropdownMenu.Label class="text-muted-foreground text-xs">Configs</DropdownMenu.Label>
+        <DropdownMenu.Label class="text-xs text-muted-foreground">Configs</DropdownMenu.Label>
         <style>
           .dropdown-item {
             display: flex;
@@ -147,12 +147,12 @@
         {/each}
 
         <DropdownMenu.Separator />
-        <div class="flex justify-between w-full">
+        <div class="flex w-full justify-between">
           <Dialog.Root>
             <Dialog.Trigger class="w-full">
-              <div class="bg-background flex items-center justify-start gap-2 p-2 rounded-md border">
+              <div class="flex items-center justify-start gap-2 rounded-md border bg-background p-2">
                 <Plus class="size-4" />
-                <div class="text-muted-foreground font-medium">Upload config file</div>
+                <div class="font-medium text-muted-foreground">Upload config file</div>
               </div>
             </Dialog.Trigger>
             <Dialog.Content>
@@ -165,7 +165,7 @@
                       <div class="grid gap-2">
                         <Input type="file" id="name" class="col-span-3 cursor-pointer" onchange={handleFileChange} />
                         {#if $fileError}
-                          <div class="text-red-400 text-sm mt-2">{$fileError}</div>
+                          <div class="mt-2 text-sm text-red-400">{$fileError}</div>
                         {/if}
                       </div>
                       <Button type="submit" class="w-full">Upload</Button>

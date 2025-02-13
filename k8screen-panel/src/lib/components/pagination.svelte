@@ -27,7 +27,7 @@
   <div class="flex flex-col items-center space-y-4">
     <div class="flex items-center space-x-2">
       <button
-        class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-200 disabled:bg-gray-200 text-white"
+        class="rounded bg-gray-300 px-3 py-1 text-white hover:bg-gray-200 disabled:bg-gray-200"
         on:click={() => goToPage(pageNum - 1)}
         disabled={pageNum === 1}
       >
@@ -38,8 +38,8 @@
         .fill(0)
         .map((_, i) => i + 1) as num}
         <button
-          class="px-3 py-1 rounded
-               {num === pageNum ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-200 text-white'}"
+          class="rounded px-3 py-1
+               {num === pageNum ? 'bg-blue-500 text-white' : 'bg-gray-300 text-white hover:bg-gray-200'}"
           on:click={() => goToPage(num)}
         >
           {num}
@@ -47,7 +47,7 @@
       {/each}
 
       <button
-        class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-200 disabled:bg-gray-200 text-white"
+        class="rounded bg-gray-300 px-3 py-1 text-white hover:bg-gray-200 disabled:bg-gray-200"
         on:click={() => goToPage(pageNum + 1)}
         disabled={pageNum === totalPages}
       >

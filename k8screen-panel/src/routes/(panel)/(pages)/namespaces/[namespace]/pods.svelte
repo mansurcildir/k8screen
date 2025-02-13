@@ -62,7 +62,7 @@
 </script>
 
 <div class="flex flex-col" style="height: calc(100vh - 150px);">
-  <div class="flex-grow flex flex-col gap-8 justify-between overflow-auto">
+  <div class="flex flex-grow flex-col justify-between gap-8 overflow-auto">
     <Table.Root>
       <Table.Header>
         <Table.Row>
@@ -96,7 +96,7 @@
               <Table.Cell>{pod.name}</Table.Cell>
               <Table.Cell>
                 <Badge
-                  class="w-20 flex justify-center"
+                  class="flex w-20 justify-center"
                   variant={pod.ready_containers < pod.total_containers ? 'destructive' : 'default'}
                 >
                   {pod.ready_containers}/{pod.total_containers}
@@ -104,7 +104,7 @@
               >
               <Table.Cell>
                 <Badge
-                  class="w-20 flex justify-center"
+                  class="flex w-20 justify-center"
                   variant={pod.status.toUpperCase() == Status.FAILED ? 'destructive' : 'default'}
                 >
                   {pod.status}
@@ -115,7 +115,7 @@
               <Table.Cell>
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
-                    <Button class="p-2 h-auto" variant="ghost">
+                    <Button class="h-auto p-2" variant="ghost">
                       <IconKebabMenu />
                     </Button>
                   </DropdownMenu.Trigger>

@@ -76,9 +76,9 @@
                         <Sidebar.MenuSubButton isActive={$page.params.namespace == 'Add namespace'}>
                           {#snippet child({ props })}
                             <button style="display: block; width: 100%" onclick={() => (visible = true)} {...props}>
-                              <div class="flex justify-between items-center w-full">
+                              <div class="flex w-full items-center justify-between">
                                 <span class="text-left">Add namespace</span>
-                                <Plus class="size-5 hidden group-hover:inline-flex ml-auto" />
+                                <Plus class="ml-auto hidden size-5 group-hover:inline-flex" />
                               </div>
                             </button>
                           {/snippet}
@@ -88,7 +88,7 @@
                       <Sidebar.MenuSubItem>
                         <Sidebar.MenuSubButton>
                           {#snippet child({ props })}
-                            <div class="flex justify-between items-center gap-2">
+                            <div class="flex items-center justify-between gap-2">
                               <input type="text" bind:value={namespace} placeholder="namespace..." {...props} />
                               <form onsubmit={createNamespace}>
                                 <div class="flex justify-end gap-1">

@@ -24,12 +24,12 @@
 </svelte:head>
 
 {#if isAuthenticated}
-  <div class="drawer min-h-screen bg-base-200 lg:drawer-open">
+  <div class="drawer bg-base-200 lg:drawer-open min-h-screen">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <slot />
   </div>
 {:else if loading}
-  <div class="flex flex-col items-center justify-center min-h-screen">
+  <div class="flex min-h-screen flex-col items-center justify-center">
     <span class="loading loading-spinner loading-lg"></span>
   </div>
 {/if}

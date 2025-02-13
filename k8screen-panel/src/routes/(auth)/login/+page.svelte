@@ -73,7 +73,7 @@
         <div class="mx-auto grid w-[350px] gap-6">
           <div class="grid gap-2 text-center">
             <h1 class="text-3xl font-bold">Login</h1>
-            <p class="text-muted-foreground text-balance">Login to your account</p>
+            <p class="text-balance text-muted-foreground">Login to your account</p>
           </div>
           <div class="grid gap-4">
             <div class="grid gap-2">
@@ -86,7 +86,7 @@
                 bind:value={userForm.username}
                 required
               />
-              <span class="text-error text-sm h-2 mb-2">
+              <span class="text-error mb-2 h-2 text-sm">
                 {#if $errors.username}
                   {$errors.username}
                 {/if}
@@ -105,7 +105,7 @@
                 bind:value={userForm.password}
                 required
               />
-              <span class="text-error text-sm h-2 mb-2">
+              <span class="text-error mb-2 h-2 text-sm">
                 {#if $errors.password}
                   {$errors.password}
                 {/if}
@@ -113,7 +113,7 @@
             </div>
             <Button class="w-full" onclick={() => login()}>Login</Button>
             <div class="relative flex justify-center text-xs uppercase">
-              <span class="bg-background text-muted-foreground px-2"> Or continue with </span>
+              <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
             </div>
             <Button variant="outline" class="w-full" onclick={() => loginGoogle()}><IconGoogle />Google</Button>
           </div>
@@ -123,7 +123,7 @@
           </div>
         </div>
       {:else}
-        <div class="h-full w-full flex items-center justify-center">
+        <div class="flex h-full w-full items-center justify-center">
           <div class="h-10 w-10">
             <svg
               class="animate-spin text-black"
@@ -140,7 +140,7 @@
         </div>
       {/if}
     </div>
-    <div class="bg-muted hidden lg:block p-60">
+    <div class="hidden bg-muted p-60 lg:block">
       <img
         src="/k8s-logo.png"
         alt="placeholder"

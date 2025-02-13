@@ -155,8 +155,8 @@
     <header
       class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12"
     >
-      <div class="flex justify-between items-center gap-2 px-4 w-full">
-        <div class="flex justify-between items-center">
+      <div class="flex w-full items-center justify-between gap-2 px-4">
+        <div class="flex items-center justify-between">
           <Sidebar.Trigger class="-ml-1" />
           <Separator orientation="vertical" class="mr-2 h-4" />
           <Breadcrumb.Root>

@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.k8screen</groupId>
-    <artifactId>k8screen-panel</artifactId>
+    <artifactId>k8screen</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 

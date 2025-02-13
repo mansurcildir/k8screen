@@ -177,12 +177,12 @@
   }
 </style>
 
-<Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar absolute bottom-0 left-0 right-0 mx-4" open={open}>
-  <div class="flex items-center px-3 py-1 gap-2">
-    <div class="flex justify-center items-center gap-2">
+<Collapsible.Root class="group/collapsible absolute bottom-0 left-0 right-0 mx-4 rounded-t-md bg-sidebar" open={open}>
+  <div class="flex items-center gap-2 px-3 py-1">
+    <div class="flex items-center justify-center gap-2">
       <button on:click={() => (open = !open)}>
         <ChevronRight
-          class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
+          class="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
         />
       </button>
       <h1 style="font-family: 'Courier New', Courier, monospace;">
@@ -197,16 +197,16 @@
     </div>
 
     {#if k8sItem}
-      <div class="flex ms-auto gap-2">
+      <div class="ms-auto flex gap-2">
         {#if editedItem !== details}
-          <Button variant="ghost" class=" bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={save}>
+          <Button variant="ghost" class=" h-auto rounded-lg bg-muted p-2" aria-label="Playground" onclick={save}>
             <Save class="size-5" />
           </Button>
         {/if}
 
         <Button
           variant="ghost"
-          class="ms-auto bg-muted rounded-lg p-2 h-auto {option == OptionTerminal.DETAIL ? 'bg-neutral-200' : ''}"
+          class="ms-auto h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.DETAIL ? 'bg-neutral-200' : ''}"
           aria-label="Playground"
           onclick={() => (option = OptionTerminal.DETAIL)}
         >
@@ -215,7 +215,7 @@
 
         <Button
           variant="ghost"
-          class="bg-muted rounded-lg p-2 h-auto {option == OptionTerminal.EDIT ? 'bg-neutral-200' : ''}"
+          class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.EDIT ? 'bg-neutral-200' : ''}"
           aria-label="Playground"
           onclick={() => (option = OptionTerminal.EDIT)}
         >
@@ -225,7 +225,7 @@
         {#if type == 'pod'}
           <Button
             variant="ghost"
-            class="bg-muted rounded-lg p-2 h-auto {option == OptionTerminal.LOG ? 'bg-neutral-200' : ''}"
+            class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.LOG ? 'bg-neutral-200' : ''}"
             aria-label="Playground"
             onclick={() => (option = OptionTerminal.LOG)}
           >
@@ -234,7 +234,7 @@
 
           <Button
             variant="ghost"
-            class="bg-muted rounded-lg p-2 h-auto {option == OptionTerminal.BASH ? 'bg-neutral-200' : ''}"
+            class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.BASH ? 'bg-neutral-200' : ''}"
             aria-label="Playground"
             onclick={() => (option = OptionTerminal.BASH)}
           >
@@ -253,31 +253,31 @@
     style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
   ></div>
   <Collapsible.Content>
-    <div class="relative text-white log-container bg-black" style="height: {containerHeight}px;">
+    <div class="log-container relative bg-black text-white" style="height: {containerHeight}px;">
       {#if loading}
-        <div class="flex justify-center items-center h-full">
+        <div class="flex h-full items-center justify-center">
           <Spinner class="m-auto h-10 w-10" />
         </div>
       {:else if option === OptionTerminal.LOG}
-        <div class="w-full h-full p-5 overflow-auto">{logs}</div>
+        <div class="h-full w-full overflow-auto p-5">{logs}</div>
       {:else if option === OptionTerminal.BASH}
-        <div class="flex flex-col h-full p-5">
+        <div class="flex h-full flex-col p-5">
           {execRes}
-          <div class="flex items-center w-full overflow-auto">
+          <div class="flex w-full items-center overflow-auto">
             >
-            <form on:submit={async () => sendCommand()} class="flex items-center w-full">
+            <form on:submit={async () => sendCommand()} class="flex w-full items-center">
               <input
                 type="text"
                 bind:value={execReq}
-                class="w-full bg-black text-white resize-none outline-none no-animation"
+                class="no-animation w-full resize-none bg-black text-white outline-none"
               />
             </form>
           </div>
         </div>
       {:else if option === OptionTerminal.DETAIL}
-        <div class="w-full h-full p-5 overflow-auto">{details}</div>
+        <div class="h-full w-full overflow-auto p-5">{details}</div>
       {:else if option === OptionTerminal.EDIT}
-        <textarea bind:value={editedItem} class="w-full h-full p-5 bg-black overflow-auto resize-none outline-none"
+        <textarea bind:value={editedItem} class="h-full w-full resize-none overflow-auto bg-black p-5 outline-none"
         ></textarea>
       {/if}
     </div>
