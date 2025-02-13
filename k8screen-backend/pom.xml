@@ -1,63 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.1</version>
-    <relativePath/>
+    <groupId>io.k8screen</groupId>
+    <artifactId>k8screen</artifactId>
+    <version>1.0.0</version>
   </parent>
 
-  <groupId>io.k8screen</groupId>
-  <artifactId>backend</artifactId>
-  <version>1.0.0</version>
+  <artifactId>k8screen-backend</artifactId>
   <name>k8screen-backend</name>
   <description>backend of k8screen web app</description>
 
-  <url/>
-  <licenses>
-    <license/>
-  </licenses>
-  <developers>
-    <developer/>
-  </developers>
-  <scm>
-    <connection/>
-    <developerConnection/>
-    <tag/>
-    <url/>
-  </scm>
-
   <properties>
-    <java.version>21</java.version>
-    <maven.min.version>3.8.8</maven.min.version>
-    <!-- Plugins -->
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-    <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>10.2</checkstyle.version>
-    <spotbugs.version>4.8.6</spotbugs.version>
-    <spotbugs-maven-plugin.version>4.8.6.6</spotbugs-maven-plugin.version>
-    <fmt-maven-plugin.version>2.25</fmt-maven-plugin.version>
-    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <error-prone.version>2.36.0</error-prone.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <org.mapstruct.version>1.6.3</org.mapstruct.version>
-    <spring-cloud.version>2023.0.3</spring-cloud.version>
-    <jjwt.version>0.12.6</jjwt.version>
+    <checkstyle.config.location>../config/checkstyle.xml</checkstyle.config.location>
   </properties>
 
   <dependencies>
+    <!-- Compile ########################################################### -->
+
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
-      <version>26.0.1</version>
+      <version>${jetbrains-annotations.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -74,7 +45,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <version>${lombok.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -91,11 +62,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -123,7 +89,7 @@
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
-      <version>${org.mapstruct.version}</version>
+      <version>${mapstruct.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.f4b6a3</groupId>
@@ -149,14 +115,23 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-websocket</artifactId>
     </dependency>
+
+    <!-- Runtime ########################################################### -->
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 
   <build>
-    <finalName>backend</finalName>
+    <finalName>k8screen-backend</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
         <configuration>
           <excludes>
             <exclude>
@@ -165,155 +140,14 @@
             </exclude>
           </excludes>
         </configuration>
-      </plugin>
-
-      <!-- Compiler Plugin Start-->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-          <encoding>UTF-8</encoding>
-          <compilerArgs>
-            <arg>-XDcompilePolicy=simple</arg>
-            <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/src/test/.*</arg>
-            <arg>--should-stop=ifError=FLOW</arg>
-          </compilerArgs>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>com.google.errorprone</groupId>
-              <artifactId>error_prone_core</artifactId>
-              <version>${error-prone.version}</version>
-            </path>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>1.18.36</version>
-            </path>
-            <path>
-              <groupId>org.mapstruct</groupId>
-              <artifactId>mapstruct-processor</artifactId>
-              <version>${org.mapstruct.version}</version>
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
-      </plugin>
-      <!-- Compiler Plugin End-->
-
-      <!-- FMT Plugin Start-->
-      <plugin>
-        <groupId>com.spotify.fmt</groupId>
-        <artifactId>fmt-maven-plugin</artifactId>
-        <version>${fmt-maven-plugin.version}</version>
         <executions>
           <execution>
             <goals>
-              <goal>format</goal>
+              <goal>repackage</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
-      <!-- FMT Plugin End-->
-
-      <!-- Checkstyle Plugin Start-->
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>${maven-checkstyle-plugin.version}</version>
-        <dependencies>
-          <dependency>
-            <groupId>com.puppycrawl.tools</groupId>
-            <artifactId>checkstyle</artifactId>
-            <version>10.21.1</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <failsOnError>true</failsOnError>
-          <consoleOutput>true</consoleOutput>
-          <configLocation>config/checkstyle.xml</configLocation>
-          <includeTestSourceDirectory>false</includeTestSourceDirectory>
-          <excludes>**/module-info.java</excludes>
-        </configuration>
-      </plugin>
-      <!-- Checkstyle Plugin End-->
-
-      <!-- Spotbugs Plugin Start-->
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>${spotbugs-maven-plugin.version}</version>
-        <dependencies>
-          <dependency>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs</artifactId>
-            <version>${spotbugs.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <!-- Spotbugs Plugin End-->
-
-      <!-- Source Plugin (JAR) Start-->
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Source Plugin (JAR) End-->
-
-      <!-- Enforcer Plugin Start-->
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>${maven-enforcer-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>enforce-versions-compile</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>${maven.min.version}</version>
-                </requireMavenVersion>
-              </rules>
-            </configuration>
-          </execution>
-          <execution>
-            <id>enforce-versions-deploy</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>${maven.min.version}</version>
-                </requireMavenVersion>
-                <requireJavaVersion>
-                  <version>${java.version}</version>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Enforcer Plugin End-->
     </plugins>
   </build>
 </project>
