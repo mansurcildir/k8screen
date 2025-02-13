@@ -1,11 +1,11 @@
-package io.k8screen.backend.data.dto;
+package io.k8screen.backend.data.dto.k8s;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import org.jetbrains.annotations.NotNull;
 
 @Builder
-public record PodDTO(
+public record PodInfo(
     @NotNull String name,
     @JsonProperty("total_containers") int totalContainers,
     @JsonProperty("ready_containers") int readyContainers,

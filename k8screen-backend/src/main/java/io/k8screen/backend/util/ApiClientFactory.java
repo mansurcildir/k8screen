@@ -1,4 +1,4 @@
-package io.k8screen.backend.config;
+package io.k8screen.backend.util;
 
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiClient;

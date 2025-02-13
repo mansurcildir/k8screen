@@ -5,8 +5,11 @@
   import type { UserForm } from '$lib/model/user/UserForm';
   import { authAPI } from '$lib/service/auth-service';
   import { setTokens } from '$lib/service/storage-manager';
+  import { writable } from 'svelte/store';
+  import { z } from 'zod';
 
   let loading = false;
+  let errors = writable<Record<string, string>>({});
 
   const userForm: UserForm = {
     username: '',
@@ -29,6 +32,28 @@
   const loginGoogle = () => {
     loading = true;
     window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  };
+
+  const schema = z.object({
+    username: z.string().min(1, { message: 'Username is required' }).max(50),
+    password: z.string().min(1, { message: 'Password is required' }).max(50)
+  });
+
+  const validate = (field: keyof UserForm) => {
+    try {
+      schema.pick({ [field]: true } as any).parse({ [field]: userForm[field] });
+
+      errors.update((currentErrors) => {
+        const { [field]: _, ...rest } = currentErrors;
+        return rest;
+      });
+    } catch (e: any) {
+      const error = e.errors[0];
+      errors.update((currentErrors) => ({
+        ...currentErrors,
+        [field]: error.message
+      }));
+    }
   };
 </script>
 

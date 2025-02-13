@@ -16,33 +16,23 @@
   export let namespace;
 
   let size: number = 5;
-
-  let loading = false;
-  let option: OptionTerminal;
   let details: string;
-
   let paginated: Deployment[] = [];
-  let k8sItem: string;
+  let k8sItem: string = '';
   let open: boolean;
 
   $: if (namespace) {
     getAllDeployments(namespace);
   }
 
-  const getDetails = async (deployment: string, opt: OptionTerminal): Promise<string> => {
-    loading = true;
+  const getDetails = async (): Promise<string> => {
     open = true;
-    k8sItem = deployment;
-    option = opt;
-    details = await deploymentAPI.getDeploymentDetails(namespace, deployment);
-    loading = false;
+    details = await deploymentAPI.getDeploymentDetails(namespace, k8sItem);
     return details;
   };
 
-  const updateItem = async (deployment: string) => {
-    loading = true;
-    details = await deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(deployment));
-    loading = false;
+  const updateItem = async () => {
+    details = await deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(k8sItem));
     return details;
   };
 </script>
@@ -72,7 +62,13 @@
           </Table.Row>
         {:else}
           {#each paginated as deployment}
-            <Table.Row on:click={() => getDetails(deployment.name, OptionTerminal.DETAIL)} class="cursor-pointer">
+            <Table.Row
+              on:click={() => {
+                k8sItem = deployment.name;
+                open = true;
+              }}
+              class="cursor-pointer"
+            >
               <Table.Cell>{deployment.name}</Table.Cell>
               <Table.Cell>
                 <Badge
@@ -97,13 +93,9 @@
                       <DropdownMenu.Group>
                         <DropdownMenu.Item
                           onclick={() => {
-                            getDetails(deployment.name, OptionTerminal.DETAIL);
+                            k8sItem = deployment.name;
+                            getDetails();
                           }}>View</DropdownMenu.Item
-                        >
-                        <DropdownMenu.Item
-                          onclick={() => {
-                            getDetails(deployment.name, OptionTerminal.EDIT);
-                          }}>Edit</DropdownMenu.Item
                         >
                         <DropdownMenu.Item>Delete</DropdownMenu.Item>
                       </DropdownMenu.Group>
@@ -127,9 +119,7 @@
       getDetails={getDetails}
       updateItem={updateItem}
       k8sItem={k8sItem}
-      option={option}
       details={details}
-      loading={loading}
       bind:open={open}
     />
   {/if}

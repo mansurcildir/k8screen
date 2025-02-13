@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.SecretDTO;
+import io.k8screen.backend.data.dto.k8s.SecretInfo;
 import io.k8screen.backend.service.SecretService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
@@ -30,24 +30,24 @@ public class SecretController {
   }
 
   @GetMapping
-  public ResponseEntity<List<SecretDTO>> listSecrets(
+  public ResponseEntity<List<SecretInfo>> listSecrets(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final List<SecretDTO> secrets = this.secretService.findAll(namespace, userId);
+    final List<SecretInfo> secrets = this.secretService.findAll(namespace, userId);
     return ResponseEntity.status(HttpStatus.OK).body(secrets);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<SecretDTO> getSecret(
+  public ResponseEntity<SecretInfo> getSecret(
       final @NotNull Authentication authentication,
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final SecretDTO secret = this.secretService.findByName(namespace, name, userId);
+    final SecretInfo secret = this.secretService.findByName(namespace, name, userId);
     return ResponseEntity.status(HttpStatus.OK).body(secret);
   }
 

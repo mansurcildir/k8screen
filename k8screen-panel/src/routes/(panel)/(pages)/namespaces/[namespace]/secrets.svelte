@@ -2,7 +2,6 @@
   import Bar from '$lib/components/bar.svelte';
   import Terminal from '$lib/components/terminal.svelte';
   import * as Table from '$lib/components/ui/table';
-  import { OptionTerminal } from '$lib/model/enum';
   import type { Secret } from '$lib/model/Secret';
   import { secretAPI } from '$lib/service/secret-service';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -15,33 +14,23 @@
   export let namespace;
 
   let size: number = 5;
-
-  let loading = false;
-  let option: OptionTerminal;
   let details: string;
-
   let paginated: Secret[] = [];
-  let k8sItem: string;
+  let k8sItem: string = '';
   let open: boolean;
 
   $: if (namespace) {
     getAllSecrets(namespace);
   }
 
-  const getDetails = async (secret: string, opt: OptionTerminal): Promise<string> => {
-    loading = true;
+  const getDetails = async (): Promise<string> => {
     open = true;
-    k8sItem = secret;
-    option = opt;
     details = await secretAPI.getSecretDetails(namespace, k8sItem);
-    loading = false;
     return details;
   };
 
-  const updateItem = async (secret: string) => {
-    loading = true;
-    details = await secretAPI.updateSecret(namespace, k8sItem, yaml.parse(secret));
-    loading = false;
+  const updateItem = async () => {
+    details = await secretAPI.updateSecret(namespace, k8sItem, yaml.parse(k8sItem));
     return details;
   };
 </script>
@@ -71,7 +60,8 @@
           {#each paginated as secret}
             <Table.Row
               on:click={() => {
-                getDetails(secret.name, OptionTerminal.DETAIL);
+                k8sItem = secret.name;
+                open = true;
               }}
               class="cursor-pointer"
             >
@@ -90,13 +80,9 @@
                     <DropdownMenu.Group>
                       <DropdownMenu.Item
                         onclick={() => {
-                          getDetails(secret.name, OptionTerminal.DETAIL);
+                          k8sItem = secret.name;
+                          getDetails();
                         }}>View</DropdownMenu.Item
-                      >
-                      <DropdownMenu.Item
-                        onclick={() => {
-                          getDetails(secret.name, OptionTerminal.EDIT);
-                        }}>Edit</DropdownMenu.Item
                       >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
@@ -119,9 +105,7 @@
       getDetails={getDetails}
       updateItem={updateItem}
       k8sItem={k8sItem}
-      option={option}
       details={details}
-      loading={loading}
       bind:open={open}
     />
   {/if}

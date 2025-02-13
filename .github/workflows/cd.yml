@@ -7,21 +7,26 @@ on:
       - "v*"
 
 jobs:
-  k8screen-backend:
+  k8screen:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
           cache: maven
 
-      - name: Build with Maven
-        run: mvn -B -ntp clean install -DskipTests -Dcheckstyle.skip -Denforcer.skip
-        working-directory: ./k8screen-backend
+      - name: Create jar files and run unit tests
+        run: ./mvnw -ntp -B package
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -52,7 +57,7 @@ jobs:
 
   helm-update:
     needs:
-      - k8screen-backend
+      - k8screen
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -1,4 +1,4 @@
-package io.k8screen.backend.data.config;
+package io.k8screen.backend.data.dto.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

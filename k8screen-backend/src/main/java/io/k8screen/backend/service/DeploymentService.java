@@ -1,40 +1,35 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
-import io.k8screen.backend.data.dto.DeploymentDTO;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.k8s.DeploymentInfo;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.mapper.DeploymentConverter;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1DeploymentList;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.util.Yaml;
+import jakarta.transaction.Transactional;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class DeploymentService {
 
   private final @NotNull DeploymentConverter deploymentConverter;
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
 
-  public DeploymentService(
-      final @NotNull DeploymentConverter deploymentConverter,
-      final @NotNull UserService userService,
-      final @NotNull ApiClientFactory apiClientFactory) {
-    this.deploymentConverter = deploymentConverter;
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-  }
-
   public V1Deployment create(
       final @NotNull String namespace,
       final @NotNull V1Deployment deployment,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.createNamespacedDeployment(namespace, deployment).execute();
   }
@@ -45,14 +40,14 @@ public class DeploymentService {
       final @NotNull V1Deployment deployment,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.replaceNamespacedDeployment(name, namespace, deployment).execute();
   }
 
-  public List<DeploymentDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
+  public List<DeploymentInfo> findAll(final @NotNull String namespace, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1DeploymentList deploymentList = appsV1Api.listNamespacedDeployment(namespace).execute();
     return deploymentList.getItems().stream()
@@ -60,10 +55,10 @@ public class DeploymentService {
         .toList();
   }
 
-  public DeploymentDTO findByName(
+  public DeploymentInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1Deployment deployment = appsV1Api.readNamespacedDeployment(name, namespace).execute();
     return this.deploymentConverter.toDeploymentDTO(deployment);
@@ -72,7 +67,7 @@ public class DeploymentService {
   public String getDetailByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1Deployment deployment = appsV1Api.readNamespacedDeployment(name, namespace).execute();
     if (deployment.getMetadata() != null && deployment.getMetadata().getManagedFields() != null) {
@@ -84,7 +79,7 @@ public class DeploymentService {
   public V1Status deleteByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.deleteNamespacedDeployment(name, namespace).execute();
   }

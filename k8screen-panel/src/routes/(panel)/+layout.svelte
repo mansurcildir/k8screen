@@ -4,7 +4,7 @@
   import { authAPI } from '$lib/service/auth-service';
 
   let isAuthenticated: boolean | undefined = false;
-  let isLoading = true;
+  let loading = true;
 
   onMount(async () => {
     const code = new URLSearchParams(window.location.search).get('code');
@@ -14,7 +14,7 @@
         isAuthenticated = data;
       })
       .finally(() => {
-        isLoading = false;
+        loading = false;
       });
   });
 </script>
@@ -28,7 +28,7 @@
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <slot />
   </div>
-{:else if isLoading}
+{:else if loading}
   <div class="flex flex-col items-center justify-center min-h-screen">
     <span class="loading loading-spinner loading-lg"></span>
   </div>

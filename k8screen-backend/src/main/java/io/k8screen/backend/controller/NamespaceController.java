@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
 import io.k8screen.backend.service.NamespaceService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;

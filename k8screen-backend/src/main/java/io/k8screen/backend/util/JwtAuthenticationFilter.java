@@ -1,6 +1,5 @@
-package io.k8screen.backend.config;
+package io.k8screen.backend.util;
 
-import io.k8screen.backend.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

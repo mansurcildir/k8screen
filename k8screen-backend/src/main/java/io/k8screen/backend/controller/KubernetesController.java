@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
 import io.k8screen.backend.service.KubernetesService;
+import io.k8screen.backend.util.CustomUserDetails;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;

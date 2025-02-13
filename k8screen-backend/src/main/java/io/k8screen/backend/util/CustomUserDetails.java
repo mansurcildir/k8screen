@@ -1,4 +1,4 @@
-package io.k8screen.backend.config;
+package io.k8screen.backend.util;
 
 import java.util.Collection;
 import lombok.Getter;

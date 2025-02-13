@@ -23,41 +23,13 @@ jobs:
           fi
 
       - name: Install editorconfig-checker
-        uses: editorconfig-checker/action-editorconfig-checker@main
+        uses: editorconfig-checker/action-editorconfig-checker@v2
+        with:
+          version: v3.0.3
 
       - run: editorconfig-checker
 
-  k8screen-panel:
-    needs:
-      - check
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./k8screen-panel
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run Build
-        run: pnpm run build
-
-      - name: Run Check
-        run: pnpm run check
-
-      - name: Run Lint
-        run: pnpm run lint
-
-  k8screen-backend:
+  k8screen:
     needs:
       - check
     runs-on: ubuntu-latest
@@ -72,5 +44,31 @@ jobs:
           cache: maven
 
       - name: Build and Verify
-        run: mvn -B verify
-        working-directory: ./k8screen-backend
+        run: mvn -B -ntp verify
+
+  k8screen-panel:
+    needs:
+      - check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./k8screen-panel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint Check
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build

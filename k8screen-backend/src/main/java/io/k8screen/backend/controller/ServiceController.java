@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.config.CustomUserDetails;
-import io.k8screen.backend.data.dto.ServiceDTO;
+import io.k8screen.backend.data.dto.k8s.ServiceInfo;
 import io.k8screen.backend.service.ServiceService;
+import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Service;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -65,24 +65,24 @@ public class ServiceController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ServiceDTO>> listServices(
+  public ResponseEntity<List<ServiceInfo>> listServices(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final List<ServiceDTO> services = this.serviceService.findAll(namespace, userId);
+    final List<ServiceInfo> services = this.serviceService.findAll(namespace, userId);
     return ResponseEntity.status(HttpStatus.OK).body(services);
   }
 
   @GetMapping("/{name}")
-  public ResponseEntity<ServiceDTO> getService(
+  public ResponseEntity<ServiceInfo> getService(
       final @NotNull Authentication authentication,
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
     final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     final String userId = userDetails.getUserId();
-    final ServiceDTO service = this.serviceService.findByName(namespace, name, userId);
+    final ServiceInfo service = this.serviceService.findByName(namespace, name, userId);
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 

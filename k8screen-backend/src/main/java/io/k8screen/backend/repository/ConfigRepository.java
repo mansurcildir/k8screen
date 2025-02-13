@@ -16,4 +16,7 @@ public interface ConfigRepository extends JpaRepository<Config, String> {
   @NotNull
   @Query("select c from Config c where c.user.id = :userId")
   List<Config> findAllByUserId(@NotNull String userId);
+
+  @NotNull
+  Optional<Void> deleteByName(@NotNull String name);
 }

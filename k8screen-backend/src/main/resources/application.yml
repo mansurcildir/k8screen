@@ -1,3 +1,7 @@
+logging:
+  level:
+    root: WARN
+
 k8screen-api:
   base-url: ${API_BASE_URL:http://localhost:8080}
 
@@ -25,6 +29,8 @@ spring:
     username: ${k8screen-db.username}
     password: ${k8screen-db.password}
   jpa:
+    show-sql: false
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
