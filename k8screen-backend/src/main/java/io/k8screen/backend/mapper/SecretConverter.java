@@ -1,6 +1,6 @@
 package io.k8screen.backend.mapper;
 
-import io.k8screen.backend.data.dto.SecretDTO;
+import io.k8screen.backend.data.dto.k8s.SecretInfo;
 import io.k8screen.backend.util.Util;
 import io.kubernetes.client.openapi.models.V1Secret;
 import java.time.OffsetDateTime;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SecretConverter {
-  public SecretDTO toSecretDTO(final @NotNull V1Secret secret) {
+  public SecretInfo toSecretDTO(final @NotNull V1Secret secret) {
 
     final String name = Objects.requireNonNull(secret.getMetadata()).getName();
     final String type = secret.getType();
@@ -22,6 +22,6 @@ public class SecretConverter {
       age = Util.formatAge(creationTimestamp);
     }
 
-    return SecretDTO.builder().name(name).type(type).dataSize(dataSize).age(age).build();
+    return SecretInfo.builder().name(name).type(type).dataSize(dataSize).age(age).build();
   }
 }

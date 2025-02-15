@@ -1,8 +1,8 @@
-<script>
-  export let size = '10';
+<script lang="ts">
+  let props = $props();
 </script>
 
-<div class={`flex items-center justify-center h-${size} w-${size}`}>
+<div {...props}>
   <svg
     class="animate-spin text-white"
     xmlns="http://www.w3.org/2000/svg"

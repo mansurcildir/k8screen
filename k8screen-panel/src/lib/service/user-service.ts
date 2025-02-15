@@ -1,10 +1,10 @@
 import type { UserConfig } from '$lib/model/user/UserConfig';
-import type { UserItem } from '$lib/model/user/UserItem';
+import type { UserInfo } from '$lib/model/user/UserInfo';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
 import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from './http-request';
 
 export const userAPI = {
-  getProfile: async (): Promise<UserItem> => {
+  getProfile: async (): Promise<UserInfo> => {
     const url = `${SPRING_BASE_URL}/api/v1/users/profile`;
     return await (await applyGetRequestWithBearerHeader(url)).json();
   },

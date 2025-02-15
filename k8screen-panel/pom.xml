@@ -6,11 +6,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.k8screen</groupId>
-    <artifactId>panel-frontend</artifactId>
+    <artifactId>k8screen</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>panel-frontend</name>
+    <name>k8screen-panel</name>
     <description>frontend of k8screen web app</description>
 
     <properties>

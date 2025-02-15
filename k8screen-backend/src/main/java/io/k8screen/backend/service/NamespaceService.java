@@ -1,19 +1,23 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.user.UserInfo;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Status;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class NamespaceService {
 
   @Value("${k8screen.config.path}")
@@ -22,14 +26,8 @@ public class NamespaceService {
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
 
-  public NamespaceService(
-      final @NotNull UserService userService, final @NotNull ApiClientFactory apiClientFactory) {
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-  }
-
   public List<String> getAllNamespaces(final @NotNull String userId) throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
 
     final V1NamespaceList namespaceList = coreV1Api.listNamespace().execute();
@@ -42,7 +40,7 @@ public class NamespaceService {
 
   public V1Namespace createNamespace(final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
 
     final V1Namespace namespace = new V1Namespace();
@@ -55,7 +53,7 @@ public class NamespaceService {
 
   public V1Status deleteNamespace(final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.config(), userId);
 
     return coreV1Api.deleteNamespace(name).execute();

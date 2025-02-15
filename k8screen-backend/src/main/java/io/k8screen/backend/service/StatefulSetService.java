@@ -1,40 +1,35 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.config.ApiClientFactory;
-import io.k8screen.backend.data.dto.StatefulSetDTO;
-import io.k8screen.backend.data.user.UserItem;
+import io.k8screen.backend.data.dto.k8s.StatefulSetInfo;
+import io.k8screen.backend.data.dto.user.UserInfo;
 import io.k8screen.backend.mapper.StatefulSetConverter;
+import io.k8screen.backend.util.ApiClientFactory;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import io.kubernetes.client.openapi.models.V1StatefulSetList;
 import io.kubernetes.client.openapi.models.V1Status;
 import io.kubernetes.client.util.Yaml;
+import jakarta.transaction.Transactional;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class StatefulSetService {
 
   private final @NotNull UserService userService;
   private final @NotNull ApiClientFactory apiClientFactory;
   private final @NotNull StatefulSetConverter statefulSetConverter;
 
-  public StatefulSetService(
-      final @NotNull UserService userService,
-      final @NotNull ApiClientFactory apiClientFactory,
-      final @NotNull StatefulSetConverter statefulSetConverter) {
-    this.userService = userService;
-    this.apiClientFactory = apiClientFactory;
-    this.statefulSetConverter = statefulSetConverter;
-  }
-
   public V1StatefulSet create(
       final @NotNull String namespace,
       final @NotNull V1StatefulSet statefulSet,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.createNamespacedStatefulSet(namespace, statefulSet).execute();
   }
@@ -45,14 +40,14 @@ public class StatefulSetService {
       final @NotNull V1StatefulSet statefulSet,
       final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.replaceNamespacedStatefulSet(name, namespace, statefulSet).execute();
   }
 
-  public List<StatefulSetDTO> findAll(final @NotNull String namespace, final @NotNull String userId)
-      throws Exception {
-    final UserItem user = this.userService.findById(userId);
+  public List<StatefulSetInfo> findAll(
+      final @NotNull String namespace, final @NotNull String userId) throws Exception {
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1StatefulSetList serviceList = appsV1Api.listNamespacedStatefulSet(namespace).execute();
     return serviceList.getItems().stream()
@@ -60,10 +55,10 @@ public class StatefulSetService {
         .toList();
   }
 
-  public StatefulSetDTO findByName(
+  public StatefulSetInfo findByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1StatefulSet statefulSet =
         appsV1Api.readNamespacedStatefulSet(name, namespace).execute();
@@ -73,7 +68,7 @@ public class StatefulSetService {
   public String getDetailByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     final V1StatefulSet statefulSet =
         appsV1Api.readNamespacedStatefulSet(name, namespace).execute();
@@ -86,7 +81,7 @@ public class StatefulSetService {
   public V1Status deleteByName(
       final @NotNull String namespace, final @NotNull String name, final @NotNull String userId)
       throws Exception {
-    final UserItem user = this.userService.findById(userId);
+    final UserInfo user = this.userService.findById(userId);
     final AppsV1Api appsV1Api = this.apiClientFactory.appsV1Api(user.config(), userId);
     return appsV1Api.deleteNamespacedStatefulSet(name, namespace).execute();
   }

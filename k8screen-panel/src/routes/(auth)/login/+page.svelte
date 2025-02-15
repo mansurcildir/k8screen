@@ -6,8 +6,11 @@
   import type { LoginReq } from '$lib/model/user/LoginReq';
   import { authAPI } from '$lib/service/auth-service';
   import { setTokens } from '$lib/service/storage-manager';
+  import { writable } from 'svelte/store';
+  import { z } from 'zod';
 
   let loading = false;
+  let errors = writable<Record<string, string>>({});
 
   const userForm: LoginReq = {
     username: '',
@@ -15,19 +18,51 @@
   };
 
   const login = () => {
-    loading = true;
-    authAPI
-      .login(userForm)
-      .then((data: { access_token: string; refresh_token: string }) => {
-        setTokens(data.access_token, data.refresh_token);
-        window.location.href = '/namespaces';
-      })
-      .finally(() => (loading = false));
+    try {
+      schema.parse(userForm);
+      loading = true;
+      authAPI
+        .login(userForm)
+        .then((data: { access_token: string; refresh_token: string }) => {
+          setTokens(data.access_token, data.refresh_token);
+          window.location.href = '/namespaces';
+        })
+        .finally(() => (loading = false));
+    } catch (e: any) {
+      const errorMessages: Record<string, string> = {};
+      e.errors.forEach((err: any) => {
+        errorMessages[err.path[0]] = err.message;
+      });
+
+      errors.set(errorMessages);
+    }
   };
 
   const loginGoogle = () => {
     loading = true;
     window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  };
+
+  const schema = z.object({
+    username: z.string().min(1, { message: 'Username is required' }).max(50),
+    password: z.string().min(1, { message: 'Password is required' }).max(50)
+  });
+
+  const validate = (field: keyof LoginReq) => {
+    try {
+      schema.pick({ [field]: true } as any).parse({ [field]: userForm[field] });
+
+      errors.update((currentErrors) => {
+        const { [field]: _, ...rest } = currentErrors;
+        return rest;
+      });
+    } catch (e: any) {
+      const error = e.errors[0];
+      errors.update((currentErrors) => ({
+        ...currentErrors,
+        [field]: error.message
+      }));
+    }
   };
 </script>
 
@@ -38,23 +73,47 @@
         <div class="mx-auto grid w-[350px] gap-6">
           <div class="grid gap-2 text-center">
             <h1 class="text-3xl font-bold">Login</h1>
-            <p class="text-muted-foreground text-balance">Login to your account</p>
+            <p class="text-balance text-muted-foreground">Login to your account</p>
           </div>
           <div class="grid gap-4">
             <div class="grid gap-2">
               <Label for="username">Username</Label>
-              <Input id="username" type="text" bind:value={userForm.username} placeholder="username" required />
+              <Input
+                id="username"
+                type="text"
+                placeholder="username"
+                oninput={() => validate('username')}
+                bind:value={userForm.username}
+                required
+              />
+              <span class="text-error mb-2 h-2 text-sm">
+                {#if $errors.username}
+                  {$errors.username}
+                {/if}
+              </span>
             </div>
             <div class="grid gap-2">
               <div class="flex items-center">
                 <Label for="password">Password</Label>
                 <a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
               </div>
-              <Input id="password" type="password" placeholder="******" bind:value={userForm.password} required />
+              <Input
+                id="password"
+                type="password"
+                placeholder="******"
+                oninput={() => validate('password')}
+                bind:value={userForm.password}
+                required
+              />
+              <span class="text-error mb-2 h-2 text-sm">
+                {#if $errors.password}
+                  {$errors.password}
+                {/if}
+              </span>
             </div>
             <Button class="w-full" onclick={() => login()}>Login</Button>
             <div class="relative flex justify-center text-xs uppercase">
-              <span class="bg-background text-muted-foreground px-2"> Or continue with </span>
+              <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
             </div>
             <Button variant="outline" class="w-full" onclick={() => loginGoogle()}><IconGoogle />Google</Button>
           </div>
@@ -64,7 +123,7 @@
           </div>
         </div>
       {:else}
-        <div class="h-full w-full flex items-center justify-center">
+        <div class="flex h-full w-full items-center justify-center">
           <div class="h-10 w-10">
             <svg
               class="animate-spin text-black"
@@ -81,7 +140,7 @@
         </div>
       {/if}
     </div>
-    <div class="bg-muted hidden lg:block p-60">
+    <div class="hidden bg-muted p-60 lg:block">
       <img
         src="/k8s-logo.png"
         alt="placeholder"

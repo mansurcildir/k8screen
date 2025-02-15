@@ -5,8 +5,11 @@
   import type { UserForm } from '$lib/model/user/UserForm';
   import { authAPI } from '$lib/service/auth-service';
   import { setTokens } from '$lib/service/storage-manager';
+  import { writable } from 'svelte/store';
+  import { z } from 'zod';
 
   let loading = false;
+  let errors = writable<Record<string, string>>({});
 
   const userForm: UserForm = {
     username: '',
@@ -30,6 +33,28 @@
     loading = true;
     window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   };
+
+  const schema = z.object({
+    username: z.string().min(1, { message: 'Username is required' }).max(50),
+    password: z.string().min(1, { message: 'Password is required' }).max(50)
+  });
+
+  const validate = (field: keyof UserForm) => {
+    try {
+      schema.pick({ [field]: true } as any).parse({ [field]: userForm[field] });
+
+      errors.update((currentErrors) => {
+        const { [field]: _, ...rest } = currentErrors;
+        return rest;
+      });
+    } catch (e: any) {
+      const error = e.errors[0];
+      errors.update((currentErrors) => ({
+        ...currentErrors,
+        [field]: error.message
+      }));
+    }
+  };
 </script>
 
 <form on:submit|preventDefault={register}>
@@ -39,7 +64,7 @@
         <div class="mx-auto grid w-[350px] gap-6">
           <div class="grid gap-2 text-center">
             <h1 class="text-3xl font-bold">Register</h1>
-            <p class="text-muted-foreground text-balance">Register your account</p>
+            <p class="text-balance text-muted-foreground">Register your account</p>
           </div>
           <div class="grid gap-4">
             <div class="grid gap-2">
@@ -58,7 +83,7 @@
             </div>
             <Button type="submit" class="w-full">Register</Button>
             <div class="relative flex justify-center text-xs uppercase">
-              <span class="bg-background text-muted-foreground px-2"> Or continue with </span>
+              <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
             </div>
             <Button variant="outline" class="w-full" onclick={() => loginGoogle()}>Google</Button>
           </div>
@@ -68,7 +93,7 @@
           </div>
         </div>
       {:else}
-        <div class="h-full w-full flex items-center justify-center">
+        <div class="flex h-full w-full items-center justify-center">
           <div class="h-10 w-10">
             <svg
               class="animate-spin text-black"
@@ -85,7 +110,7 @@
         </div>
       {/if}
     </div>
-    <div class="bg-muted hidden lg:block p-60">
+    <div class="hidden bg-muted p-60 lg:block">
       <img
         src="/k8s-logo.png"
         alt="placeholder"

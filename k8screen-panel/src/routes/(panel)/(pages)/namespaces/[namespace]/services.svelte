@@ -15,11 +15,7 @@
   export let namespace;
 
   let size: number = 5;
-
-  let loading = true;
-  let option: OptionTerminal;
   let details: string;
-
   let paginated: Service[] = [];
   let k8sItem: string;
   let open: boolean;
@@ -28,26 +24,20 @@
     getAllServices(namespace);
   }
 
-  const getDetails = async (service: string, opt: OptionTerminal): Promise<string> => {
-    loading = true;
+  const getDetails = async (): Promise<string> => {
     open = true;
-    k8sItem = service;
-    option = opt;
     details = await serviceAPI.getServiceDetails(namespace, k8sItem);
-    loading = false;
     return details;
   };
 
-  const updateItem = async (service: string) => {
-    loading = true;
-    details = await serviceAPI.updateService(namespace, k8sItem, yaml.parse(service));
-    loading = false;
+  const updateItem = async () => {
+    details = await serviceAPI.updateService(namespace, k8sItem, yaml.parse(k8sItem));
     return details;
   };
 </script>
 
 <div class="flex flex-col" style="height: calc(100vh - 150px);">
-  <div class="flex-grow flex flex-col gap-8 justify-between overflow-auto">
+  <div class="flex flex-grow flex-col justify-between gap-8 overflow-auto">
     <Table.Root>
       <Table.Header>
         <Table.Row>
@@ -72,7 +62,8 @@
           {#each paginated as service}
             <Table.Row
               on:click={() => {
-                getDetails(service.name, OptionTerminal.DETAIL);
+                k8sItem = service.name;
+                open = true;
               }}
               class="cursor-pointer"
             >
@@ -85,7 +76,7 @@
               <Table.Cell>
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
-                    <Button class="p-2 h-auto" variant="ghost">
+                    <Button class="h-auto p-2" variant="ghost">
                       <IconKebabMenu />
                     </Button>
                   </DropdownMenu.Trigger>
@@ -93,13 +84,9 @@
                     <DropdownMenu.Group>
                       <DropdownMenu.Item
                         onclick={() => {
-                          getDetails(service.name, OptionTerminal.DETAIL);
+                          k8sItem = service.name;
+                          getDetails();
                         }}>View</DropdownMenu.Item
-                      >
-                      <DropdownMenu.Item
-                        onclick={() => {
-                          getDetails(service.name, OptionTerminal.EDIT);
-                        }}>Edit</DropdownMenu.Item
                       >
                       <DropdownMenu.Item>Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
@@ -122,9 +109,7 @@
       getDetails={getDetails}
       updateItem={updateItem}
       k8sItem={k8sItem}
-      option={option}
       details={details}
-      loading={loading}
       bind:open={open}
     />
   {/if}

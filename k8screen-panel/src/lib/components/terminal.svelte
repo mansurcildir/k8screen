@@ -9,27 +9,40 @@
   import Logs from 'lucide-svelte/icons/logs';
   import Save from 'lucide-svelte/icons/save';
   import { OptionTerminal } from '$lib/model/enum';
-  import { onMount } from 'svelte';
-  import { stringTag } from 'yaml/util';
 
   export let k8sItem: string;
-  export let option: OptionTerminal;
   export let details: string;
   export let logs: string = '';
-  export let execReq: string = '';
-  export let execRes: string = '';
-  export let loading: boolean;
   export let open: boolean;
   export let containerHeight = 300;
   export let type: 'deployment' | 'pod' | 'service' | 'secret' | 'stateful-set' | 'none' = 'none';
 
-  export let getDetails: (pod: string, opt: OptionTerminal) => Promise<string>;
-  export let getLogs: (pod: string, opt: OptionTerminal) => Promise<string> = async () => '';
-  export let updateItem: (pod: string) => Promise<string>;
-  export let exec: (req: string) => Promise<string> = async () => '';
+  export let getDetails: () => Promise<string>;
+  export let updateItem: () => Promise<string>;
+  export let getLogs: () => Promise<string> = async () => '';
+  export let getExec: () => Promise<string> = async () => '';
+
+  let wsLogs: WebSocket;
+  let wsExec: WebSocket;
+  let loading: boolean = false;
+  let execReq: string = '';
+  let execRes: string = '';
+  let option: OptionTerminal = OptionTerminal.DETAIL;
 
   $: {
     editedItem = details;
+
+    if (k8sItem) {
+      if (option === OptionTerminal.LOG) {
+        log();
+      } else if (option === OptionTerminal.BASH) {
+        exec();
+      } else if (option === OptionTerminal.DETAIL) {
+        detail();
+      } else if (option === OptionTerminal.EDIT) {
+        edit();
+      }
+    }
   }
 
   let editedItem: string;
@@ -38,27 +51,93 @@
   const minContainerHeight = 100;
 
   const detail = async () => {
-    details = await getDetails(k8sItem, OptionTerminal.DETAIL);
-  };
-
-  const edit = async () => {
-    details = await getDetails(k8sItem, OptionTerminal.EDIT);
-  };
-
-  const save = async () => {
-    editedItem = await updateItem(k8sItem);
-  };
-
-  const log = async () => {
     loading = true;
-    open = true;
-    logs = await getLogs(k8sItem, OptionTerminal.LOG);
+    option = OptionTerminal.DETAIL;
+    details = await getDetails();
     loading = false;
   };
 
-  const terminal = async () => {
+  const edit = async () => {
+    loading = true;
+    option = OptionTerminal.EDIT;
+    details = await getDetails();
+    loading = false;
+  };
+
+  const save = async () => {
+    editedItem = await updateItem();
+  };
+
+  const log = async () => {
+    closeSocket(wsLogs);
+
+    loading = true;
     open = true;
-    option = OptionTerminal.BASH;
+    const url = await getLogs();
+
+    if (option !== OptionTerminal.LOG) {
+      option = OptionTerminal.LOG;
+    }
+
+    if (!wsLogs || wsLogs.readyState !== WebSocket.OPEN) {
+      wsLogs = new WebSocket(url);
+    }
+
+    wsLogs.onopen = function () {
+      console.log('WebSocket connection opened!');
+    };
+
+    wsLogs.onmessage = function (event) {
+      logs = event.data;
+      loading = false;
+    };
+
+    wsLogs.onclose = function () {
+      console.log('WebSocket connection closed!');
+    };
+  };
+
+  const sendCommand = () => {
+    if (wsExec && wsExec.readyState === WebSocket.OPEN && execReq.trim() !== '') {
+      wsExec.send(execReq);
+      execReq = '';
+    }
+  };
+
+  const exec = async () => {
+    closeSocket(wsExec);
+
+    loading = true;
+    open = true;
+    const url = await getExec();
+
+    if (option !== OptionTerminal.BASH) {
+      option = OptionTerminal.BASH;
+    }
+
+    if (!wsExec || wsExec.readyState !== WebSocket.OPEN) {
+      wsExec = new WebSocket(url);
+    }
+
+    wsExec.onopen = function () {
+      console.log('WebSocket connection opened!');
+    };
+
+    wsExec.onmessage = function (event) {
+      execRes = event.data;
+      loading = false;
+    };
+
+    wsExec.onclose = function () {
+      console.log('WebSocket connection closed!');
+    };
+  };
+
+  const closeSocket = (socket: WebSocket | undefined) => {
+    if (socket) {
+      console.log('WebSocket is already open, closing it first.');
+      socket.close();
+    }
   };
 
   const handleMouseDown = () => {
@@ -66,7 +145,7 @@
   };
 
   const handleMouseMove = (event: MouseEvent) => {
-    if (isResizing) {
+    if (open && isResizing) {
       const newHeight = containerHeight - event.movementY;
       if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
         if (newHeight < containerHeight) {
@@ -87,14 +166,6 @@
 
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mouseup', handleMouseUp);
-
-  onMount(() => {
-    setInterval(async () => {
-      if (option === OptionTerminal.LOG) {
-        logs = await getLogs(k8sItem, OptionTerminal.LOG);
-      }
-    }, 5000);
-  });
 </script>
 
 <style>
@@ -106,12 +177,12 @@
   }
 </style>
 
-<Collapsible.Root class="group/collapsible rounded-t-md bg-sidebar" open={open}>
-  <div class="flex items-center px-3 py-1 gap-2">
-    <div class="flex justify-center items-center gap-2">
+<Collapsible.Root class="group/collapsible absolute bottom-0 left-0 right-0 mx-4 rounded-t-md bg-sidebar" open={open}>
+  <div class="flex items-center gap-2 px-3 py-1">
+    <div class="flex items-center justify-center gap-2">
       <button on:click={() => (open = !open)}>
         <ChevronRight
-          class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 size-4"
+          class="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
         />
       </button>
       <h1 style="font-family: 'Courier New', Courier, monospace;">
@@ -126,27 +197,47 @@
     </div>
 
     {#if k8sItem}
-      <div class="flex ms-auto gap-2">
+      <div class="ms-auto flex gap-2">
         {#if editedItem !== details}
-          <Button variant="ghost" class=" bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={save}>
+          <Button variant="ghost" class=" h-auto rounded-lg bg-muted p-2" aria-label="Playground" onclick={save}>
             <Save class="size-5" />
           </Button>
         {/if}
 
-        <Button variant="ghost" class="ms-auto bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={detail}>
+        <Button
+          variant="ghost"
+          class="ms-auto h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.DETAIL ? 'bg-neutral-200' : ''}"
+          aria-label="Playground"
+          onclick={() => (option = OptionTerminal.DETAIL)}
+        >
           <CodeXML class="size-5" />
         </Button>
 
-        <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={edit}>
+        <Button
+          variant="ghost"
+          class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.EDIT ? 'bg-neutral-200' : ''}"
+          aria-label="Playground"
+          onclick={() => (option = OptionTerminal.EDIT)}
+        >
           <Code class="size-5" />
         </Button>
 
         {#if type == 'pod'}
-          <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={log}>
+          <Button
+            variant="ghost"
+            class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.LOG ? 'bg-neutral-200' : ''}"
+            aria-label="Playground"
+            onclick={() => (option = OptionTerminal.LOG)}
+          >
             <Logs class="size-5" />
           </Button>
 
-          <Button variant="ghost" class="bg-muted rounded-lg p-2 h-auto" aria-label="Playground" onclick={terminal}>
+          <Button
+            variant="ghost"
+            class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.BASH ? 'bg-neutral-200' : ''}"
+            aria-label="Playground"
+            onclick={() => (option = OptionTerminal.BASH)}
+          >
             <SquareTerminal class="size-5" />
           </Button>
         {/if}
@@ -154,39 +245,39 @@
     {/if}
   </div>
 
+  <div
+    class="resize-handle"
+    role="button"
+    tabindex="0"
+    on:mousedown={handleMouseDown}
+    style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
+  ></div>
   <Collapsible.Content>
-    <div
-      class="resize-handle"
-      role="button"
-      tabindex="0"
-      on:mousedown={handleMouseDown}
-      style="cursor: ns-resize; height: 5px; background: gray; left: 0; right: 0;"
-    ></div>
-    <div class="relative text-white log-container rounded-b-md bg-black" style="height: {containerHeight}px;">
+    <div class="log-container relative bg-black text-white" style="height: {containerHeight}px;">
       {#if loading}
-        <div class="flex justify-center items-center h-full">
-          <Spinner />
+        <div class="flex h-full items-center justify-center">
+          <Spinner class="m-auto h-10 w-10" />
         </div>
       {:else if option === OptionTerminal.LOG}
-        <div class="w-full h-full p-5 overflow-auto">{logs}</div>
+        <div class="h-full w-full overflow-auto p-5">{logs}</div>
       {:else if option === OptionTerminal.BASH}
-        <div class="flex flex-col justify-between h-full p-5">
+        <div class="flex h-full flex-col p-5">
           {execRes}
-          <div class="flex items-center w-full overflow-auto">
+          <div class="flex w-full items-center overflow-auto">
             >
-            <form on:submit={async () => (execRes = await exec(execReq))} class="flex items-center w-full">
+            <form on:submit={async () => sendCommand()} class="flex w-full items-center">
               <input
                 type="text"
                 bind:value={execReq}
-                class="w-full bg-black text-white resize-none outline-none no-animation"
+                class="no-animation w-full resize-none bg-black text-white outline-none"
               />
             </form>
           </div>
         </div>
       {:else if option === OptionTerminal.DETAIL}
-        <div class="w-full h-full p-5 overflow-auto">{details}</div>
+        <div class="h-full w-full overflow-auto p-5">{details}</div>
       {:else if option === OptionTerminal.EDIT}
-        <textarea bind:value={editedItem} class="w-full h-full p-5 bg-black overflow-auto resize-none outline-none"
+        <textarea bind:value={editedItem} class="h-full w-full resize-none overflow-auto bg-black p-5 outline-none"
         ></textarea>
       {/if}
     </div>

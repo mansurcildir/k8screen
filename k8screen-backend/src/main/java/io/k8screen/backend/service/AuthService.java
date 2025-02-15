@@ -1,12 +1,14 @@
 package io.k8screen.backend.service;
 
-import io.k8screen.backend.data.user.UserForm;
-import io.k8screen.backend.data.user.UserLoginReq;
+import io.k8screen.backend.core.exception.ItemNotFoundException;
+import io.k8screen.backend.data.dto.user.UserForm;
+import io.k8screen.backend.data.dto.user.UserLoginReq;
 import io.k8screen.backend.util.JwtUtil;
+import jakarta.transaction.Transactional;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -25,6 +27,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class AuthService {
 
   @Value("${spring.security.oauth2.client.registration.google.client-id}")
@@ -40,17 +44,6 @@ public class AuthService {
   private final @NotNull JwtUtil jwtUtil;
   private final @NotNull PasswordEncoder passwordEncoder;
   private final @NotNull UserService userService;
-
-  public AuthService(
-      final @NotNull AuthenticationManager authManager,
-      final @NotNull JwtUtil jwtUtil,
-      final @NotNull PasswordEncoder passwordEncoder,
-      final @NotNull UserService userService) {
-    this.authManager = authManager;
-    this.jwtUtil = jwtUtil;
-    this.passwordEncoder = passwordEncoder;
-    this.userService = userService;
-  }
 
   public Map<String, String> login(final @NotNull UserLoginReq loginRequest) {
     final Authentication authentication =
@@ -79,23 +72,7 @@ public class AuthService {
 
     try {
       this.userService.findByUsername(username);
-    } catch (NoSuchElementException e) {
-      this.createUserIfNotExists(email, username, picture);
-    }
-
-    final String accessToken = this.jwtUtil.generateAccessToken(username);
-    final String refreshToken = this.jwtUtil.generateRefreshToken(username);
-
-    return Map.of(
-        "access_token", accessToken,
-        "refresh_token", refreshToken);
-  }
-
-  private void createUserIfNotExists(
-      final @NotNull String email, final @NotNull String username, final @NotNull String picture) {
-    try {
-      this.userService.findByUsername(username);
-    } catch (NoSuchElementException e) {
+    } catch (ItemNotFoundException e) {
       final UserForm userForm =
           UserForm.builder()
               .email(email)
@@ -105,6 +82,13 @@ public class AuthService {
               .build();
       this.userService.create(userForm);
     }
+
+    final String accessToken = this.jwtUtil.generateAccessToken(username);
+    final String refreshToken = this.jwtUtil.generateRefreshToken(username);
+
+    return Map.of(
+        "access_token", accessToken,
+        "refresh_token", refreshToken);
   }
 
   public Map<String, Object> getGoogleTokens(final @NotNull String code) {

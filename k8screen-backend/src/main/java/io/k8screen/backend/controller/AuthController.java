@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.data.user.UserForm;
-import io.k8screen.backend.data.user.UserLoginReq;
+import io.k8screen.backend.data.dto.user.UserForm;
+import io.k8screen.backend.data.dto.user.UserLoginReq;
 import io.k8screen.backend.service.AuthService;
 import jakarta.validation.Valid;
 import java.util.Map;
