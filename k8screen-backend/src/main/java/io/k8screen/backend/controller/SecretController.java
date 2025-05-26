@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.dto.k8s.SecretInfo;
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.SecretService;
-import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
@@ -33,9 +33,8 @@ public class SecretController {
   public ResponseEntity<List<SecretInfo>> listSecrets(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<SecretInfo> secrets = this.secretService.findAll(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<SecretInfo> secrets = this.secretService.findAll(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(secrets);
   }
 
@@ -45,9 +44,9 @@ public class SecretController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final SecretInfo secret = this.secretService.findByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final SecretInfo secret =
+        this.secretService.findByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(secret);
   }
 
@@ -57,9 +56,9 @@ public class SecretController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final String secret = this.secretService.getDetailByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final String secret =
+        this.secretService.getDetailByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(secret);
   }
 
@@ -69,9 +68,9 @@ public class SecretController {
       @PathVariable final @NotNull String namespace,
       @RequestBody final @NotNull V1Secret secret)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Secret createdSecret = this.secretService.create(namespace, secret, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Secret createdSecret =
+        this.secretService.create(namespace, secret, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.CREATED).body(createdSecret);
   }
 
@@ -82,9 +81,9 @@ public class SecretController {
       @PathVariable final @NotNull String name,
       @RequestBody final @NotNull V1Secret secret)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Secret createdSecret = this.secretService.updateByName(namespace, name, secret, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Secret createdSecret =
+        this.secretService.updateByName(namespace, name, secret, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(createdSecret);
   }
 
@@ -94,9 +93,9 @@ public class SecretController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Status status = this.secretService.deleteByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Status status =
+        this.secretService.deleteByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(status);
   }
 }

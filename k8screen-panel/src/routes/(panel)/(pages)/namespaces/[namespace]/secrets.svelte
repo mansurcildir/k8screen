@@ -7,21 +7,27 @@
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import * as yaml from 'yaml';
   import Button from '$lib/components/ui/button/button.svelte';
-  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import IconEllipsis from 'lucide-svelte/icons/ellipsis';
   import Pagination from '$lib/components/pagination.svelte';
   import { secrets, getAllSecrets, loadingSecret } from '$lib/store';
 
   export let namespace;
 
-  let size: number = 5;
+  let perPage: number = 5;
   let details: string;
   let paginated: Secret[] = [];
   let k8sItem: string = '';
   let open: boolean;
 
   $: if (namespace) {
-    getAllSecrets(namespace);
+    getAllSecrets(namespace).then(() => load(1));
   }
+
+  const load = (page: number) => {
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+    paginated = $secrets.slice(startIndex, endIndex);
+  };
 
   const getDetails = async (): Promise<string> => {
     open = true;
@@ -44,7 +50,7 @@
           <Table.Head>TYPE</Table.Head>
           <Table.Head>DATA</Table.Head>
           <Table.Head>AGE</Table.Head>
-          <Table.Head>Options</Table.Head>
+          <Table.Head>OPTIONS</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -73,7 +79,7 @@
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
                     <Button class="h-auto p-2" variant="ghost">
-                      <IconKebabMenu />
+                      <IconEllipsis />
                     </Button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
@@ -94,9 +100,7 @@
         {/if}
       </Table.Body>
     </Table.Root>
-    <div class="mb-5">
-      <Pagination bind:pageSize={size} data={$secrets} bind:paginated={paginated} />
-    </div>
+    <Pagination perPage={perPage} load={load} count={$secrets.length} />
   </div>
 
   {#if k8sItem}

@@ -2,27 +2,32 @@
   import Bar from '$lib/components/bar.svelte';
   import Terminal from '$lib/components/terminal.svelte';
   import * as Table from '$lib/components/ui/table';
-  import { OptionTerminal } from '$lib/model/enum';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import type { Service } from '$lib/model/Service';
   import { serviceAPI } from '$lib/service/service-service';
   import * as yaml from 'yaml';
   import Button from '$lib/components/ui/button/button.svelte';
-  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import IconEllipsis from 'lucide-svelte/icons/ellipsis';
   import Pagination from '$lib/components/pagination.svelte';
   import { services, getAllServices, loadingService } from '$lib/store';
 
   export let namespace;
 
-  let size: number = 5;
+  let perPage: number = 5;
   let details: string;
   let paginated: Service[] = [];
   let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllServices(namespace);
+    getAllServices(namespace).then(() => load(1));
   }
+
+  const load = (page: number) => {
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+    paginated = $services.slice(startIndex, endIndex);
+  };
 
   const getDetails = async (): Promise<string> => {
     open = true;
@@ -47,11 +52,13 @@
           <Table.Head>EXTERNAL-IP</Table.Head>
           <Table.Head>PORTS</Table.Head>
           <Table.Head>AGE</Table.Head>
+          <Table.Head>OPTIONS</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
         {#if $loadingService}
           <Table.Row>
+            <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
@@ -77,7 +84,7 @@
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
                     <Button class="h-auto p-2" variant="ghost">
-                      <IconKebabMenu />
+                      <IconEllipsis />
                     </Button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
@@ -98,9 +105,7 @@
         {/if}
       </Table.Body>
     </Table.Root>
-    <div class="mb-5">
-      <Pagination bind:pageSize={size} data={$services} bind:paginated={paginated} />
-    </div>
+    <Pagination perPage={perPage} load={load} count={$services.length} />
   </div>
 
   {#if k8sItem}

@@ -1,58 +1,47 @@
 <script lang="ts">
-  let pageNum: number = 1;
-  let totalPages: number = 1;
-  export let data: any[] = [];
-  export let paginated: any[] = [];
-  export let pageSize: number;
+  import ChevronLeftIcon from 'lucide-svelte/icons/chevron-left';
+  import ChevronRightIcon from 'lucide-svelte/icons/chevron-right';
+  import * as Pagination from '$lib/components/ui/pagination/index.js';
 
-  $: {
-    totalPages = Math.ceil(data.length / pageSize);
-    load(pageNum, pageSize);
-  }
-
-  const load = (page: number, size: number) => {
-    const startIndex = (page - 1) * size;
-    const endIndex = page * size;
-    paginated = data.slice(startIndex, endIndex);
-  };
-
-  const goToPage = (page: number) => {
-    if (page > 0 && page <= totalPages) {
-      pageNum = page;
-    }
-  };
+  export let count;
+  export let perPage;
+  export let load: (pageNum: number) => void;
 </script>
 
-{#if totalPages > 1}
-  <div class="flex flex-col items-center space-y-4">
-    <div class="flex items-center space-x-2">
-      <button
-        class="rounded bg-gray-300 px-3 py-1 text-white hover:bg-gray-200 disabled:bg-gray-200"
-        on:click={() => goToPage(pageNum - 1)}
-        disabled={pageNum === 1}
-      >
-        ‹
-      </button>
-
-      {#each Array(totalPages)
-        .fill(0)
-        .map((_, i) => i + 1) as num}
-        <button
-          class="rounded px-3 py-1
-               {num === pageNum ? 'bg-blue-500 text-white' : 'bg-gray-300 text-white hover:bg-gray-200'}"
-          on:click={() => goToPage(num)}
-        >
-          {num}
-        </button>
+<Pagination.Root class="mb-5" count={count} perPage={perPage}>
+  {#snippet children({ pages, currentPage })}
+    <Pagination.Content>
+      <Pagination.Item>
+        <Pagination.PrevButton onclick={() => load(currentPage - 1)}>
+          <ChevronLeftIcon class="size-4" />
+          <span class="hidden sm:block">Previous</span>
+        </Pagination.PrevButton>
+      </Pagination.Item>
+      {#each pages as page (page.key)}
+        {#if page.type === 'ellipsis'}
+          <Pagination.Item>
+            <Pagination.Ellipsis />
+          </Pagination.Item>
+        {:else}
+          <Pagination.Item>
+            <Pagination.Link
+              onclick={() => {
+                load(page.value);
+              }}
+              page={page}
+              isActive={currentPage === page.value}
+            >
+              {page.value}
+            </Pagination.Link>
+          </Pagination.Item>
+        {/if}
       {/each}
-
-      <button
-        class="rounded bg-gray-300 px-3 py-1 text-white hover:bg-gray-200 disabled:bg-gray-200"
-        on:click={() => goToPage(pageNum + 1)}
-        disabled={pageNum === totalPages}
-      >
-        ›
-      </button>
-    </div>
-  </div>
-{/if}
+      <Pagination.Item>
+        <Pagination.NextButton onclick={() => load(currentPage + 1)}>
+          <span class="hidden sm:block">Next</span>
+          <ChevronRightIcon class="size-4" />
+        </Pagination.NextButton>
+      </Pagination.Item>
+    </Pagination.Content>
+  {/snippet}
+</Pagination.Root>

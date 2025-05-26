@@ -20,7 +20,7 @@ export const deployments = writable<Deployment[]>([]);
 export const pods = writable<Pod[]>([]);
 export const secrets = writable<Secret[]>([]);
 export const services = writable<Service[]>([]);
-export const statefulsets = writable<StatefulSet[]>([]);
+export const statefulSets = writable<StatefulSet[]>([]);
 
 export const getAllDeployments = async (namespace: string) => {
   loadingDeployment.set(true);
@@ -53,7 +53,7 @@ export const getAllServices = async (namespace: string) => {
 export const getAllStatefulSets = async (namespace: string) => {
   loadingStatefulSet.set(true);
   const data = await statefulSetAPI.getAllStatefulSets(namespace);
-  statefulsets.set(data);
+  statefulSets.set(data);
   loadingStatefulSet.set(false);
 };
 

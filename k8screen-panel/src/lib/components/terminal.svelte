@@ -199,14 +199,21 @@
     {#if k8sItem}
       <div class="ms-auto flex gap-2">
         {#if editedItem !== details}
-          <Button variant="ghost" class=" h-auto rounded-lg bg-muted p-2" aria-label="Playground" onclick={save}>
+          <Button
+            variant="ghost"
+            class=" h-auto rounded-lg bg-muted p-2 hover:bg-neutral-200"
+            aria-label="Playground"
+            onclick={save}
+          >
             <Save class="size-5" />
           </Button>
         {/if}
 
         <Button
           variant="ghost"
-          class="ms-auto h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.DETAIL ? 'bg-neutral-200' : ''}"
+          class="ms-auto h-auto rounded-lg bg-muted p-2 hover:bg-neutral-200 {option == OptionTerminal.DETAIL
+            ? 'bg-neutral-200'
+            : ''}"
           aria-label="Playground"
           onclick={() => (option = OptionTerminal.DETAIL)}
         >
@@ -215,7 +222,9 @@
 
         <Button
           variant="ghost"
-          class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.EDIT ? 'bg-neutral-200' : ''}"
+          class="h-auto rounded-lg bg-muted p-2 hover:bg-neutral-200 {option == OptionTerminal.EDIT
+            ? 'bg-neutral-200'
+            : ''}"
           aria-label="Playground"
           onclick={() => (option = OptionTerminal.EDIT)}
         >
@@ -225,7 +234,9 @@
         {#if type == 'pod'}
           <Button
             variant="ghost"
-            class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.LOG ? 'bg-neutral-200' : ''}"
+            class="h-auto rounded-lg bg-muted p-2 hover:bg-neutral-200 {option == OptionTerminal.LOG
+              ? 'bg-neutral-200'
+              : ''}"
             aria-label="Playground"
             onclick={() => (option = OptionTerminal.LOG)}
           >
@@ -234,7 +245,9 @@
 
           <Button
             variant="ghost"
-            class="h-auto rounded-lg bg-muted p-2 {option == OptionTerminal.BASH ? 'bg-neutral-200' : ''}"
+            class="h-auto rounded-lg bg-muted p-2 hover:bg-neutral-200 {option == OptionTerminal.BASH
+              ? 'bg-neutral-200'
+              : ''}"
             aria-label="Playground"
             onclick={() => (option = OptionTerminal.BASH)}
           >

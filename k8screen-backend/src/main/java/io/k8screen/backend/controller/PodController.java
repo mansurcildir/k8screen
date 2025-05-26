@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.dto.k8s.PodInfo;
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.PodService;
-import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Pod;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -29,9 +29,8 @@ public class PodController {
   public ResponseEntity<List<PodInfo>> listPods(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<PodInfo> pods = this.podService.findAll(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<PodInfo> pods = this.podService.findAll(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(pods);
   }
 
@@ -41,9 +40,8 @@ public class PodController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final PodInfo pod = this.podService.findByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final PodInfo pod = this.podService.findByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(pod);
   }
 
@@ -53,9 +51,8 @@ public class PodController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final String pod = this.podService.getDetailByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final String pod = this.podService.getDetailByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(pod);
   }
 
@@ -65,9 +62,8 @@ public class PodController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Pod pod = this.podService.deleteByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Pod pod = this.podService.deleteByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(pod);
   }
 }

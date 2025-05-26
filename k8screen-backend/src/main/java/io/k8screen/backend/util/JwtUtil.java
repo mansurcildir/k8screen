@@ -7,14 +7,15 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-/** Provides JWT services */
 @Component
 public class JwtUtil {
 
@@ -24,19 +25,22 @@ public class JwtUtil {
   private final String refreshKey =
       "42DCCF1E0B06EF601CF9DCDA0ED3877F4F0DB32FAE243DC5F0C681DB09AFB454";
 
-  public @NotNull Object getClaim(final @NotNull String claimKey, final @NotNull String token) {
-
-    return this.extractClaim(token, claims -> claims.get(claimKey, String.class));
+  public @NotNull UUID getUserUuidFromAccessToken(final @NotNull String token) {
+    return this.extractClaim(token, this.accessKey, claims -> UUID.fromString(claims.getSubject()));
   }
 
-  public @NotNull String getAccessClaim(final @NotNull String token) {
+  public @NotNull UUID getUserUuidFromRefreshToken(final @NotNull String token) {
+    return this.extractClaim(
+        token, this.refreshKey, claims -> UUID.fromString(claims.getSubject()));
+  }
+
+  public @NotNull String getUsernameFromAccessToken(final @NotNull String token) {
     return this.extractClaim(token, this.accessKey, claims -> claims.get("username", String.class));
   }
 
-  public @NotNull String getRefreshClaim(final @NotNull String token) {
-
-    return this.extractClaim(
-        token, this.refreshKey, claims -> claims.get("username", String.class));
+  public @NotNull List<String> getUserRoles(final @NotNull String token) {
+    final Claims claims = this.extractAllClaims(token, this.accessKey);
+    return claims.get("roles", List.class);
   }
 
   public @NotNull <T> T extractClaim(
@@ -56,21 +60,14 @@ public class JwtUtil {
         .getPayload();
   }
 
-  public @NotNull <T> T extractClaim(
-      final @NotNull String token, final @NotNull Function<Claims, T> claimsResolver) {
-    final Claims claims = this.extractAllClaims(token);
-    return claimsResolver.apply(claims);
-  }
-
-  public @NotNull Claims extractAllClaims(final @NotNull String token) {
-    return Jwts.parser().build().parseSignedClaims(token).getPayload();
-  }
-
   public @NotNull String generateToken(
-      @NotNull final String signKey, final @NotNull Map<String, Object> claims, final int expMin) {
+      @NotNull final String signKey,
+      final @NotNull String subject,
+      final @NotNull Map<String, Object> claims,
+      final int expMin) {
 
     final Instant now = Instant.now();
-    final Instant futureInstant = now.plusSeconds((long) expMin * 60);
+    final Instant futureInstant = now.plusSeconds(expMin * 60L);
     final ZonedDateTime zonedDateTime = futureInstant.atZone(ZoneId.systemDefault());
 
     final Date expirationDate = Date.from(zonedDateTime.toInstant());
@@ -82,6 +79,7 @@ public class JwtUtil {
                 "alg", "HS256",
                 "typ", "JWT"))
         .and()
+        .subject(subject)
         .claims(claims)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(expirationDate)
@@ -89,12 +87,16 @@ public class JwtUtil {
         .compact();
   }
 
-  public @NotNull String generateAccessToken(final @NotNull String username) {
-    return this.generateToken(this.accessKey, Map.of("username", username), 1);
+  public @NotNull String generateAccessToken(
+      final @NotNull UUID userUuid,
+      final @NotNull String username,
+      final @NotNull List<String> roles) {
+    return this.generateToken(
+        this.accessKey, userUuid.toString(), Map.of("username", username, "roles", roles), 1);
   }
 
-  public @NotNull String generateRefreshToken(final @NotNull String username) {
-    return this.generateToken(this.refreshKey, Map.of("username", username), 60 * 24);
+  public @NotNull String generateRefreshToken(final @NotNull UUID userUuid) {
+    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), 7 * 24 * 60);
   }
 
   private @NotNull SecretKey getSignKey(final @NotNull String signKey) {

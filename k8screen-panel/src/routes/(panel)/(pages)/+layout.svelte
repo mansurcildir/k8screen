@@ -108,8 +108,8 @@
     user: {
       name: user?.username,
       email: user?.email,
-      avatar: user?.picture || '/k8s-logo.png',
-      config: user?.config
+      avatar: user?.picture || '/favicon.png',
+      active_config: user?.active_config
     },
     updateConfig: updateConfig,
     uploadFile: uploadFile,
@@ -120,6 +120,7 @@
         title: 'Namespaces',
         url: '#',
         icon: BookOpen,
+        isActive: true,
         items: namespaces
       }
     ]
@@ -139,6 +140,7 @@
             title: 'Namespaces',
             url: '#',
             icon: BookOpen,
+            isActive: true,
             items: namespaces
           }
         ]

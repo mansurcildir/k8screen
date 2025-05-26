@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Slf4j
 public class PodLogHandler extends TextWebSocketHandler {
 
-  private final PodService podService;
+  private final @NotNull PodService podService;
 
   public PodLogHandler(final @NotNull PodService podService) {
     this.podService = podService;
@@ -40,15 +41,15 @@ public class PodLogHandler extends TextWebSocketHandler {
 
     final String namespace = this.decode(params.get("namespace").getFirst());
     final String podName = this.decode(params.get("podName").getFirst());
-    final String userId = this.decode(params.get("userId").getFirst());
+    final UUID userUuid = UUID.fromString(this.decode(params.get("userUuid").getFirst()));
 
     log.info(
-        "Received parameters: namespace={}, podName={}, userId={}", namespace, podName, userId);
+        "Received parameters: namespace={}, podName={}, userUuid={}", namespace, podName, userUuid);
 
     new Thread(
             () -> {
               try {
-                this.streamPodLogs(namespace, podName, userId, session);
+                this.streamPodLogs(namespace, podName, userUuid, session);
               } catch (Exception e) {
                 throw new RuntimeException(e);
               }
@@ -64,17 +65,17 @@ public class PodLogHandler extends TextWebSocketHandler {
   public void afterConnectionClosed(
       final @NotNull WebSocketSession session, final @NotNull CloseStatus status) {}
 
-  private String decode(final @NotNull String value) {
+  private @NotNull String decode(final @NotNull String value) {
     return URLDecoder.decode(value, StandardCharsets.UTF_8);
   }
 
   private void streamPodLogs(
       final @NotNull String namespace,
       final @NotNull String podName,
-      final @NotNull String userId,
+      final @NotNull UUID userUuid,
       final @NotNull WebSocketSession session)
       throws Exception {
 
-    this.podService.streamPodLogs(namespace, podName, userId, session);
+    this.podService.streamPodLogs(namespace, podName, userUuid, session);
   }
 }
