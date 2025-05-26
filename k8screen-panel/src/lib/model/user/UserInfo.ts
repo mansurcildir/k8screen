@@ -1,10 +1,7 @@
-import type { Role } from './Role';
-
 export interface UserInfo {
-  id: string;
+  uuid: string;
   username: string;
   email: string;
   picture: string;
-  config: string;
-  roles: Role[];
+  active_config: string;
 }

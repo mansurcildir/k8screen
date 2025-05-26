@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "ROLE")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,8 +20,9 @@ import lombok.NoArgsConstructor;
 public class Role {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "ID", nullable = false, updatable = false)
   private int id;
 
-  @Column(name = "name", unique = true, nullable = false)
+  @Column(name = "NAME", unique = true, nullable = false)
   private String name;
 }

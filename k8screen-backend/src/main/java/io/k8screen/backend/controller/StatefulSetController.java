@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.dto.k8s.StatefulSetInfo;
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.StatefulSetService;
-import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1StatefulSet;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
@@ -34,10 +34,9 @@ public class StatefulSetController {
       @PathVariable final @NotNull String namespace,
       @RequestBody final @NotNull V1StatefulSet statefulSet)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     final V1StatefulSet createdStatefulSet =
-        this.statefulSetService.create(namespace, statefulSet, userId);
+        this.statefulSetService.create(namespace, statefulSet, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(createdStatefulSet);
   }
 
@@ -48,10 +47,9 @@ public class StatefulSetController {
       @PathVariable final @NotNull String name,
       @RequestBody final @NotNull V1StatefulSet statefulSet)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     final V1StatefulSet updatedService =
-        this.statefulSetService.update(namespace, name, statefulSet, userId);
+        this.statefulSetService.update(namespace, name, statefulSet, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(updatedService);
   }
 
@@ -59,9 +57,9 @@ public class StatefulSetController {
   public ResponseEntity<List<StatefulSetInfo>> listStatefulSet(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<StatefulSetInfo> service = this.statefulSetService.findAll(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<StatefulSetInfo> service =
+        this.statefulSetService.findAll(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
@@ -71,9 +69,9 @@ public class StatefulSetController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final StatefulSetInfo service = this.statefulSetService.findByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final StatefulSetInfo service =
+        this.statefulSetService.findByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
@@ -83,9 +81,9 @@ public class StatefulSetController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final String statefulSet = this.statefulSetService.getDetailByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final String statefulSet =
+        this.statefulSetService.getDetailByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(statefulSet);
   }
 
@@ -95,9 +93,9 @@ public class StatefulSetController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Status status = this.statefulSetService.deleteByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Status status =
+        this.statefulSetService.deleteByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(status);
   }
 }

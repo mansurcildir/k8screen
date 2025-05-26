@@ -8,7 +8,7 @@
   import Terminal from '$lib/components/terminal.svelte';
   import * as yaml from 'yaml';
   import { Status } from '$lib/model/enum';
-  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import IconEllipsis from 'lucide-svelte/icons/ellipsis';
   import Pagination from '$lib/components/pagination.svelte';
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { pods, getAllPods, loadingPod } from '$lib/store';
@@ -16,7 +16,7 @@
 
   export let namespace;
 
-  let size: number = 5;
+  let perPage: number = 5;
   let k8sItem: string = '';
   let details: string;
   let logs: string = '';
@@ -24,8 +24,14 @@
   let open: boolean;
 
   $: if (namespace) {
-    getAllPods(namespace);
+    getAllPods(namespace).then(() => load(1));
   }
+
+  const load = (page: number) => {
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+    paginated = $pods.slice(startIndex, endIndex);
+  };
 
   const getDetails = async (): Promise<string> => {
     open = true;
@@ -37,8 +43,8 @@
     open = true;
 
     const user = await userAPI.getProfile();
-    if (user && user.id) {
-      const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userId=${user.id}`;
+    if (user && user.uuid) {
+      const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
       return wsUrl;
     }
     return '';
@@ -53,8 +59,8 @@
     open = true;
 
     const user = await userAPI.getProfile();
-    if (user && user.id) {
-      const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userId=${user.id}`;
+    if (user && user.uuid) {
+      const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
       return wsUrl;
     }
     return '';
@@ -71,7 +77,7 @@
           <Table.Head>STATUS</Table.Head>
           <Table.Head>RESTARTS</Table.Head>
           <Table.Head>AGE</Table.Head>
-          <Table.Head>Options</Table.Head>
+          <Table.Head>OPTIONS</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -116,7 +122,7 @@
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
                     <Button class="h-auto p-2" variant="ghost">
-                      <IconKebabMenu />
+                      <IconEllipsis />
                     </Button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
@@ -137,9 +143,7 @@
         {/if}
       </Table.Body>
     </Table.Root>
-    <div class="mb-5">
-      <Pagination bind:pageSize={size} data={$pods} bind:paginated={paginated} />
-    </div>
+    <Pagination perPage={perPage} load={load} count={$pods.length} />
   </div>
 
   {#if k8sItem}

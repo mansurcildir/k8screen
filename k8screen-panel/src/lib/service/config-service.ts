@@ -6,7 +6,7 @@ import { getAccessToken } from './storage-manager';
 export const configAPI = {
   getAllConfigs: async (): Promise<ConfigInfo[]> => {
     const url = `${SPRING_BASE_URL}/api/v1/configs`;
-    return await (await applyGetRequestWithBearerHeader(url)).json();
+    return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
   uploadConfig: async (formData: FormData) => {
@@ -21,6 +21,6 @@ export const configAPI = {
 
   deleteConfig: async (fileName: string) => {
     const url = `${SPRING_BASE_URL}/api/v1/configs/delete?name=${fileName}`;
-    return await (await applyDeleteRequestWithBearerHeader(url)).json();
+    return (await applyDeleteRequestWithBearerHeader(url)).json();
   }
 };

@@ -1,45 +1,39 @@
 package io.k8screen.backend.mapper;
 
 import io.k8screen.backend.data.dto.k8s.PodInfo;
-import io.k8screen.backend.util.Util;
+import io.k8screen.backend.util.FormatUtil;
 import io.kubernetes.client.openapi.models.V1ContainerStatus;
 import io.kubernetes.client.openapi.models.V1Pod;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PodConverter {
-  public PodInfo toPodDTO(final @NotNull V1Pod pod) {
-    final String name = Objects.requireNonNull(pod.getMetadata()).getName();
+  public @NotNull PodInfo toPodInfo(final @NotNull V1Pod pod) {
+    final var metaData = Objects.requireNonNull(pod.getMetadata());
+    final var status = Objects.requireNonNull(pod.getStatus());
+    final var containerStatuses = Objects.requireNonNull(status.getContainerStatuses());
 
-    final List<V1ContainerStatus> containerStatuses =
-        Objects.requireNonNull(pod.getStatus()).getContainerStatuses();
-    final int totalContainers = containerStatuses != null ? containerStatuses.size() : 0;
+    final String name = Objects.requireNonNull(metaData.getName());
+    final int totalContainers = containerStatuses.size();
     final int readyContainers =
-        containerStatuses != null
-            ? (int) containerStatuses.stream().filter(V1ContainerStatus::getReady).count()
-            : 0;
-    final String status = pod.getStatus().getPhase();
+        (int) containerStatuses.stream().filter(V1ContainerStatus::getReady).count();
 
+    final String podStatus = Objects.requireNonNull(status.getPhase());
     final int restarts =
-        containerStatuses != null
-            ? containerStatuses.stream().mapToInt(V1ContainerStatus::getRestartCount).sum()
-            : 0;
+        containerStatuses.stream().mapToInt(V1ContainerStatus::getRestartCount).sum();
 
-    final OffsetDateTime creationTimestamp = pod.getMetadata().getCreationTimestamp();
-    String age = "Unknown";
-    if (creationTimestamp != null) {
-      age = Util.formatAge(creationTimestamp);
-    }
+    final OffsetDateTime creationTimestamp =
+        Objects.requireNonNull(metaData.getCreationTimestamp());
+    final String age = FormatUtil.formatAge(creationTimestamp);
 
     return PodInfo.builder()
         .name(name)
         .totalContainers(totalContainers)
         .readyContainers(readyContainers)
-        .status(status)
+        .status(podStatus)
         .restarts(restarts)
         .age(age)
         .build();

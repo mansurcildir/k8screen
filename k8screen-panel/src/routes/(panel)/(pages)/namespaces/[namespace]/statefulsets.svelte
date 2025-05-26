@@ -1,6 +1,6 @@
 <script lang="ts">
   import Bar from '$lib/components/bar.svelte';
-  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
+  import IconEllipsis from 'lucide-svelte/icons/ellipsis';
   import Pagination from '$lib/components/pagination.svelte';
   import Terminal from '$lib/components/terminal.svelte';
   import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -9,14 +9,13 @@
   import * as Table from '$lib/components/ui/table';
   import type { StatefulSet } from '$lib/model/StatefulSet';
   import { statefulSetAPI } from '$lib/service/statefulset-service';
-  import { getAllStatefulSets, loadingStatefulSet } from '$lib/store';
+  import { getAllStatefulSets, loadingStatefulSet, statefulSets } from '$lib/store';
   import * as yaml from 'yaml';
 
   export let namespace;
 
-  let size: number = 5;
+  let perPage: number = 5;
   let details: string;
-  let statefulSets: StatefulSet[] = [];
   let paginated: StatefulSet[] = [];
   let k8sItem: string;
   let open: boolean;
@@ -24,6 +23,12 @@
   $: if (namespace) {
     getAllStatefulSets(namespace);
   }
+
+  const load = (page: number) => {
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+    paginated = $statefulSets.slice(startIndex, endIndex);
+  };
 
   const getDetails = async (): Promise<string> => {
     open = true;
@@ -45,7 +50,7 @@
           <Table.Head>NAME</Table.Head>
           <Table.Head>READY</Table.Head>
           <Table.Head>AGE</Table.Head>
-          <Table.Head></Table.Head>
+          <Table.Head>OPTIONS</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -79,7 +84,7 @@
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
                     <Button class="h-auto p-2" variant="ghost">
-                      <IconKebabMenu />
+                      <IconEllipsis />
                     </Button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
@@ -100,9 +105,7 @@
         {/if}
       </Table.Body>
     </Table.Root>
-    <div class="mb-5">
-      <Pagination bind:pageSize={size} data={statefulSets} bind:paginated={paginated} />
-    </div>
+    <Pagination perPage={perPage} load={load} count={$statefulSets.length} />
   </div>
 
   {#if k8sItem}

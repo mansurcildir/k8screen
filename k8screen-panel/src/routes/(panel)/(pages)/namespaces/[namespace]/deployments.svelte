@@ -3,27 +3,32 @@
   import Terminal from '$lib/components/terminal.svelte';
   import * as Table from '$lib/components/ui/table';
   import type { Deployment } from '$lib/model/Deployment';
-  import { OptionTerminal } from '$lib/model/enum';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
   import { deploymentAPI } from '$lib/service/deployment-service';
   import yaml from 'yaml';
   import Button from '$lib/components/ui/button/button.svelte';
-  import IconKebabMenu from '$lib/components/icons/IconKebabMenu.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/ui/badge/badge.svelte';
   import { deployments, getAllDeployments, loadingDeployment } from '$lib/store';
+  import IconEllipsis from 'lucide-svelte/icons/ellipsis';
 
   export let namespace;
 
-  let size: number = 5;
+  let perPage: number = 5;
   let details: string;
   let paginated: Deployment[] = [];
   let k8sItem: string = '';
   let open: boolean;
 
   $: if (namespace) {
-    getAllDeployments(namespace);
+    getAllDeployments(namespace).then(() => load(1));
   }
+
+  const load = (page: number) => {
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+    paginated = $deployments.slice(startIndex, endIndex);
+  };
 
   const getDetails = async (): Promise<string> => {
     open = true;
@@ -47,7 +52,7 @@
           <Table.Head>UP-TO-DATE</Table.Head>
           <Table.Head>AVAILABLE</Table.Head>
           <Table.Head>AGE</Table.Head>
-          <Table.Head></Table.Head>
+          <Table.Head>OPTIONS</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -85,7 +90,7 @@
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
                     <Button class="h-auto p-2" variant="ghost">
-                      <IconKebabMenu />
+                      <IconEllipsis />
                     </Button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
@@ -108,9 +113,7 @@
         {/if}
       </Table.Body>
     </Table.Root>
-    <div class="mb-5">
-      <Pagination bind:pageSize={size} data={$deployments} bind:paginated={paginated} />
-    </div>
+    <Pagination perPage={perPage} load={load} count={$deployments.length} />
   </div>
 
   {#if k8sItem}

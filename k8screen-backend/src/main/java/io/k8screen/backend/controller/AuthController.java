@@ -1,56 +1,74 @@
 package io.k8screen.backend.controller;
 
-import io.k8screen.backend.data.dto.user.UserForm;
-import io.k8screen.backend.data.dto.user.UserLoginReq;
+import static io.k8screen.backend.util.Constant.REFRESH_TOKEN;
+
+import io.k8screen.backend.data.dto.user.AuthResponse;
+import io.k8screen.backend.data.dto.user.UserDetails;
+import io.k8screen.backend.data.dto.user.UserGoogleLogin;
+import io.k8screen.backend.data.dto.user.UserInfo;
+import io.k8screen.backend.data.dto.user.UserLogin;
+import io.k8screen.backend.data.dto.user.UserRegister;
+import io.k8screen.backend.result.ResponseFactory;
+import io.k8screen.backend.result.Result;
 import io.k8screen.backend.service.AuthService;
 import jakarta.validation.Valid;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
   private final @NotNull AuthService authService;
-
-  public AuthController(final @NotNull AuthService authService) {
-    this.authService = authService;
-  }
+  private final @NotNull ResponseFactory responseFactory;
 
   @PostMapping("/login")
-  public ResponseEntity<Map<String, String>> login(
-      @Valid @RequestBody final UserLoginReq loginRequest) {
+  public ResponseEntity<AuthResponse> login(@Valid @RequestBody final UserLogin loginRequest) {
     return ResponseEntity.status(HttpStatus.OK).body(this.authService.login(loginRequest));
   }
 
   @PostMapping("/login/google")
-  public ResponseEntity<Object> loginGoogle(final @RequestBody @NotNull Map<String, String> body) {
-
-    try {
-      final Map<String, Object> tokens = this.authService.loginGoogle(body.get("code"));
-      return ResponseEntity.ok(tokens);
-    } catch (HttpClientErrorException e) {
-      return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAs(Map.class));
-    }
+  public ResponseEntity<AuthResponse> loginGoogle(
+      @Valid @RequestBody final UserGoogleLogin loginRequest) {
+    final AuthResponse authResponse = this.authService.loginGoogle(loginRequest);
+    return ResponseEntity.ok(authResponse);
   }
 
   @PostMapping("/register")
-  public ResponseEntity<Map<String, String>> register(@Valid @RequestBody final UserForm userForm) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(this.authService.register(userForm));
+  public ResponseEntity<AuthResponse> register(
+      @Valid @RequestBody final @NotNull UserRegister userRegister) {
+    final AuthResponse authResponse = this.authService.register(userRegister);
+    return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
   }
 
-  @GetMapping("/access-token")
-  public ResponseEntity<Map<String, String>> getAccessToken(
-      @RequestHeader("Refresh-Token") final @NotNull String header) {
-    return ResponseEntity.status(HttpStatus.OK).body(this.authService.getAccessToken(header));
+  @GetMapping("/logout")
+  public ResponseEntity<Result> logout(final @NotNull Authentication authentication) {
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    this.authService.logout(userDetails.userUuid());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.responseFactory.success(HttpStatus.OK.value(), "loggedOut"));
+  }
+
+  @GetMapping("/refresh")
+  public ResponseEntity<AuthResponse> refresh(
+      @RequestHeader(REFRESH_TOKEN) final @NotNull String header) {
+    return ResponseEntity.status(HttpStatus.OK).body(this.authService.refresh(header));
+  }
+
+  @GetMapping("/profile")
+  public ResponseEntity<UserInfo> profile(final @NotNull Authentication authentication) {
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.authService.getUserInfo(userDetails.userUuid()));
   }
 }

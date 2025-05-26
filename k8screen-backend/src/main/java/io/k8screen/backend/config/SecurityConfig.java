@@ -1,23 +1,19 @@
 package io.k8screen.backend.config;
 
-import io.k8screen.backend.util.CustomUserDetailsService;
+import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.util.JwtAuthenticationFilter;
 import io.k8screen.backend.util.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,14 +33,13 @@ public class SecurityConfig {
   @Value("${k8screen-frontend.success-url}")
   private String apiSuccessURL;
 
-  private final JwtUtil jwtUtil;
-  private final CustomUserDetailsService customUserDetailsService;
+  private final @NotNull JwtUtil jwtUtil;
+  private final @NotNull ResponseFactory responseFactory;
 
   public SecurityConfig(
-      final @NotNull JwtUtil jwtUtil,
-      final @NotNull CustomUserDetailsService customUserDetailsService) {
+      final @NotNull JwtUtil jwtUtil, final @NotNull ResponseFactory responseFactory) {
     this.jwtUtil = jwtUtil;
-    this.customUserDetailsService = customUserDetailsService;
+    this.responseFactory = responseFactory;
   }
 
   @Bean
@@ -54,18 +49,11 @@ public class SecurityConfig {
         .cors(this::cors)
         .authorizeHttpRequests(this::authorizeHttpRequests)
         .oauth2Login(this::oAuth2Login)
-        .logout(this::logout)
         .addFilterBefore(
-            new JwtAuthenticationFilter(this.jwtUtil, this.customUserDetailsService),
+            new JwtAuthenticationFilter(this.jwtUtil, this.responseFactory),
             UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
-
-  @Bean
-  public AuthenticationManager authenticationManager(
-      final @NotNull AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
   }
 
   @Bean
@@ -102,12 +90,10 @@ public class SecurityConfig {
                   .AuthorizationManagerRequestMatcherRegistry
               auth) {
     auth.requestMatchers(
-            HttpMethod.POST,
             "/api/v1/auth/register",
             "/api/v1/auth/login",
-            "/api/v1/auth/login/google")
-        .permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/v1/auth/access-token")
+            "/api/v1/auth/login/google",
+            "/api/v1/auth/refresh")
         .permitAll()
         .requestMatchers("/ws/**")
         .permitAll()
@@ -117,18 +103,5 @@ public class SecurityConfig {
 
   private void oAuth2Login(final @NotNull OAuth2LoginConfigurer<HttpSecurity> oauth2) {
     oauth2.defaultSuccessUrl(this.apiSuccessURL);
-  }
-
-  private void logout(final @NotNull LogoutConfigurer<HttpSecurity> logout) {
-    logout
-        .logoutUrl("/api/v1/auth/logout")
-        .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID")
-        .logoutSuccessHandler(
-            (request, response, authentication) -> {
-              response.setStatus(HttpServletResponse.SC_OK);
-              response.getWriter().write("Logout successful");
-              response.sendRedirect(this.loginURL);
-            });
   }
 }

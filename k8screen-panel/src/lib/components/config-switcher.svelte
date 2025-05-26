@@ -26,7 +26,7 @@
     deleteFile
   }: {
     configs: ConfigInfo[];
-    user: { name: string; email: string; avatar: string; config: string };
+    user: { name: string; email: string; avatar: string; active_config: string };
     updateConfig: (config: string) => void;
     uploadFile: (file: File) => Promise<void>;
     deleteFile: (fileName: string) => Promise<void>;
@@ -60,12 +60,6 @@
       uploadFile(file);
     }
   };
-
-  onMount(() => {
-    configAPI.getAllConfigs().then((data: ConfigInfo[]) => {
-      configs = data;
-    });
-  });
 </script>
 
 <Sidebar.Menu>
@@ -86,7 +80,7 @@
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-semibold">
                 {#if user}
-                  {user.config}
+                  {user.active_config}
                 {:else}
                   No config available
                 {/if}
@@ -124,7 +118,7 @@
           <DropdownMenu.Item
             onSelect={() => {
               updateConfig(config.name);
-              user.config != config.name && goto('/namespaces');
+              user.active_config != config.name && goto('/namespaces');
             }}
             class="dropdown-item"
           >

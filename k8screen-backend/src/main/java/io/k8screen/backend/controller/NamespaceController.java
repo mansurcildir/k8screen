@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.NamespaceService;
-import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Namespace;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
@@ -30,9 +30,8 @@ public class NamespaceController {
   @GetMapping
   public ResponseEntity<List<String>> listNamespaces(final @NotNull Authentication authentication)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<String> namespaces = this.namespaceService.getAllNamespaces(userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<String> namespaces = this.namespaceService.getAllNamespaces(userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(namespaces);
   }
 
@@ -40,9 +39,9 @@ public class NamespaceController {
   public ResponseEntity<V1Namespace> createNamespace(
       final @NotNull Authentication authentication, @RequestBody final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Namespace createdNamespace = this.namespaceService.createNamespace(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Namespace createdNamespace =
+        this.namespaceService.createNamespace(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.CREATED).body(createdNamespace);
   }
 
@@ -50,9 +49,9 @@ public class NamespaceController {
   public ResponseEntity<V1Status> deleteNamespace(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Status status = this.namespaceService.deleteNamespace(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Status status =
+        this.namespaceService.deleteNamespace(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(status);
   }
 }
