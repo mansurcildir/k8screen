@@ -25,6 +25,7 @@
     <mapstruct.version>1.6.3</mapstruct.version>
     <jjwt.version>0.12.6</jjwt.version>
     <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
+    <kubernetes-client.version>24.0.0</kubernetes-client.version>
     <!-- Plugins -->
     <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
