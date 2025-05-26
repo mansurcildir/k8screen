@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Slf4j
 public class PodExecHandler extends TextWebSocketHandler {
 
-  private final PodService podService;
+  private final @NotNull PodService podService;
 
   public PodExecHandler(final @NotNull PodService podService) {
     this.podService = podService;
@@ -45,20 +46,20 @@ public class PodExecHandler extends TextWebSocketHandler {
                 Collectors.groupingBy(
                     param -> param[0], Collectors.mapping(param -> param[1], Collectors.toList())));
 
-    final String namespace = this.decode(params.get("namespace").get(0));
-    final String podName = this.decode(params.get("podName").get(0));
-    final String userId = this.decode(params.get("userId").get(0));
+    final String namespace = this.decode(params.get("namespace").getFirst());
+    final String podName = this.decode(params.get("podName").getFirst());
+    final UUID userUuid = UUID.fromString(this.decode(params.get("userUuid").getFirst()));
 
     log.info(
-        "Received parameters for exec: namespace={}, podName={}, userId={}",
+        "Received parameters for exec: namespace={}, podName={}, userUuid={}",
         namespace,
         podName,
-        userId);
+        userUuid);
 
     final String command = message.getPayload();
     log.info("Received command: {}", command);
 
-    new Thread(() -> this.terminalExec(namespace, podName, userId, session, command)).start();
+    new Thread(() -> this.terminalExec(namespace, podName, userUuid, session, command)).start();
   }
 
   @Override
@@ -67,24 +68,24 @@ public class PodExecHandler extends TextWebSocketHandler {
     log.info("Connection closed: sessionId={}, status={}", session.getId(), status);
   }
 
-  private String decode(final @NotNull String value) {
+  private @NotNull String decode(final @NotNull String value) {
     return URLDecoder.decode(value, StandardCharsets.UTF_8);
   }
 
   private void terminalExec(
       final @NotNull String namespace,
       final @NotNull String podName,
-      final @NotNull String userId,
+      final @NotNull UUID userUuid,
       final @NotNull WebSocketSession session,
       final @NotNull String command) {
     try {
-      this.podService.terminalExec(namespace, podName, userId, session, command);
+      this.podService.terminalExec(namespace, podName, userUuid, session, command);
     } catch (Exception e) {
       log.error(
-          "Error while streaming logs with namespace: {}, podName: {}, userId: {}",
+          "Error while streaming logs with namespace: {}, podName: {}, userUuid: {}",
           namespace,
           podName,
-          userId);
+          userUuid);
     }
   }
 }

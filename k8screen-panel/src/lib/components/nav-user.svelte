@@ -4,7 +4,6 @@
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import { useSidebar } from '$lib/components/ui/sidebar/index.js';
   import { authAPI } from '$lib/service/auth-service';
-  import { clearTokens } from '$lib/service/storage-manager';
   import BadgeCheck from 'lucide-svelte/icons/badge-check';
   import Bell from 'lucide-svelte/icons/bell';
   import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
@@ -17,7 +16,6 @@
 
   const logout = () => {
     authAPI.logout().then(() => {
-      clearTokens();
       window.location.href = '/login';
     });
   };

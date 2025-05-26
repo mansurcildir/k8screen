@@ -1,4 +1,4 @@
-package io.k8screen.backend.core.exception;
+package io.k8screen.backend.exception;
 
 import org.jetbrains.annotations.NotNull;
 

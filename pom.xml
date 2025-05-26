@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.k8screen</groupId>
-    <artifactId>k8screen</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
+  <groupId>io.k8screen</groupId>
+  <artifactId>k8screen</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
 
-    <name>k8screen</name>
-    <description>k8screen</description>
-    <url>https://github.com/mansur74/k8screen</url>
+  <name>k8screen</name>
+  <description>k8screen</description>
+  <url>https://github.com/mansur74/k8screen</url>
 
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
@@ -24,7 +24,7 @@
     <lombok.version>1.18.36</lombok.version>
     <mapstruct.version>1.6.3</mapstruct.version>
     <jjwt.version>0.12.6</jjwt.version>
-    <jetbrains-annotations.version>26.0.1</jetbrains-annotations.version>
+    <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
     <!-- Plugins -->
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
@@ -36,7 +36,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- Plugin Dependency Versions -->
     <error-prone.version>2.36.0</error-prone.version>
-    <checkstyle.version>10.21.0</checkstyle.version>
+    <checkstyle.version>10.23.0</checkstyle.version>
     <spotbugs.version>4.9.3</spotbugs.version>
   </properties>
 

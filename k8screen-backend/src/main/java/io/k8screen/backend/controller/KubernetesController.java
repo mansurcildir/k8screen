@@ -1,7 +1,7 @@
 package io.k8screen.backend.controller;
 
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.KubernetesService;
-import io.k8screen.backend.util.CustomUserDetails;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -24,9 +24,8 @@ public class KubernetesController {
   @GetMapping("/nodes")
   public ResponseEntity<List<String>> listNodes(final @NotNull Authentication authentication)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<String> nodes = this.kubernetesService.getNodes(userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<String> nodes = this.kubernetesService.getNodes(userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(nodes);
   }
 }

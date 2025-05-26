@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.jetbrains.annotations.NotNull;
 
-public class Util {
+public class FormatUtil {
 
-  public static String formatAge(final @NotNull OffsetDateTime creationTimestamp) {
+  public static @NotNull String formatAge(final @NotNull OffsetDateTime creationTimestamp) {
     final Duration duration = Duration.between(creationTimestamp, OffsetDateTime.now());
 
     long days = duration.toDays();

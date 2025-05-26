@@ -1,14 +1,15 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.dto.config.ConfigInfo;
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.ConfigService;
-import io.k8screen.backend.util.CustomUserDetails;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,21 +27,20 @@ public class ConfigController {
 
   private final @NotNull ConfigService configService;
 
+  @PreAuthorize("hasRole('USER')")
   @GetMapping({"", "/"})
   public ResponseEntity<List<ConfigInfo>> getAllConfigs(
       final @NotNull Authentication authentication) {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<ConfigInfo> result = this.configService.findAllConfigs(userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<ConfigInfo> result = this.configService.findAllConfigs(userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
   @GetMapping({"/{name}", "/{name}/"})
   public ResponseEntity<ConfigInfo> getConfig(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String name) {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final ConfigInfo result = this.configService.findConfigByName(name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final ConfigInfo result = this.configService.findConfigByName(name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
@@ -49,9 +49,8 @@ public class ConfigController {
       final @NotNull Authentication authentication,
       @RequestParam("config") final @NotNull MultipartFile file)
       throws IOException {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    this.configService.createConfig(file, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    this.configService.checkConfig(file, userDetails.userUuid());
 
     return ResponseEntity.status(HttpStatus.OK).body(true);
   }
@@ -60,9 +59,8 @@ public class ConfigController {
   public ResponseEntity<Boolean> deleteConfigFile(
       final @NotNull Authentication authentication, @RequestParam final @NotNull String name)
       throws IOException {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    this.configService.deleteConfigByName(name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    this.configService.deleteConfigByName(name, userDetails.userUuid());
 
     return ResponseEntity.status(HttpStatus.OK).body(true);
   }

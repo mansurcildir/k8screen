@@ -3,12 +3,9 @@
   import NavUser from '$lib/components/nav-user.svelte';
   import TeamSwitcher from '$lib/components/config-switcher.svelte';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-  import { theme } from 'mode-watcher';
 
   export let data;
   export let loading: boolean;
-
-  $: color = $theme ? $theme : 'light';
 </script>
 
 <Sidebar.Root>

@@ -2,6 +2,8 @@
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
   import { authAPI } from '$lib/service/auth-service';
+  import { toastService } from '$lib/service/toast-service';
+  import Spinner from '$lib/components/spinner.svelte';
 
   let isAuthenticated: boolean | undefined = false;
   let loading = true;
@@ -9,9 +11,12 @@
   onMount(async () => {
     const code = new URLSearchParams(window.location.search).get('code');
     await authAPI
-      .authenticate(code)
-      .then((data) => {
-        isAuthenticated = data;
+      .authorize(code)
+      .then(() => {
+        isAuthenticated = true;
+      })
+      .catch((e) => {
+        toastService.show(e.message, 'error');
       })
       .finally(() => {
         loading = false;
@@ -29,7 +34,7 @@
     <slot />
   </div>
 {:else if loading}
-  <div class="flex min-h-screen flex-col items-center justify-center">
-    <span class="loading loading-spinner loading-lg"></span>
+  <div class="drawer bg-base-200 lg:drawer-open min-h-screen">
+    <Spinner class="h-10 w-10" color="black" />
   </div>
 {/if}

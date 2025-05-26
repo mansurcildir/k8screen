@@ -1,9 +1,9 @@
+server:
+  port: 8080
+
 logging:
   level:
     root: WARN
-
-k8screen-api:
-  base-url: ${API_BASE_URL:http://localhost:8080}
 
 k8screen-db:
   host: ${K8SCREEN_DB_HOST:localhost}
@@ -21,6 +21,8 @@ k8screen-frontend:
 k8screen:
   config:
     path: ${user.home}/.k8screen/configs
+  trash:
+    path: ${k8screen.config.path}/trash
 
 spring:
   datasource:
@@ -28,21 +30,25 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${k8screen-db.username}
     password: ${k8screen-db.password}
+
   jpa:
     show-sql: false
     open-in-view: false
+    generate-ddl: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        format_sql: true
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+        globally_quoted_identifiers: true
+
   flyway:
     baseline-on-migrate: true
     baseline-description: "init"
     baseline-version: 0
     enabled: true
+
   security:
     oauth2:
       client:
@@ -57,6 +63,4 @@ spring:
         provider:
           google:
             token-uri: https://oauth2.googleapis.com/token
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
