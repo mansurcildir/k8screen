@@ -10,13 +10,13 @@
   $: namespace = $page.params.namespace;
 </script>
 
-<Tabs.Root>
-  <Tabs.List class="grid w-full grid-cols-5">
-    <Tabs.Trigger value="deployments">Deployments</Tabs.Trigger>
-    <Tabs.Trigger value="pods">Pods</Tabs.Trigger>
-    <Tabs.Trigger value="statefulsets">StatefulSets</Tabs.Trigger>
-    <Tabs.Trigger value="services">Services</Tabs.Trigger>
-    <Tabs.Trigger value="secrets">Secrets</Tabs.Trigger>
+<Tabs.Root value="deployments">
+  <Tabs.List class="grid w-full grid-cols-5 space-x-2">
+    <Tabs.Trigger class="hover:bg-white" value="deployments">Deployments</Tabs.Trigger>
+    <Tabs.Trigger class="hover:bg-white" value="pods">Pods</Tabs.Trigger>
+    <Tabs.Trigger class="hover:bg-white" value="statefulsets">StatefulSets</Tabs.Trigger>
+    <Tabs.Trigger class="hover:bg-white" value="services">Services</Tabs.Trigger>
+    <Tabs.Trigger class="hover:bg-white" value="secrets">Secrets</Tabs.Trigger>
   </Tabs.List>
   <Tabs.Content value="deployments">
     <Deployments namespace={namespace} />

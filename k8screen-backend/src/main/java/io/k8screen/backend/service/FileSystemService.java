@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,14 +19,14 @@ public class FileSystemService {
   @Value("${k8screen.config.path}")
   private String configPath;
 
-  public void uploadConfig(final @NotNull MultipartFile file, final @NotNull String userId)
+  @Value("${k8screen.trash.path}")
+  private String trashPath;
+
+  public void uploadConfig(final @NotNull MultipartFile file, final @NotNull UUID userUuid)
       throws IOException {
-    final File targetDirectory = new File(this.configPath + File.separator + userId);
-    if (!targetDirectory.exists()) {
-      final boolean created = targetDirectory.mkdirs();
-      if (!created) {
-        throw new IOException();
-      }
+    final File targetDirectory = new File(this.configPath + File.separator + userUuid);
+    if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
+      throw new IOException("directoryNotFound");
     }
 
     final File targetFile =
@@ -33,21 +34,25 @@ public class FileSystemService {
     file.transferTo(targetFile);
   }
 
-  public void deleteConfig(final @NotNull String fileName, final @NotNull String userId)
+  public void deleteConfig(final @NotNull String fileName, final @NotNull UUID userUuid)
       throws IOException {
-    final File targetDirectory = new File(this.configPath + File.separator + userId);
+    final File targetDirectory = new File(this.configPath + File.separator + userUuid);
     if (!targetDirectory.exists()) {
-      throw new IOException("Directory not found for user: " + userId);
+      throw new IOException("directoryNotFound");
     }
 
     final File targetFile = new File(targetDirectory, fileName);
     if (!targetFile.exists()) {
-      throw new IOException("File not found: " + fileName);
+      throw new IOException("fileNotFound");
+    }
+    final File trashDirectory = new File(this.trashPath + File.separator + userUuid);
+    if (!trashDirectory.exists() && !trashDirectory.mkdirs()) {
+      throw new IOException("directoryNotFound");
     }
 
-    final boolean deleted = targetFile.delete();
-    if (!deleted) {
-      throw new IOException("Failed to delete file: " + fileName);
+    final File trashFile = new File(trashDirectory, fileName);
+    if (!targetFile.renameTo(trashFile)) {
+      throw new IOException();
     }
   }
 }

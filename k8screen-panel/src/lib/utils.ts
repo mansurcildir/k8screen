@@ -91,14 +91,14 @@ export function extractBreadcrumbs(pathname: string): Breadcrumb[] {
       // Accumulate the path incrementally
       accumulatedPath += `/${path}`;
 
-      // Filter out ULIDs for the text, but keep ULIDs for the link
-      const text = isUlid(path)
+      // Filter out UUIDs for the text, but keep UUIDs for the link
+      const text = isUuid(path)
         ? '' // If it's a ULID, keep the text empty
         : decodeURIComponent(path);
 
       return {
-        text: text, // ULIDs won't affect the text, only non-ULID paths will
-        link: accumulatedPath // Keep full path (including ULIDs) in the link
+        text: text, // UUIDs won't affect the text, only non-UUID paths will
+        link: accumulatedPath // Keep full path (including UUIDs) in the link
       };
     })
     .filter((crumb) => crumb.text !== ''); // Filter out breadcrumbs with empty text
@@ -106,6 +106,6 @@ export function extractBreadcrumbs(pathname: string): Breadcrumb[] {
   return breadcrumbs;
 }
 
-export const isUlid = (id: string): boolean => {
-  return /^[0-9A-HJKMNP-TV-Z]{26}$/.test(id.toUpperCase());
+export const isUuid = (id: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
 };

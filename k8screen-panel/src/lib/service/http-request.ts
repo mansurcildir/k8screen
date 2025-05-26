@@ -1,12 +1,10 @@
 import { authAPI } from './auth-service';
-import { getBearerAccessTokenWithHeaderAttribute } from './storage-manager';
+import { getBearerAccessTokenWithHeaderAttribute, getRefreshTokenWithHeaderAttribute } from './storage-manager';
 
-export type HeadersCallback = () => { [key: string]: string };
-
-const createGetRequestOptions = (headers: HeadersCallback): RequestInit => {
+const createGetRequestWithRefreshHeader = (): RequestInit => {
   return {
     method: 'GET',
-    headers: headers()
+    headers: getRefreshTokenWithHeaderAttribute()
   };
 };
 
@@ -79,120 +77,95 @@ const createDeleteRequest = (): RequestInit => {
 };
 
 export const applyGetRequestWithBearerHeader = async (url: string) => {
-  try {
-    authAPI.authorize();
-    const response = await fetch(url, createGetRequestWithBearerHeader());
+  await authAPI.authorize();
+  const response = await fetch(url, createGetRequestWithBearerHeader());
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyPostRequestWithBearerHeader = async (url: string, body: string) => {
-  try {
-    authAPI.authorize();
-    return await fetch(url, createPostRequestWithBearerHeader(body));
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  await authAPI.authorize();
+  const response = await fetch(url, createPostRequestWithBearerHeader(body));
+
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyPutRequestWithBearerHeader = async (url: string, body: string) => {
-  try {
-    authAPI.authorize();
-    return await fetch(url, createPutRequestWithBearerHeader(body));
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  await authAPI.authorize();
+  const response = await fetch(url, createPutRequestWithBearerHeader(body));
+
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyDeleteRequestWithBearerHeader = async (url: string) => {
-  try {
-    authAPI.authorize();
-    const response = await fetch(url, createDeleteRequestWithBearerHeader());
+  await authAPI.authorize();
+  const response = await fetch(url, createDeleteRequestWithBearerHeader());
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyGetRequest = async (url: string) => {
-  try {
-    const response = await fetch(url, createGetRequest());
+  const response = await fetch(url, createGetRequest());
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyPostRequest = async (url: string, body: string) => {
-  try {
-    const response = await fetch(url, createPostRequest(body));
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response;
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  const response = await fetch(url, createPostRequest(body));
+
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyPutRequest = async (url: string, body: string) => {
-  try {
-    return await fetch(url, createPutRequest(body));
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  const response = await fetch(url, createPutRequest(body));
+
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
 export const applyDeleteRequest = async (url: string) => {
-  try {
-    const response = await fetch(url, createDeleteRequest());
+  const response = await fetch(url, createDeleteRequest());
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };
 
-export const applyGetRequestOptional = async (url: string, headers: HeadersCallback) => {
-  try {
-    const response = await fetch(url, createGetRequestOptions(headers));
+export const applyGetRequestWithRefreshToken = async (url: string) => {
+  const response = await fetch(url, createGetRequestWithRefreshHeader());
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}, url: ${url}`);
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Request failed', error);
-    throw error;
+  if (!response.ok) {
+    throw await response.json();
   }
+
+  return response;
 };

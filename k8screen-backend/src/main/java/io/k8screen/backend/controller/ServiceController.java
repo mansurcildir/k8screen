@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.dto.k8s.ServiceInfo;
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.ServiceService;
-import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Service;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +33,9 @@ public class ServiceController {
       @PathVariable final @NotNull String namespace,
       @RequestBody final @NotNull V1Service service)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Service createdService = this.serviceService.create(namespace, service, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Service createdService =
+        this.serviceService.create(namespace, service, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(createdService);
   }
 
@@ -46,9 +46,9 @@ public class ServiceController {
       @PathVariable final @NotNull String name,
       @RequestBody final @NotNull V1Service service)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Service updatedService = this.serviceService.update(namespace, name, service, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Service updatedService =
+        this.serviceService.update(namespace, name, service, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(updatedService);
   }
 
@@ -58,9 +58,9 @@ public class ServiceController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final String service = this.serviceService.getDetailByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final String service =
+        this.serviceService.getDetailByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
@@ -68,9 +68,9 @@ public class ServiceController {
   public ResponseEntity<List<ServiceInfo>> listServices(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<ServiceInfo> services = this.serviceService.findAll(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<ServiceInfo> services =
+        this.serviceService.findAll(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(services);
   }
 
@@ -80,9 +80,9 @@ public class ServiceController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final ServiceInfo service = this.serviceService.findByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final ServiceInfo service =
+        this.serviceService.findByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(service);
   }
 
@@ -92,9 +92,9 @@ public class ServiceController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Service status = this.serviceService.deleteByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Service status =
+        this.serviceService.deleteByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(status);
   }
 }

@@ -6,11 +6,11 @@ import { applyGetRequestWithBearerHeader, applyPutRequestWithBearerHeader } from
 export const userAPI = {
   getProfile: async (): Promise<UserInfo> => {
     const url = `${SPRING_BASE_URL}/api/v1/users/profile`;
-    return await (await applyGetRequestWithBearerHeader(url)).json();
+    return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
-  updateConfig: async (body: UserConfig): Promise<boolean> => {
+  updateConfig: async (body: UserConfig): Promise<Response> => {
     const url = `${SPRING_BASE_URL}/api/v1/users/config`;
-    return await (await applyPutRequestWithBearerHeader(url, JSON.stringify(body))).json();
+    return await applyPutRequestWithBearerHeader(url, JSON.stringify(body));
   }
 };

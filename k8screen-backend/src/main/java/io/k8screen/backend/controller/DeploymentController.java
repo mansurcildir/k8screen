@@ -1,8 +1,8 @@
 package io.k8screen.backend.controller;
 
 import io.k8screen.backend.data.dto.k8s.DeploymentInfo;
+import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.service.DeploymentService;
-import io.k8screen.backend.util.CustomUserDetails;
 import io.kubernetes.client.openapi.models.V1Deployment;
 import io.kubernetes.client.openapi.models.V1Status;
 import java.util.List;
@@ -35,10 +35,10 @@ public class DeploymentController {
       @PathVariable final @NotNull String namespace,
       @RequestBody final @NotNull V1Deployment deployment)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
     final V1Deployment createdDeployment =
-        this.deploymentService.create(namespace, deployment, userId);
+        this.deploymentService.create(namespace, deployment, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.CREATED).body(createdDeployment);
   }
 
@@ -46,9 +46,9 @@ public class DeploymentController {
   public ResponseEntity<List<DeploymentInfo>> listDeployments(
       final @NotNull Authentication authentication, @PathVariable final @NotNull String namespace)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final List<DeploymentInfo> deployment = this.deploymentService.findAll(namespace, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final List<DeploymentInfo> deployment =
+        this.deploymentService.findAll(namespace, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 
@@ -58,9 +58,9 @@ public class DeploymentController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final DeploymentInfo deployment = this.deploymentService.findByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final DeploymentInfo deployment =
+        this.deploymentService.findByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 
@@ -70,9 +70,9 @@ public class DeploymentController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final String deployment = this.deploymentService.getDetailByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final String deployment =
+        this.deploymentService.getDetailByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(deployment);
   }
 
@@ -83,10 +83,9 @@ public class DeploymentController {
       @PathVariable final @NotNull String name,
       @RequestBody final @NotNull V1Deployment deployment)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     final V1Deployment updatedDeployment =
-        this.deploymentService.updateByName(namespace, name, deployment, userId);
+        this.deploymentService.updateByName(namespace, name, deployment, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(updatedDeployment);
   }
 
@@ -96,9 +95,9 @@ public class DeploymentController {
       @PathVariable final @NotNull String namespace,
       @PathVariable final @NotNull String name)
       throws Exception {
-    final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    final String userId = userDetails.getUserId();
-    final V1Status status = this.deploymentService.deleteByName(namespace, name, userId);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    final V1Status status =
+        this.deploymentService.deleteByName(namespace, name, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK).body(status);
   }
 }

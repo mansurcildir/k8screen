@@ -7,10 +7,8 @@ export interface CustomJwtPayload {
 
 export const isTokenExpired = (token: string) => {
   try {
-    // Decode the token
     const decodedToken = jwtDecode(token);
 
-    // Check if the token has an expiration date
     if (!decodedToken.exp) {
       return true;
     }
