@@ -9,6 +9,8 @@
   import Logs from 'lucide-svelte/icons/logs';
   import Save from 'lucide-svelte/icons/save';
   import { OptionTerminal } from '$lib/model/enum';
+  import HighlightBlock from './highlight-block.svelte';
+  import TextArea from './text-area.svelte';
 
   export let k8sItem: string;
   export let details: string;
@@ -140,27 +142,21 @@
     }
   };
 
+  const handleMouseMove = (event: MouseEvent) => {
+  event.preventDefault();
+  if (open && isResizing) {
+    const newHeight = containerHeight - event.movementY;
+    if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
+      containerHeight = newHeight;
+    }
+  }
+};
+
   const handleMouseDown = () => {
     isResizing = true;
   };
 
-  const handleMouseMove = (event: MouseEvent) => {
-    if (open && isResizing) {
-      const newHeight = containerHeight - event.movementY;
-      if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
-        if (newHeight < containerHeight) {
-          const isAtTop = window.innerHeight - (containerHeight - event.movementY) <= 150;
-          if (!isAtTop) {
-            containerHeight = newHeight;
-          }
-        } else {
-          containerHeight = newHeight;
-        }
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
+   const handleMouseUp = () => {
     isResizing = false;
   };
 
@@ -172,7 +168,6 @@
   .log-container {
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;
-    overflow-wrap: break-word;
     word-break: break-word;
   }
 </style>
@@ -272,12 +267,13 @@
           <Spinner class="m-auto h-10 w-10" />
         </div>
       {:else if option === OptionTerminal.LOG}
-        <div class="h-full w-full overflow-auto p-5">{logs}</div>
+        <div class="h-full w-full overflow-auto p-5">
+          <HighlightBlock code={logs} language="1c"/>
+        </div>
       {:else if option === OptionTerminal.BASH}
         <div class="flex h-full flex-col p-5">
           {execRes}
           <div class="flex w-full items-center overflow-auto">
-            >
             <form on:submit={async () => sendCommand()} class="flex w-full items-center">
               <input
                 type="text"
@@ -288,10 +284,13 @@
           </div>
         </div>
       {:else if option === OptionTerminal.DETAIL}
-        <div class="h-full w-full overflow-auto p-5">{details}</div>
+        <div class="h-full w-full overflow-y-auto overflow-x-hidden px-5">
+          <HighlightBlock code={details} language="yaml"/>
+        </div>
       {:else if option === OptionTerminal.EDIT}
-        <textarea bind:value={editedItem} class="h-full w-full resize-none overflow-auto bg-black p-5 outline-none"
-        ></textarea>
+        <div class="h-full w-full overflow-y-auto overflow-x-hidden px-5">
+        <TextArea code={details} language="yaml"/>
+        </div>
       {/if}
     </div>
   </Collapsible.Content>
