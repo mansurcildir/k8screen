@@ -9,7 +9,7 @@ Frontend web application of k8screen for panel
 
 ## Tech Stack
 
-**Language:** TyspeScript
+**Language:** TypeScript
 
 **Framework:** Svelte
 
@@ -22,7 +22,7 @@ Frontend web application of k8screen for panel
 - Clone the project
 
 ```bash
-  git clone https://mansur74/k8screen
+  git clone https://github.com/mansurcildir/k8screen.git
 ```
 
 - Go to the project directory

@@ -2,30 +2,29 @@
 
 Backend application of k8screen
 
-
 ## Tech Stack
 
 **Language:** Java
 
-**Framework:** Spring
+**Framework:** Spring Boot
 
 **Security**: Spring Security, JWT, Google OAuth2 Authentication
 
 **Database**: PostgreSQL
 
+**Storage**: File System
+
 **Migration**: Flyway
 
-
 **API and Clients:**
-- https://github.com/kubernetes-client/java/
-
+- https://github.com/kubernetes-client/java
 
 ## Run Locally
 
 - Clone the project
 
 ```bash
-   git clone https://mansur74/k8screen
+   git clone https://github.com/mansurcildir/k8screen.git
 ```
 
 - Go to the project directory
@@ -44,7 +43,7 @@ Backend application of k8screen
 
 - Open ``application.yml`` on ``k8screen-backend`` project directory
 
-- Open ``Project Structure...`` on File menu, add ``k8screen-backend`` as module on  ``Modules`` session, apply changes and save
+- Open ``Project Structure...`` on File menu, add  ``k8screen`` and ``k8screen-backend`` as module on  ``Modules`` session, apply changes and save
 
 - Change OAuth 2.0 Client ID credentials with your Google ClientId and Clint Secret credentials (If you don't have, you should create ``k8screen`` application and ``OAuth 2.0 Client ID`` credentials on ``https://console.cloud.google.com``)
 ```

@@ -1,7 +1,10 @@
 # k8screen
 The multifunctional web application which you can monitor and manage your kubernetes environment.
 
-![k8screen-logo](https://github.com/user-attachments/assets/e7940b9a-4f98-4d2d-bcc0-4d6e9b63c4d9)
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/e7940b9a-4f98-4d2d-bcc0-4d6e9b63c4d9" alt="k8screen-logo" />
+</div>
+<br/>
 
 The project consists of 2 parts;
 
@@ -12,7 +15,6 @@ The project consists of 2 parts;
 ## Authors
 
 - [@mansurcildir](https://www.github.com/mansurcildir)
-
 
 ## Support
 
