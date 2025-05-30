@@ -2,12 +2,11 @@
 
 Backend application of k8screen
 
-
 ## Tech Stack
 
 **Language:** Java
 
-**Framework:** Spring
+**Framework:** Spring Boot
 
 **Security**: Spring Security, JWT, Google OAuth2 Authentication
 
@@ -17,17 +16,15 @@ Backend application of k8screen
 
 **Migration**: Flyway
 
-
 **API and Clients:**
 - https://github.com/kubernetes-client/java/
-
 
 ## Run Locally
 
 - Clone the project
 
 ```bash
-   git clone https://mansurcildir/k8screen
+   git clone https://github.com/mansurcildir/k8screen.git
 ```
 
 - Go to the project directory
