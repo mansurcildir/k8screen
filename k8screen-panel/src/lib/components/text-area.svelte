@@ -8,14 +8,14 @@
   $: highlighted = hljs.highlight(code, { language }).value;
 </script>
 
-<div class="grid sm:grid-cols-2 gap-5 h-full">
+<div class="grid h-full gap-5 sm:grid-cols-2">
   <textarea
     bind:value={code}
-    class="p-5 bg-[#020817] p-5 outline-none resize-none text-sm h-full"
+    class="h-full resize-none bg-[#020817] p-5 p-5 text-sm outline-none"
     placeholder="Kodunuzu buraya yazın..."
   ></textarea>
 
-  <pre class="max-w-full text-sm whitespace-pre-wrap break-words">
+  <pre class="max-w-full whitespace-pre-wrap break-words text-sm">
     <code class="language-{language}">
       {@html highlighted}
     </code>

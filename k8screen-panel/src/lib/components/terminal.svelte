@@ -143,20 +143,20 @@
   };
 
   const handleMouseMove = (event: MouseEvent) => {
-  event.preventDefault();
-  if (open && isResizing) {
-    const newHeight = containerHeight - event.movementY;
-    if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
-      containerHeight = newHeight;
+    event.preventDefault();
+    if (open && isResizing) {
+      const newHeight = containerHeight - event.movementY;
+      if (newHeight <= maxContainerHeight && newHeight >= minContainerHeight) {
+        containerHeight = newHeight;
+      }
     }
-  }
-};
+  };
 
   const handleMouseDown = () => {
     isResizing = true;
   };
 
-   const handleMouseUp = () => {
+  const handleMouseUp = () => {
     isResizing = false;
   };
 
@@ -268,7 +268,7 @@
         </div>
       {:else if option === OptionTerminal.LOG}
         <div class="h-full w-full overflow-auto p-5">
-          <HighlightBlock code={logs} language="1c"/>
+          <HighlightBlock code={logs} language="1c" />
         </div>
       {:else if option === OptionTerminal.BASH}
         <div class="flex h-full flex-col p-5">
@@ -285,11 +285,11 @@
         </div>
       {:else if option === OptionTerminal.DETAIL}
         <div class="h-full w-full overflow-y-auto overflow-x-hidden px-5">
-          <HighlightBlock code={details} language="yaml"/>
+          <HighlightBlock code={details} language="yaml" />
         </div>
       {:else if option === OptionTerminal.EDIT}
         <div class="h-full w-full overflow-y-auto overflow-x-hidden px-5">
-        <TextArea code={details} language="yaml"/>
+          <TextArea code={details} language="yaml" />
         </div>
       {/if}
     </div>

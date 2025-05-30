@@ -70,8 +70,7 @@ export const authAPI = {
         authAPI.unAuthorize();
       }
     }
-  },
-
+  }
 };
 
 const loginGoogle = async (code: string) => {
