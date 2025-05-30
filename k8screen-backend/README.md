@@ -13,6 +13,8 @@ Backend application of k8screen
 
 **Database**: PostgreSQL
 
+**Storage**: File System
+
 **Migration**: Flyway
 
 
@@ -25,7 +27,7 @@ Backend application of k8screen
 - Clone the project
 
 ```bash
-   git clone https://mansur74/k8screen
+   git clone https://mansurcildir/k8screen
 ```
 
 - Go to the project directory
@@ -44,7 +46,7 @@ Backend application of k8screen
 
 - Open ``application.yml`` on ``k8screen-backend`` project directory
 
-- Open ``Project Structure...`` on File menu, add ``k8screen-backend`` as module on  ``Modules`` session, apply changes and save
+- Open ``Project Structure...`` on File menu, add  ``k8screen`` and ``k8screen-backend`` as module on  ``Modules`` session, apply changes and save
 
 - Change OAuth 2.0 Client ID credentials with your Google ClientId and Clint Secret credentials (If you don't have, you should create ``k8screen`` application and ``OAuth 2.0 Client ID`` credentials on ``https://console.cloud.google.com``)
 ```

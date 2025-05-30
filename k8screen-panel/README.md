@@ -22,7 +22,7 @@ Frontend web application of k8screen for panel
 - Clone the project
 
 ```bash
-  git clone https://mansur74/k8screen
+  git clone https://mansurcildir/k8screen
 ```
 
 - Go to the project directory
