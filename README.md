@@ -10,7 +10,7 @@ The project consists of 2 parts;
 
 ## Authors
 
-- [@mansur74](https://www.github.com/mansur74)
+- [@mansurcildir](https://www.github.com/mansurcildir)
 
 
 ## Support
