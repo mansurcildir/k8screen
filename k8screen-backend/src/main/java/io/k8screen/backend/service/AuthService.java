@@ -93,6 +93,7 @@ public class AuthService {
         this.jwtUtil.generateAccessToken(user.getUuid(), user.getUsername(), roles);
     final String refreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
 
+    this.logout(user.getUuid());
     this.createRefreshToken(user, refreshToken);
     return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
   }
@@ -115,6 +116,7 @@ public class AuthService {
         this.jwtUtil.generateAccessToken(user.getUuid(), user.getUsername(), roles);
     final String refreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
 
+    this.logout(user.getUuid());
     this.createRefreshToken(user, refreshToken);
     return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
   }

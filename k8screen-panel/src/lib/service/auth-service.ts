@@ -54,7 +54,7 @@ export const authAPI = {
 
   authorize: async (code: string | null = null): Promise<void> => {
     if (code) {
-      return authAPI.authorizeGoogle(code);
+      return await loginGoogle(code);
     }
 
     const tokens = getAllTokens();
@@ -72,16 +72,6 @@ export const authAPI = {
     }
   },
 
-  authorizeGoogle: async (code: string): Promise<void> => {
-    const tokens = getAllTokens();
-
-    if (!tokens.accessToken || isTokenExpired(tokens.accessToken)) {
-      return await loginGoogle(code);
-    }
-
-    await authAPI.logout();
-    await loginGoogle(code);
-  }
 };
 
 const loginGoogle = async (code: string) => {
