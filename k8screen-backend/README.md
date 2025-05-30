@@ -17,7 +17,7 @@ Backend application of k8screen
 **Migration**: Flyway
 
 **API and Clients:**
-- https://github.com/kubernetes-client/java/
+- https://github.com/kubernetes-client/java
 
 ## Run Locally
 
