@@ -9,7 +9,7 @@ Frontend web application of k8screen for panel
 
 ## Tech Stack
 
-**Language:** TyspeScript
+**Language:** TypeScript
 
 **Framework:** Svelte
 
