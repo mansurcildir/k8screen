@@ -21,7 +21,7 @@
     <checkstyle.config.location>config/checkstyle.xml</checkstyle.config.location>
     <!-- Dependency Versions -->
     <spring-boot.version>3.5.0</spring-boot.version>
-    <lombok.version>1.18.36</lombok.version>
+    <lombok.version>1.18.38</lombok.version>
     <mapstruct.version>1.6.3</mapstruct.version>
     <jjwt.version>0.12.6</jjwt.version>
     <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
