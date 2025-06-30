@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/namespaces")
+@RequestMapping("/v1/namespaces")
 public class NamespaceController {
 
   private final @NotNull NamespaceService namespaceService;

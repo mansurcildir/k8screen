@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/namespaces/{namespace}/stateful-sets")
+@RequestMapping("/v1/namespaces/{namespace}/stateful-sets")
 public class StatefulSetController {
   private final @NotNull StatefulSetService statefulSetService;
 

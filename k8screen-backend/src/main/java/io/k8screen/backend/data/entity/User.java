@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
@@ -52,6 +53,13 @@ public class User {
 
   @Column(name = "ACTIVE_CONFIG")
   private String activeConfig;
+
+  @Column(name = "STRIPE_CUSTOMER_ID", nullable = false)
+  private UUID stripeCustomerId;
+
+  @ManyToOne
+  @JoinColumn(name = "SUBSCRIPTION_PLAN_ID")
+  private SubscriptionPlan subscriptionPlan;
 
   @Column(name = "DELETED", nullable = false)
   private boolean deleted;

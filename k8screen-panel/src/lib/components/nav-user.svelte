@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import * as Avatar from '$lib/components/ui/avatar/index.js';
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
   import * as Sidebar from '$lib/components/ui/sidebar/index.js';
   import { useSidebar } from '$lib/components/ui/sidebar/index.js';
   import { authAPI } from '$lib/service/auth-service';
+  import { stripeAPI } from '$lib/service/stripe-service';
   import BadgeCheck from 'lucide-svelte/icons/badge-check';
   import Bell from 'lucide-svelte/icons/bell';
   import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
@@ -17,6 +19,12 @@
   const logout = () => {
     authAPI.logout().then(() => {
       window.location.href = '/login';
+    });
+  };
+
+  const redirectToStripePanel = async () => {
+    stripeAPI.getPanelSession().then((url: string) => {
+      window.location.href = url;
     });
   };
 </script>
@@ -63,7 +71,12 @@
         </DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-          <DropdownMenu.Item>
+          <DropdownMenu.Item
+            class="cursor-pointer"
+            onclick={() => {
+              redirectToStripePanel();
+            }}
+          >
             <Sparkles />
             Upgrade to Pro
           </DropdownMenu.Item>
@@ -74,7 +87,12 @@
             <BadgeCheck />
             Account
           </DropdownMenu.Item>
-          <DropdownMenu.Item>
+          <DropdownMenu.Item
+            class="cursor-pointer"
+            onclick={() => {
+              goto('/billing');
+            }}
+          >
             <CreditCard />
             Billing
           </DropdownMenu.Item>

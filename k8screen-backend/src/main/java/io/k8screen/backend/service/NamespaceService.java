@@ -35,6 +35,10 @@ public class NamespaceService {
             .findByUuidAndDeletedFalse(userUuid)
             .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
 
+    if (user.getActiveConfig() == null) {
+      return List.of();
+    }
+
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.getActiveConfig(), userUuid);
     final V1NamespaceList namespaceList = coreV1Api.listNamespace().execute();
     return namespaceList.getItems().stream()

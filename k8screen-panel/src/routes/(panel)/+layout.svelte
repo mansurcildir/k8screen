@@ -34,7 +34,7 @@
     <slot />
   </div>
 {:else if loading}
-  <div class="drawer bg-base-200 lg:drawer-open min-h-screen">
+  <div class="drawer bg-base-200 lg:drawer-open flex min-h-screen items-center justify-center">
     <Spinner class="h-10 w-10" color="black" />
   </div>
 {/if}

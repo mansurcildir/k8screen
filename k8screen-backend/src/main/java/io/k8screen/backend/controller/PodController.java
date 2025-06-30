@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/namespaces/{namespace}/pods")
+@RequestMapping("/v1/namespaces/{namespace}/pods")
 public class PodController {
 
   private final @NotNull PodService podService;

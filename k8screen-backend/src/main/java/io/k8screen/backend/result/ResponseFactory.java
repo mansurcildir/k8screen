@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class ResponseFactory {
   private final @NotNull MessageSource messageSource;
 
-  public Result success(final int status, final @NotNull String msgId) {
+  public @NotNull Result success(final int status, final @NotNull String msgId) {
     final String message =
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
@@ -20,7 +20,8 @@ public class ResponseFactory {
     return new SuccessResult<>(status, message);
   }
 
-  public <T> DataResult<T> success(final int status, final @NotNull String msgId, final T data) {
+  public @NotNull <T> DataResult<T> success(
+      final int status, final @NotNull String msgId, final T data) {
     final String message =
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
@@ -28,7 +29,7 @@ public class ResponseFactory {
     return new SuccessDataResult<>(status, message, data);
   }
 
-  public Result error(final int status, final @NotNull String msgId) {
+  public @NotNull Result error(final int status, final @NotNull String msgId) {
     final String message =
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
@@ -36,7 +37,8 @@ public class ResponseFactory {
     return new ErrorResult<>(status, message);
   }
 
-  public <T> DataResult<T> error(final int status, final @NotNull String msgId, final T data) {
+  public @NotNull <T> DataResult<T> error(
+      final int status, final @NotNull String msgId, final T data) {
     final String message =
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));

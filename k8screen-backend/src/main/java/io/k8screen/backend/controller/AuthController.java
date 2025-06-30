@@ -2,6 +2,7 @@ package io.k8screen.backend.controller;
 
 import static io.k8screen.backend.util.Constant.REFRESH_TOKEN;
 
+import com.stripe.exception.StripeException;
 import io.k8screen.backend.data.dto.user.AuthResponse;
 import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.data.dto.user.UserGoogleLogin;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -46,7 +47,7 @@ public class AuthController {
 
   @PostMapping("/register")
   public ResponseEntity<AuthResponse> register(
-      @Valid @RequestBody final @NotNull UserRegister userRegister) {
+      @Valid @RequestBody final @NotNull UserRegister userRegister) throws StripeException {
     final AuthResponse authResponse = this.authService.register(userRegister);
     return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
   }

@@ -128,12 +128,13 @@
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
                       <DropdownMenu.Item
+                        class="cursor-pointer"
                         onclick={() => {
                           k8sItem = pod.name;
                           getDetails();
                         }}>View</DropdownMenu.Item
                       >
-                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                      <DropdownMenu.Item class="cursor-pointer">Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>

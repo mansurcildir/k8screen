@@ -1,5 +1,6 @@
 package io.k8screen.backend.service;
 
+import com.stripe.exception.StripeException;
 import io.k8screen.backend.data.dto.user.AuthResponse;
 import io.k8screen.backend.data.dto.user.GoogleToken;
 import io.k8screen.backend.data.dto.user.GoogleUserInfo;
@@ -9,17 +10,20 @@ import io.k8screen.backend.data.dto.user.UserLogin;
 import io.k8screen.backend.data.dto.user.UserRegister;
 import io.k8screen.backend.data.entity.RefreshToken;
 import io.k8screen.backend.data.entity.Role;
+import io.k8screen.backend.data.entity.SubscriptionPlan;
 import io.k8screen.backend.data.entity.User;
 import io.k8screen.backend.exception.ItemNotFoundException;
 import io.k8screen.backend.exception.UnauthorizedException;
 import io.k8screen.backend.mapper.UserConverter;
 import io.k8screen.backend.repository.RefreshTokenRepository;
 import io.k8screen.backend.repository.RoleRepository;
+import io.k8screen.backend.repository.SubscriptionPlanRepository;
 import io.k8screen.backend.repository.UserRepository;
 import io.k8screen.backend.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,12 +68,16 @@ public class AuthService {
   @Value("${spring.security.oauth2.client.provider.google.user-info-uri}")
   private String userInfoUri;
 
+  private static final String SUBSCRIPTION_PLAN_FREE = "Free";
+
   private final @NotNull JwtUtil jwtUtil;
   private final @NotNull PasswordEncoder passwordEncoder;
   private final @NotNull UserRepository userRepository;
   private final @NotNull RoleRepository roleRepository;
   private final @NotNull RefreshTokenRepository refreshTokenRepository;
   private final @NotNull UserConverter userConverter;
+  private final @NotNull SubscriptionPlanRepository subscriptionPlanRepository;
+  private final @NotNull StripeService stripeService;
 
   public @NotNull AuthResponse login(final @NotNull UserLogin loginRequest) {
     final User user =
@@ -88,14 +96,8 @@ public class AuthService {
       throw new UnauthorizedException("wrongPassword");
     }
 
-    final List<String> roles = user.getRoles().stream().map(Role::getName).toList();
-    final String accessToken =
-        this.jwtUtil.generateAccessToken(user.getUuid(), user.getUsername(), roles);
-    final String refreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
-
     this.logout(user.getUuid());
-    this.createRefreshToken(user, refreshToken);
-    return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    return this.createAuthResponse(user);
   }
 
   public @NotNull AuthResponse loginGoogle(final @NotNull UserGoogleLogin loginRequest) {
@@ -111,14 +113,8 @@ public class AuthService {
             .findByUsernameAndDeletedFalse(username)
             .orElseGet(() -> this.createUser(username, email, picture));
 
-    final List<String> roles = user.getRoles().stream().map(Role::getName).toList();
-    final String accessToken =
-        this.jwtUtil.generateAccessToken(user.getUuid(), user.getUsername(), roles);
-    final String refreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
-
     this.logout(user.getUuid());
-    this.createRefreshToken(user, refreshToken);
-    return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    return this.createAuthResponse(user);
   }
 
   private @NotNull User createUser(
@@ -136,40 +132,45 @@ public class AuthService {
             .findByName("USER")
             .orElseThrow(() -> new ItemNotFoundException("roleNotFound"));
 
-    user.setRoles(Set.of(role));
+    user.setRoles(new HashSet<>(Set.of(role)));
+
+    final SubscriptionPlan subscriptionPlan =
+        this.subscriptionPlanRepository
+            .findByName(SUBSCRIPTION_PLAN_FREE)
+            .orElseThrow(() -> new ItemNotFoundException("subscriptionPlanNotFound"));
+
+    user.setSubscriptionPlan(subscriptionPlan);
     return this.userRepository.save(user);
   }
 
-  public @NotNull AuthResponse register(final @NotNull UserRegister userRegister) {
+  private @NotNull AuthResponse createAuthResponse(final @NotNull User user) {
+    final List<String> roles = user.getRoles().stream().map(Role::getName).toList();
+
+    final String accessToken =
+        this.jwtUtil.generateAccessToken(user.getUuid(), user.getUsername(), roles);
+    final String refreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
+
+    final RefreshToken token =
+        RefreshToken.builder().uuid(UUID.randomUUID()).token(refreshToken).user(user).build();
+
+    this.refreshTokenRepository.save(token);
+    return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+  }
+
+  public @NotNull AuthResponse register(final @NotNull UserRegister userRegister)
+      throws StripeException {
     final String encodedPassword = this.passwordEncoder.encode(userRegister.password());
     final User user =
-        this.userConverter.toUser(
-            UserRegister.builder()
-                .username(userRegister.username())
-                .password(encodedPassword)
-                .email(userRegister.email())
-                .picture(userRegister.picture())
-                .build());
-    user.setUuid(UUID.randomUUID());
+        this.createUser(userRegister.username(), userRegister.email(), userRegister.picture());
 
-    final Role role =
-        this.roleRepository
-            .findByName("USER")
-            .orElseThrow(() -> new ItemNotFoundException("roleNotFound"));
-    user.setRoles(Set.of(role));
-
+    user.setPassword(encodedPassword);
     this.userRepository.save(user);
+
+    this.stripeService.createCustomerWithFreeProduct(user.getUuid());
 
     log.warn("User: {} registered to auth-service!", user.getUuid());
 
-    final String accessToken =
-        this.jwtUtil.generateAccessToken(
-            user.getUuid(), user.getUsername(), List.of(role.getName()));
-
-    final String refreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
-
-    this.createRefreshToken(user, refreshToken);
-    return AuthResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    return this.createAuthResponse(user);
   }
 
   public @NotNull AuthResponse refresh(final @NotNull String token) {
@@ -205,13 +206,6 @@ public class AuthService {
             .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
 
     return this.userConverter.toUserInfo(user);
-  }
-
-  private void createRefreshToken(final @NotNull User user, final @NotNull String token) {
-    final RefreshToken refreshToken =
-        RefreshToken.builder().uuid(UUID.randomUUID()).token(token).user(user).build();
-
-    this.refreshTokenRepository.save(refreshToken);
   }
 
   private @NotNull GoogleToken getGoogleTokens(final @NotNull String code) {

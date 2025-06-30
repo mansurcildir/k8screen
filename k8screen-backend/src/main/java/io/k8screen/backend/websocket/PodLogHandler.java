@@ -28,7 +28,8 @@ public class PodLogHandler extends TextWebSocketHandler {
     this.podService = podService;
   }
 
-  public void afterConnectionEstablished(final @NotNull WebSocketSession session) {
+  @Override
+  public void afterConnectionEstablished(final @NotNull WebSocketSession session) throws Exception {
     final URI uri = Objects.requireNonNull(session.getUri());
     final String query = uri.getQuery();
 
@@ -44,17 +45,12 @@ public class PodLogHandler extends TextWebSocketHandler {
     final UUID userUuid = UUID.fromString(this.decode(params.get("userUuid").getFirst()));
 
     log.info(
-        "Received parameters: namespace={}, podName={}, userUuid={}", namespace, podName, userUuid);
+        "Received parameters for log namespace={}, podName={}, userUuid={}",
+        namespace,
+        podName,
+        userUuid);
 
-    new Thread(
-            () -> {
-              try {
-                this.streamPodLogs(namespace, podName, userUuid, session);
-              } catch (Exception e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .start();
+    this.podService.streamPodLogs(namespace, podName, userUuid, session);
   }
 
   @Override
@@ -67,15 +63,5 @@ public class PodLogHandler extends TextWebSocketHandler {
 
   private @NotNull String decode(final @NotNull String value) {
     return URLDecoder.decode(value, StandardCharsets.UTF_8);
-  }
-
-  private void streamPodLogs(
-      final @NotNull String namespace,
-      final @NotNull String podName,
-      final @NotNull UUID userUuid,
-      final @NotNull WebSocketSession session)
-      throws Exception {
-
-    this.podService.streamPodLogs(namespace, podName, userUuid, session);
   }
 }

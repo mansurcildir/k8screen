@@ -2,14 +2,15 @@ package io.k8screen.backend.service;
 
 import jakarta.transaction.Transactional;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Objects;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -22,16 +23,26 @@ public class FileSystemService {
   @Value("${k8screen.trash.path}")
   private String trashPath;
 
-  public void uploadConfig(final @NotNull MultipartFile file, final @NotNull UUID userUuid)
+  public void uploadConfig(
+      final @NotNull InputStream inputStream,
+      final @NotNull String filename,
+      final @NotNull UUID userUuid)
       throws IOException {
+
     final File targetDirectory = new File(this.configPath + File.separator + userUuid);
     if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
       throw new IOException("directoryNotFound");
     }
 
-    final File targetFile =
-        new File(targetDirectory, Objects.requireNonNull(file.getOriginalFilename()));
-    file.transferTo(targetFile);
+    final File targetFile = new File(targetDirectory, filename);
+
+    try (final OutputStream outputStream = new FileOutputStream(targetFile)) {
+      final byte[] buffer = new byte[8192];
+      int bytesRead;
+      while ((bytesRead = inputStream.read(buffer)) != -1) {
+        outputStream.write(buffer, 0, bytesRead);
+      }
+    }
   }
 
   public void deleteConfig(final @NotNull String fileName, final @NotNull UUID userUuid)
@@ -45,6 +56,7 @@ public class FileSystemService {
     if (!targetFile.exists()) {
       throw new IOException("fileNotFound");
     }
+
     final File trashDirectory = new File(this.trashPath + File.separator + userUuid);
     if (!trashDirectory.exists() && !trashDirectory.mkdirs()) {
       throw new IOException("directoryNotFound");

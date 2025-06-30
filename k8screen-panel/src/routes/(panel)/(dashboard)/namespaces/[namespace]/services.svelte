@@ -90,12 +90,15 @@
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
                       <DropdownMenu.Item
+                        class="cursor-pointer"
                         onclick={() => {
                           k8sItem = service.name;
                           getDetails();
-                        }}>View</DropdownMenu.Item
+                        }}
                       >
-                      <DropdownMenu.Item>Delete</DropdownMenu.Item>
+                        View
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item class="cursor-pointer">Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
