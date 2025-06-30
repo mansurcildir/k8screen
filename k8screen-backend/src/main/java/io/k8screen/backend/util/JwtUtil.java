@@ -87,11 +87,11 @@ public class JwtUtil {
       final @NotNull String username,
       final @NotNull List<String> roles) {
     return this.generateToken(
-        this.accessKey, userUuid.toString(), Map.of("username", username, "roles", roles), 1);
+        this.accessKey, userUuid.toString(), Map.of("username", username, "roles", roles), 5);
   }
 
   public @NotNull String generateRefreshToken(final @NotNull UUID userUuid) {
-    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), 7 * 24 * 60);
+    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), 30);
   }
 
   private @NotNull SecretKey getSignKey(final @NotNull String signKey) {

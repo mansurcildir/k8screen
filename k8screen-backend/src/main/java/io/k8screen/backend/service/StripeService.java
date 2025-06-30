@@ -41,7 +41,7 @@ public class StripeService {
 
   @PostConstruct
   private void initStripe() {
-    Stripe.apiKey = stripeSecretKey;
+    Stripe.apiKey = this.stripeSecretKey;
   }
 
   public @NotNull String createStripePanelSession(final @NotNull UUID userUuid)
