@@ -34,9 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SubscriptionPlanService {
 
-  @Value("${stripe.enable:false}")
-  private boolean enableStripe;
-
   @Value("${stripe.product.price-id.free}")
   private String stripeFreeProductPriceId;
 
@@ -76,7 +73,7 @@ public class SubscriptionPlanService {
     final String eventType = event.getType();
 
     if (!eventType.equals(EVENT_INVOICE_PAID)) {
-      log.error("Unexpected stripe webhook event type {} {}", eventType, event.getId());
+      log.error("Unexpected stripe webhook event type {} ({})", eventType, event.getId());
       throw new BadRequestException("unexpectedEventType");
     }
 
@@ -124,7 +121,8 @@ public class SubscriptionPlanService {
   }
 
   private void deleteRemainingConfigs(final long limit, final @NotNull User user) {
-    final long configCount = this.configRepository.countConfigByUserUuidAndDeletedFalse(user.getUuid());
+    final long configCount =
+        this.configRepository.countConfigByUserUuidAndDeletedFalse(user.getUuid());
 
     if (configCount > limit) {
       final int diff = (int) (configCount - limit);

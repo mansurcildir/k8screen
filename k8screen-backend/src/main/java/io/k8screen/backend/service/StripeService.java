@@ -13,6 +13,8 @@ import io.k8screen.backend.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class StripeService {
 
   @Value("${stripe.enable:false}")
   private boolean enableStripe;
+
+  @Value("${stripe.secret-key}")
+  private String stripeSecretKey;
 
   @Value("${stripe.product.price-id.free}")
   private String stripeFreeProductPriceId;
@@ -33,11 +39,9 @@ public class StripeService {
   private static final @NotNull String STRIPE_RETURN_URL = "http://localhost:5173";
   private final @NotNull UserRepository userRepository;
 
-  public StripeService(
-      @Value("${stripe.secret-key}") final @NotNull String stripeSecretKey,
-      final @NotNull UserRepository userRepository) {
+  @PostConstruct
+  private void initStripe() {
     Stripe.apiKey = stripeSecretKey;
-    this.userRepository = userRepository;
   }
 
   public @NotNull String createStripePanelSession(final @NotNull UUID userUuid)
@@ -60,15 +64,13 @@ public class StripeService {
     return Session.create(params).getUrl();
   }
 
-  public @NotNull String createCustomerWithFreeProduct(final @NotNull UUID userUuid)
-      throws StripeException {
+  public void createCustomerWithFreeProduct(final @NotNull UUID userUuid) throws StripeException {
     if (!this.enableStripe) {
       throw new StripeIsDisabledException();
     }
 
     final String customerId = this.createCustomer(userUuid);
     this.createFreeProduct(customerId);
-    return customerId;
   }
 
   public @NotNull String createCustomer(final @NotNull UUID userUuid) throws StripeException {

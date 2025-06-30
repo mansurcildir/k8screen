@@ -27,9 +27,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Value("${k8screen-frontend.login-url}")
-  private String loginURL;
-
   @Value("${k8screen-frontend.success-url}")
   private String apiSuccessURL;
 

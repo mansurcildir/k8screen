@@ -15,16 +15,12 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class NamespaceService {
-
-  @Value("${k8screen.config.path}")
-  private String configPath;
 
   private final @NotNull UserRepository userRepository;
   private final @NotNull ApiClientFactory apiClientFactory;

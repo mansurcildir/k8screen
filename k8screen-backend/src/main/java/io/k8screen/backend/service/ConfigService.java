@@ -8,7 +8,6 @@ import io.k8screen.backend.exception.ItemNotFoundException;
 import io.k8screen.backend.exception.SubscriptionLimitExceed;
 import io.k8screen.backend.mapper.ConfigConverter;
 import io.k8screen.backend.repository.ConfigRepository;
-import io.k8screen.backend.repository.SubscriptionPlanRepository;
 import io.k8screen.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 public class ConfigService {
 
   private final @NotNull UserRepository userRepository;
-  private final @NotNull SubscriptionPlanRepository subscriptionPlanRepository;
   private final @NotNull ConfigRepository configRepository;
   private final @NotNull ConfigConverter configConverter;
   private final @NotNull FileSystemService fileSystemService;

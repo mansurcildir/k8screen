@@ -4,8 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +65,7 @@ public class JwtUtil {
       final @NotNull Map<String, Object> claims,
       final int expMin) {
 
-    final Instant now = Instant.now();
-    final Instant futureInstant = now.plusSeconds(expMin * 60L);
-    final ZonedDateTime zonedDateTime = futureInstant.atZone(ZoneId.systemDefault());
-
-    final Date expirationDate = Date.from(zonedDateTime.toInstant());
+    final Date expirationDate = Date.from(Instant.now().plus(expMin, ChronoUnit.MINUTES));
 
     return Jwts.builder()
         .header()
