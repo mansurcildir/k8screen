@@ -12,4 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @NotNull
   Optional<User> findByUuidAndDeletedFalse(@NotNull UUID uuid);
+
+  @NotNull
+  Optional<User> findByStripeCustomerIdAndDeletedFalse(@NotNull UUID uuid);
 }

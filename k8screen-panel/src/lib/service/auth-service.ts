@@ -11,33 +11,33 @@ import { isTokenExpired } from './token-decoder';
 
 export const authAPI = {
   register: async (body: UserForm): Promise<{ access_token: string; refresh_token: string }> => {
-    const url = `${SPRING_BASE_URL}/api/v1/auth/register`;
+    const url = `${SPRING_BASE_URL}/v1/auth/register`;
     return (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
   login: async (body: LoginReq): Promise<LoginRes> => {
-    const url = `${SPRING_BASE_URL}/api/v1/auth/login`;
+    const url = `${SPRING_BASE_URL}/v1/auth/login`;
     return (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
   loginGoogle: async (body: GoogleLoginReq): Promise<LoginRes> => {
-    const url = `${SPRING_BASE_URL}/api/v1/auth/login/google`;
+    const url = `${SPRING_BASE_URL}/v1/auth/login/google`;
     return (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
   logout: async (): Promise<void> => {
-    const url = `${SPRING_BASE_URL}/api/v1/auth/logout`;
+    const url = `${SPRING_BASE_URL}/v1/auth/logout`;
     await applyGetRequestWithBearerHeader(url);
     clearTokens();
   },
 
   getProfile: async (): Promise<UserInfo> => {
-    const url = `${SPRING_BASE_URL}/api/v1/auth/profile`;
+    const url = `${SPRING_BASE_URL}/v1/auth/profile`;
     return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
   getAccessToken: async (): Promise<LoginRes> => {
-    return (await applyGetRequestWithRefreshToken(`${SPRING_BASE_URL}/api/v1/auth/refresh`)).json();
+    return (await applyGetRequestWithRefreshToken(`${SPRING_BASE_URL}/v1/auth/refresh`)).json();
   },
 
   refreshToken: async (): Promise<LoginRes> => {

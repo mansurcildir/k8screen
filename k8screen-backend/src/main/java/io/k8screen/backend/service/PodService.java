@@ -10,16 +10,17 @@ import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
-import io.kubernetes.client.util.Streams;
 import io.kubernetes.client.util.Yaml;
 import jakarta.transaction.Transactional;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -87,6 +88,7 @@ public class PodService {
     return coreV1Api.deleteNamespacedPod(name, namespace).execute();
   }
 
+  @Async
   public void streamPodLogs(
       final @NotNull String namespace,
       final @NotNull String podName,
@@ -101,9 +103,10 @@ public class PodService {
 
     final CoreV1Api coreV1Api = this.apiClientFactory.coreV1Api(user.getActiveConfig(), userUuid);
 
-    new Thread(() -> this.fetchLogs(coreV1Api, namespace, podName, session)).start();
+    this.fetchLogs(coreV1Api, namespace, podName, session);
   }
 
+  @Async
   public void terminalExec(
       final @NotNull String namespace,
       final @NotNull String podName,
@@ -121,48 +124,39 @@ public class PodService {
 
     final String[] commandArray = {"sh", "-c", command};
     final Process proc = exec.exec(namespace, podName, commandArray, null, true, true);
-    final StringBuilder stringBuilder = new StringBuilder();
 
-    final Thread thread = new Thread(() -> this.execInputStream(proc, stringBuilder));
+    final StringBuilder outputBuilder = new StringBuilder();
+    final BufferedReader stdoutReader =
+        new BufferedReader(new InputStreamReader(proc.getInputStream(), StandardCharsets.UTF_8));
 
-    thread.start();
-    proc.waitFor();
-    thread.join();
-    proc.destroy();
-    session.sendMessage(new TextMessage(stringBuilder.toString()));
-  }
+    String line;
+    while ((line = stdoutReader.readLine()) != null) {
+      outputBuilder.append(line).append(System.lineSeparator());
+    }
 
-  private void execInputStream(final @NotNull Process proc, final StringBuilder stringBuilder) {
-    try {
-      Streams.copy(
-          proc.getInputStream(),
-          new OutputStream() {
-            @Override
-            public void write(final int b) {
-              stringBuilder.append((char) b);
-            }
-          });
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
+    final int exitCode = proc.waitFor();
+
+    if (exitCode != 0) {
+      throw new RuntimeException();
+    }
+
+    if (session.isOpen()) {
+      session.sendMessage(new TextMessage(outputBuilder.toString()));
     }
   }
 
+  @Async
   private void fetchLogs(
       final @NotNull CoreV1Api coreV1Api,
       final @NotNull String namespace,
       final @NotNull String podName,
       final @NotNull WebSocketSession session) {
     try {
-      while (true) {
+      while (session.isOpen()) {
         final String logs = coreV1Api.readNamespacedPodLog(podName, namespace).execute();
-        try {
-          if (session.isOpen()) {
-            session.sendMessage(new TextMessage(logs));
-          }
-        } catch (IOException e) {
-          log.error("Error sending log to WebSocket: {}", e.getMessage());
+        if (session.isOpen()) {
+          session.sendMessage(new TextMessage(logs));
         }
-        Thread.sleep(1000);
       }
     } catch (Exception e) {
       log.error("Error while streaming logs: {}", e.getMessage());

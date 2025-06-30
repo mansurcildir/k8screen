@@ -101,6 +101,7 @@ export const applyPostRequestWithBearerHeader = async (url: string, body: string
 export const applyPutRequestWithBearerHeader = async (url: string, body: string) => {
   await authAPI.authorize();
   const response = await fetch(url, createPutRequestWithBearerHeader(body));
+  console.log(response);
 
   if (!response.ok) {
     throw await response.json();

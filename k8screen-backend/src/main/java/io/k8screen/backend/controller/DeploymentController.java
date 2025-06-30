@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/namespaces/{namespace}/deployments")
+@RequestMapping("/v1/namespaces/{namespace}/deployments")
 public class DeploymentController {
 
   private final @NotNull DeploymentService deploymentService;

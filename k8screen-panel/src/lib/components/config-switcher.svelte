@@ -8,8 +8,6 @@
   import GalleryVerticalEnd from 'lucide-svelte/icons/gallery-vertical-end';
   import Plus from 'lucide-svelte/icons/plus';
   import * as Dialog from '$lib/components/ui/dialog';
-  import { onMount } from 'svelte';
-  import { configAPI } from '$lib/service/config-service';
   import { Input } from '$lib/components/ui/input/index.js';
   import { Button } from '$lib/components/ui/button/index.js';
   import X from 'lucide-svelte/icons/x';

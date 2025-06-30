@@ -33,7 +33,8 @@ public class PodExecHandler extends TextWebSocketHandler {
 
   @Override
   public void handleTextMessage(
-      final @NotNull WebSocketSession session, final @NotNull TextMessage message) {
+      final @NotNull WebSocketSession session, final @NotNull TextMessage message)
+      throws Exception {
 
     // Parse WebSocket query parameters
     final URI uri = Objects.requireNonNull(session.getUri());
@@ -57,9 +58,7 @@ public class PodExecHandler extends TextWebSocketHandler {
         userUuid);
 
     final String command = message.getPayload();
-    log.info("Received command: {}", command);
-
-    new Thread(() -> this.terminalExec(namespace, podName, userUuid, session, command)).start();
+    this.podService.terminalExec(namespace, podName, userUuid, session, command);
   }
 
   @Override
@@ -70,22 +69,5 @@ public class PodExecHandler extends TextWebSocketHandler {
 
   private @NotNull String decode(final @NotNull String value) {
     return URLDecoder.decode(value, StandardCharsets.UTF_8);
-  }
-
-  private void terminalExec(
-      final @NotNull String namespace,
-      final @NotNull String podName,
-      final @NotNull UUID userUuid,
-      final @NotNull WebSocketSession session,
-      final @NotNull String command) {
-    try {
-      this.podService.terminalExec(namespace, podName, userUuid, session, command);
-    } catch (Exception e) {
-      log.error(
-          "Error while streaming logs with namespace: {}, podName: {}, userUuid: {}",
-          namespace,
-          podName,
-          userUuid);
-    }
   }
 }

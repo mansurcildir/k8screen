@@ -67,7 +67,9 @@
   };
 
   const save = async () => {
+    loading = true;
     editedItem = await updateItem();
+    loading = false;
   };
 
   const log = async () => {
@@ -275,7 +277,9 @@
           {execRes}
           <div class="flex w-full items-center overflow-auto">
             <form on:submit={async () => sendCommand()} class="flex w-full items-center">
+              <label for="text">{'> '}</label>
               <input
+                id="text"
                 type="text"
                 bind:value={execReq}
                 class="no-animation w-full resize-none bg-black text-white outline-none"
@@ -289,7 +293,7 @@
         </div>
       {:else if option === OptionTerminal.EDIT}
         <div class="h-full w-full overflow-y-auto overflow-x-hidden px-5">
-          <TextArea code={details} language="yaml" />
+          <TextArea bind:code={editedItem} language="yaml" />
         </div>
       {/if}
     </div>

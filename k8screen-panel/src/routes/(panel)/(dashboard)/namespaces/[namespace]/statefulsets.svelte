@@ -1,91 +1,85 @@
 <script lang="ts">
   import Bar from '$lib/components/bar.svelte';
-  import Terminal from '$lib/components/terminal.svelte';
-  import * as Table from '$lib/components/ui/table';
-  import type { Deployment } from '$lib/model/Deployment';
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-  import { deploymentAPI } from '$lib/service/deployment-service';
-  import yaml from 'yaml';
-  import Button from '$lib/components/ui/button/button.svelte';
-  import Pagination from '$lib/components/pagination.svelte';
-  import Badge from '$lib/components/ui/badge/badge.svelte';
-  import { deployments, getAllDeployments, loadingDeployment } from '$lib/store';
   import IconEllipsis from 'lucide-svelte/icons/ellipsis';
+  import Pagination from '$lib/components/pagination.svelte';
+  import Terminal from '$lib/components/terminal.svelte';
+  import Badge from '$lib/components/ui/badge/badge.svelte';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+  import * as Table from '$lib/components/ui/table';
+  import type { StatefulSet } from '$lib/model/StatefulSet';
+  import { statefulSetAPI } from '$lib/service/statefulset-service';
+  import { getAllStatefulSets, loadingStatefulSet, statefulSets } from '$lib/store';
+  import * as yaml from 'yaml';
 
   export let namespace;
 
   let perPage: number = 5;
   let details: string;
-  let paginated: Deployment[] = [];
-  let k8sItem: string = '';
+  let paginated: StatefulSet[] = [];
+  let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllDeployments(namespace).then(() => load(1));
+    getAllStatefulSets(namespace);
   }
 
   const load = (page: number) => {
     const startIndex = (page - 1) * perPage;
     const endIndex = page * perPage;
-    paginated = $deployments.slice(startIndex, endIndex);
+    paginated = $statefulSets.slice(startIndex, endIndex);
   };
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    details = await deploymentAPI.getDeploymentDetails(namespace, k8sItem);
+    details = await statefulSetAPI.getStatefulSetDetails(namespace, k8sItem);
     return details;
   };
 
   const updateItem = async () => {
-    details = await deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(k8sItem));
+    details = await statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(k8sItem));
     return details;
   };
 </script>
 
-<div class="flex flex-col justify-between" style="height: calc(100vh - 150px);">
+<div class="flex flex-col" style="height: calc(100vh - 150px);">
   <div class="flex flex-grow flex-col justify-between gap-8 overflow-auto">
     <Table.Root>
       <Table.Header>
         <Table.Row>
           <Table.Head>NAME</Table.Head>
-          <Table.Head>REPLICAS</Table.Head>
-          <Table.Head>UP-TO-DATE</Table.Head>
-          <Table.Head>AVAILABLE</Table.Head>
+          <Table.Head>READY</Table.Head>
           <Table.Head>AGE</Table.Head>
           <Table.Head>OPTIONS</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#if $loadingDeployment}
+        {#if $loadingStatefulSet}
           <Table.Row>
-            <Table.Cell><Bar /></Table.Cell>
-            <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
             <Table.Cell><Bar /></Table.Cell>
           </Table.Row>
         {:else}
-          {#each paginated as deployment}
+          {#each paginated as statefulSet}
             <Table.Row
               on:click={() => {
-                k8sItem = deployment.name;
+                k8sItem = statefulSet.name;
                 open = true;
               }}
               class="cursor-pointer"
             >
-              <Table.Cell>{deployment.name}</Table.Cell>
+              <Table.Cell>{statefulSet.name}</Table.Cell>
               <Table.Cell>
                 <Badge
                   class="flex w-20 justify-center"
-                  variant={deployment.ready_replicas < deployment.total_replicas ? 'destructive' : 'default'}
+                  variant={statefulSet.ready_replicas < statefulSet.total_replicas ? 'destructive' : 'default'}
                 >
-                  {deployment.ready_replicas}/{deployment.total_replicas}
+                  {statefulSet.ready_replicas}/{statefulSet.total_replicas}
                 </Badge>
               </Table.Cell>
-              <Table.Cell>{deployment.up_to_date}</Table.Cell>
-              <Table.Cell>{deployment.available}</Table.Cell>
-              <Table.Cell>{deployment.age}</Table.Cell>
+              <Table.Cell>{statefulSet.age}</Table.Cell>
               <Table.Cell>
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger>
@@ -95,15 +89,16 @@
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Content align="end">
                     <DropdownMenu.Group>
-                      <DropdownMenu.Group>
-                        <DropdownMenu.Item
-                          onclick={() => {
-                            k8sItem = deployment.name;
-                            getDetails();
-                          }}>View</DropdownMenu.Item
-                        >
-                        <DropdownMenu.Item>Delete</DropdownMenu.Item>
-                      </DropdownMenu.Group>
+                      <DropdownMenu.Item
+                        class="cursor-pointer"
+                        onclick={() => {
+                          k8sItem = statefulSet.name;
+                          getDetails();
+                        }}
+                      >
+                        View
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item class="cursor-pointer">Delete</DropdownMenu.Item>
                     </DropdownMenu.Group>
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
@@ -113,12 +108,12 @@
         {/if}
       </Table.Body>
     </Table.Root>
-    <Pagination perPage={perPage} load={load} count={$deployments.length} />
+    <Pagination perPage={perPage} load={load} count={$statefulSets.length} />
   </div>
 
   {#if k8sItem}
     <Terminal
-      type="deployment"
+      type="stateful-set"
       getDetails={getDetails}
       updateItem={updateItem}
       k8sItem={k8sItem}

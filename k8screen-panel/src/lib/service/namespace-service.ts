@@ -3,12 +3,12 @@ import { applyGetRequestWithBearerHeader, applyPostRequestWithBearerHeader } fro
 
 export const namespaceAPI = {
   getAllNamespaces: async (): Promise<string[]> => {
-    const url = `${SPRING_BASE_URL}/api/v1/namespaces`;
+    const url = `${SPRING_BASE_URL}/v1/namespaces`;
     return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
   createNamespace: async (body: string): Promise<any> => {
-    const url = `${SPRING_BASE_URL}/api/v1/namespaces`;
+    const url = `${SPRING_BASE_URL}/v1/namespaces`;
     return (await applyPostRequestWithBearerHeader(url, body)).json();
   }
 };

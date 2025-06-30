@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/namespaces/{namespace}/secrets")
+@RequestMapping("/v1/namespaces/{namespace}/secrets")
 public class SecretController {
 
   private final @NotNull SecretService secretService;

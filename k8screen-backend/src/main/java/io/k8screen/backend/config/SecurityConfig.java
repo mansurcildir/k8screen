@@ -27,9 +27,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Value("${k8screen-frontend.login-url}")
-  private String loginURL;
-
   @Value("${k8screen-frontend.success-url}")
   private String apiSuccessURL;
 
@@ -90,12 +87,12 @@ public class SecurityConfig {
                   .AuthorizationManagerRequestMatcherRegistry
               auth) {
     auth.requestMatchers(
-            "/api/v1/auth/register",
-            "/api/v1/auth/login",
-            "/api/v1/auth/login/google",
-            "/api/v1/auth/refresh")
-        .permitAll()
-        .requestMatchers("/ws/**")
+            "/v1/auth/register",
+            "/v1/auth/login",
+            "/v1/auth/login/google",
+            "/v1/auth/refresh",
+            "/v1/webhooks/**",
+            "/ws/**")
         .permitAll()
         .anyRequest()
         .authenticated();

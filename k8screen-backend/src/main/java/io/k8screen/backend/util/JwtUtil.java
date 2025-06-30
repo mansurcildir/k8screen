@@ -4,8 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +65,7 @@ public class JwtUtil {
       final @NotNull Map<String, Object> claims,
       final int expMin) {
 
-    final Instant now = Instant.now();
-    final Instant futureInstant = now.plusSeconds(expMin * 60L);
-    final ZonedDateTime zonedDateTime = futureInstant.atZone(ZoneId.systemDefault());
-
-    final Date expirationDate = Date.from(zonedDateTime.toInstant());
+    final Date expirationDate = Date.from(Instant.now().plus(expMin, ChronoUnit.MINUTES));
 
     return Jwts.builder()
         .header()
@@ -92,11 +87,11 @@ public class JwtUtil {
       final @NotNull String username,
       final @NotNull List<String> roles) {
     return this.generateToken(
-        this.accessKey, userUuid.toString(), Map.of("username", username, "roles", roles), 1);
+        this.accessKey, userUuid.toString(), Map.of("username", username, "roles", roles), 5);
   }
 
   public @NotNull String generateRefreshToken(final @NotNull UUID userUuid) {
-    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), 7 * 24 * 60);
+    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), 30);
   }
 
   private @NotNull SecretKey getSignKey(final @NotNull String signKey) {

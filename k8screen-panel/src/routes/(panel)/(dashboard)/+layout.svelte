@@ -21,6 +21,7 @@
   import type { UserConfig } from '$lib/model/user/UserConfig';
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';
   import { refresh } from '$lib/store';
+  import { toastService } from '$lib/service/toast-service';
 
   $: namespace = $page.params.namespace;
 
@@ -76,18 +77,28 @@
     });
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = (file: File) => {
     const formData = new FormData();
     formData.append('config', file);
 
-    configAPI.uploadConfig(formData).then(() => {
-      const userConfig: UserConfig = {
-        config: file.name
-      };
-      userAPI.updateConfig(userConfig).then(() => {
-        window.location.href = '/namespaces';
+    configAPI
+      .uploadConfig(formData)
+      .then(() => {
+        const userConfig: UserConfig = {
+          config: file.name
+        };
+        userAPI
+          .updateConfig(userConfig)
+          .then(() => {
+            window.location.href = '/namespaces';
+          })
+          .catch((e) => {
+            toastService.show(e.message, 'error');
+          });
+      })
+      .catch((e) => {
+        toastService.show(e.message, 'error');
       });
-    });
   };
 
   const deleteFile = async (fileName: string) => {

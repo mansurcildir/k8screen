@@ -4,6 +4,7 @@ server:
 logging:
   level:
     root: WARN
+    org.yaml.snakeyaml.introspector: ERROR
 
 k8screen-db:
   host: ${K8SCREEN_DB_HOST:localhost}
@@ -23,6 +24,18 @@ k8screen:
     path: ${user.home}/.k8screen/configs
   trash:
     path: ${k8screen.config.path}/trash
+
+stripe:
+  enable: false
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY:YOUR_STRIPE_PUBLISHABLE_KEY}
+  secret-key: ${STRIPE_SECRET_KEY:YOUR_STRIPE_SECRET_KEY}
+  product:
+    price-id:
+      free: price_1RfM9UIsjyVn3MvbJBsnDfFz
+      standard: price_1RfME2IsjyVn3Mvbo1AH8S4G
+      premium: price_1RfMECIsjyVn3MvbrpBWaMWb
+  webhook:
+    signature-key: ${STRIPE_WEBHOOK_SIGNATURE_KEY:YOUR_STRIPE_WEBHOOK_SIGNATURE_KEY}
 
 spring:
   datasource:

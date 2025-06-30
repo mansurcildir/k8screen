@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/namespaces/{namespace}/services")
+@RequestMapping("/v1/namespaces/{namespace}/services")
 public class ServiceController {
   private final @NotNull ServiceService serviceService;
 
