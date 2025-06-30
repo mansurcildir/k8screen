@@ -124,10 +124,10 @@ public class SubscriptionPlanService {
   }
 
   private void deleteRemainingConfigs(final long limit, final @NotNull User user) {
-    long configCount = this.configRepository.countConfigByUserUuidAndDeletedFalse(user.getUuid());
+    final long configCount = this.configRepository.countConfigByUserUuidAndDeletedFalse(user.getUuid());
 
     if (configCount > limit) {
-      int diff = (int) (configCount - limit);
+      final int diff = (int) (configCount - limit);
       final List<Long> configIds =
           this.configRepository.findIdsByUserIdAndDeletedFalseOrderByCreatedAtDesc(
               PageRequest.of(0, diff), user.getId());

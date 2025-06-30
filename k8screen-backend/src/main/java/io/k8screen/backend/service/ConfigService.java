@@ -62,7 +62,7 @@ public class ConfigService {
             .findByUuidAndDeletedFalse(userUuid)
             .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
 
-    if (configCountExceedLimit(user.getSubscriptionPlan(), userUuid)) {
+    if (this.configCountExceedLimit(user.getSubscriptionPlan(), userUuid)) {
       throw new SubscriptionLimitExceed("subscriptionLimitExceed");
     }
 
