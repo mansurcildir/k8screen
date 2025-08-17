@@ -26,10 +26,10 @@
 
   const loadServices = async (namespace: string) => {
     getAllServices(namespace)
-    .then(() =>  load(1))
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    });
+      .then(() => load(1))
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
   };
 
   const load = (page: number) => {
@@ -40,19 +40,17 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    return serviceAPI.getServiceDetails(namespace, k8sItem)
-    .then((res) => {
+    return serviceAPI.getServiceDetails(namespace, k8sItem).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 
   const updateItem = async () => {
-    return serviceAPI.updateService(namespace, k8sItem, yaml.parse(k8sItem))
-    .then((res) => {
+    return serviceAPI.updateService(namespace, k8sItem, yaml.parse(k8sItem)).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 </script>
 

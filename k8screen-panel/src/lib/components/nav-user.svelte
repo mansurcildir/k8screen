@@ -27,7 +27,7 @@
     stripeAPI
       .getPanelSession()
       .then((res) => {
-        if(res.data) {
+        if (res.data) {
           window.location.href = res.data;
         }
       })
@@ -65,11 +65,12 @@
         align="end"
         sideOffset={4}
       >
-        <DropdownMenu.Label 
+        <DropdownMenu.Label
           class="cursor-pointer p-0 font-normal"
           onclick={() => {
             goto('/profile');
-          }}>
+          }}
+        >
           <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar.Root class="h-8 w-8 rounded-lg">
               <Avatar.Image src={user.avatar} alt={user.name} />
@@ -99,7 +100,8 @@
             class="cursor-pointer"
             onclick={() => {
               goto('/profile');
-            }}>
+            }}
+          >
             <BadgeCheck />
             Account
           </DropdownMenu.Item>

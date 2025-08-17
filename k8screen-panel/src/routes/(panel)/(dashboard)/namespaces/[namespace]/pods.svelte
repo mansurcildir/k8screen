@@ -29,12 +29,12 @@
     loadPods(namespace);
   }
 
-  const loadPods= async (namespace: string) => {
+  const loadPods = async (namespace: string) => {
     getAllPods(namespace)
-    .then(() =>  load(1))
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    });
+      .then(() => load(1))
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
   };
 
   const load = (page: number) => {
@@ -45,47 +45,43 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    return podAPI.getPodDetails(namespace, k8sItem)
-    .then((res) => {
+    return podAPI.getPodDetails(namespace, k8sItem).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 
   const updateItem = async () => {
-    return podAPI.updatePod(namespace, k8sItem, yaml.parse(k8sItem))
-    .then((res) => {
+    return podAPI.updatePod(namespace, k8sItem, yaml.parse(k8sItem)).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 
   const getLogs = async (): Promise<string> => {
     open = true;
 
-    return authAPI.getProfile()
-    .then((res) => {
+    return authAPI.getProfile().then((res) => {
       const user = res.data;
       if (user && user.uuid) {
         const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
         return wsUrl;
       }
       return '';
-    })
+    });
   };
 
   const getExec = async (): Promise<string> => {
     open = true;
 
-    return authAPI.getProfile()
-    .then((res) => {
+    return authAPI.getProfile().then((res) => {
       const user = res.data;
       if (user && user.uuid) {
         const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
         return wsUrl;
       }
       return '';
-    })
+    });
   };
 </script>
 

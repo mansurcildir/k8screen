@@ -14,7 +14,7 @@ export const accountAPI = {
     return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
-   deleteAccountByUuid: async (accountUuid: string): Promise<void> => {
+  deleteAccountByUuid: async (accountUuid: string): Promise<void> => {
     const url = `${SPRING_BASE_URL}/v1/accounts/${accountUuid}`;
     await applyDeleteRequestWithBearerHeader(url);
   }

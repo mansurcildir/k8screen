@@ -149,8 +149,10 @@
             bind:value={userRegister.username}
             required
           />
-          <span class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out" 
-            style="opacity: {$errors.username ? 1 : 0};">
+          <span
+            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+            style="opacity: {$errors.username ? 1 : 0};"
+          >
             {#if $errors.username}
               {$errors.username}
             {/if}
@@ -169,8 +171,10 @@
             bind:value={userRegister.password}
             required
           />
-          <span class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out" 
-            style="opacity: {$errors.password ? 1 : 0};">
+          <span
+            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+            style="opacity: {$errors.password ? 1 : 0};"
+          >
             {#if $errors.password}
               {$errors.password}
             {/if}
@@ -198,7 +202,7 @@
           {#if loadingGoogle}
             <Spinner class="m-auto" color="black" />
           {:else}
-            <IconGithub class="mb-0.5"/> Github
+            <IconGithub class="mb-0.5" /> Github
           {/if}
         </Button>
       </div>

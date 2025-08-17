@@ -27,8 +27,8 @@ export const getAllDeployments = (namespace: string): Promise<void> => {
   loadingDeployment.set(true);
   return deploymentAPI
     .getAllDeployments(namespace)
-    .then(res => deployments.set(res.data))
-    .catch(err => toastService.show(err.message, 'error'))
+    .then((res) => deployments.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
     .finally(() => loadingDeployment.set(false));
 };
 
@@ -36,8 +36,8 @@ export const getAllPods = (namespace: string): Promise<void> => {
   loadingPod.set(true);
   return podAPI
     .getAllPods(namespace)
-    .then(res => pods.set(res.data))
-    .catch(err => toastService.show(err.message, 'error'))
+    .then((res) => pods.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
     .finally(() => loadingPod.set(false));
 };
 
@@ -45,8 +45,8 @@ export const getAllSecrets = (namespace: string): Promise<void> => {
   loadingSecret.set(true);
   return secretAPI
     .getAllSecrets(namespace)
-    .then(res => secrets.set(res.data))
-    .catch(err => toastService.show(err.message, 'error'))
+    .then((res) => secrets.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
     .finally(() => loadingSecret.set(false));
 };
 
@@ -54,8 +54,8 @@ export const getAllServices = (namespace: string): Promise<void> => {
   loadingService.set(true);
   return serviceAPI
     .getAllServices(namespace)
-    .then(res => services.set(res.data))
-    .catch(err => toastService.show(err.message, 'error'))
+    .then((res) => services.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
     .finally(() => loadingService.set(false));
 };
 
@@ -63,8 +63,8 @@ export const getAllStatefulSets = (namespace: string): Promise<void> => {
   loadingStatefulSet.set(true);
   return statefulSetAPI
     .getAllStatefulSets(namespace)
-    .then(res => statefulSets.set(res.data))
-    .catch(err => toastService.show(err.message, 'error'))
+    .then((res) => statefulSets.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
     .finally(() => loadingStatefulSet.set(false));
 };
 

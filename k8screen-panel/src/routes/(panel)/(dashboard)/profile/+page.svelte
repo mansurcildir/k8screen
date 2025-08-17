@@ -58,7 +58,7 @@
     accountAPI
       .deleteAccountByUuid(accountUuid)
       .then(() => {
-        window.location.href = "/profile";
+        window.location.href = '/profile';
       })
       .catch((err) => {
         toastService.show(err.message, 'error');
@@ -73,12 +73,12 @@
 
     const frontendBaseUrl = window.location.origin;
 
-    const token = localStorage.getItem("access-token");
+    const token = localStorage.getItem('access-token');
 
     window.open(
       `http://localhost:8080/oauth2/authorization/google?action=connect&token=${token}`,
       'googleConnect',
-      `width=${width},height=${height},left=${left},top=${top},resizable,scrollbars`,
+      `width=${width},height=${height},left=${left},top=${top},resizable,scrollbars`
     );
 
     const messageHandler = (event: MessageEvent) => {
@@ -96,7 +96,7 @@
     };
 
     window.addEventListener('message', messageHandler);
-  }
+  };
 
   const connectGithubAccount = () => {
     const width = 500;
@@ -106,12 +106,12 @@
 
     const frontendBaseUrl = window.location.origin;
 
-    const token = localStorage.getItem("access-token");
+    const token = localStorage.getItem('access-token');
 
     window.open(
       `http://localhost:8080/oauth2/authorization/github?action=connect&token=${token}`,
       'githubConnect',
-      `width=${width},height=${height},left=${left},top=${top},resizable,scrollbars`,
+      `width=${width},height=${height},left=${left},top=${top},resizable,scrollbars`
     );
 
     const messageHandler = (event: MessageEvent) => {
@@ -129,7 +129,7 @@
     };
 
     window.addEventListener('message', messageHandler);
-  }
+  };
 </script>
 
 <h1>Profile Info</h1>
@@ -137,10 +137,14 @@
   <Card.Content class="space-y-6 text-sm">
     <!-- Header -->
     <div class="flex flex-col items-center space-y-3">
-      <img src={userInfo?.avatarUrl ? userInfo.avatarUrl : "/favicon.png"} alt="avatar" class="h-28 w-28 rounded-full border-4 border-indigo-500 shadow-sm" />
+      <img
+        src={userInfo?.avatarUrl ? userInfo.avatarUrl : '/favicon.png'}
+        alt="avatar"
+        class="h-28 w-28 rounded-full border-4 border-indigo-500 shadow-sm"
+      />
     </div>
 
-     <!-- Username -->
+    <!-- Username -->
     <div class="mx-auto max-w-lg">
       <label class="text-sm font-medium text-gray-600" for="username">Username</label>
       <input
@@ -166,7 +170,6 @@
   </Card.Content>
 </Card.Root>
 
-
 <h1>Accounts</h1>
 <Card.Root class="w-full border border-primary bg-secondary hover:border">
   <Card.Content class="space-y-6 text-sm">
@@ -185,15 +188,17 @@
         </div>
 
         {#each googleAccounts as account}
-        <div class="mt-4 flex justify-between items-center gap-3">
+          <div class="mt-4 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2">
               <img src={account.avatarUrl} class="h-10 w-10 rounded-full" alt="Google User" />
-            <div>
-              <p class="text-sm font-medium text-gray-800">{account.username}</p>
-              <p class="text-xs text-gray-600">{account.email}</p>
+              <div>
+                <p class="text-sm font-medium text-gray-800">{account.username}</p>
+                <p class="text-xs text-gray-600">{account.email}</p>
+              </div>
             </div>
-            </div>
-            <button on:click={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline">Disconnect</button>
+            <button on:click={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline"
+              >Disconnect</button
+            >
           </div>
         {/each}
       </div>
@@ -211,15 +216,17 @@
         </div>
 
         {#each githubAccounts as account}
-          <div class="mt-4 flex justify-between items-center gap-3">
+          <div class="mt-4 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2">
               <img src={account.avatarUrl} class="h-10 w-10 rounded-full" alt="Google User" />
-            <div>
-              <p class="text-sm font-medium text-gray-800">{account.username}</p>
-              <p class="text-xs text-gray-600">{account.email}</p>
+              <div>
+                <p class="text-sm font-medium text-gray-800">{account.username}</p>
+                <p class="text-xs text-gray-600">{account.email}</p>
+              </div>
             </div>
-            </div>
-            <button on:click={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline">Disconnect</button>
+            <button on:click={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline"
+              >Disconnect</button
+            >
           </div>
         {/each}
       </div>

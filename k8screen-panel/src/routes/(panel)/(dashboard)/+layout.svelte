@@ -57,13 +57,14 @@
   };
 
   const getProfile = () => {
-    authAPI.getProfile()
-    .then((res) => {
-      user = res.data;
-    })
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    });
+    authAPI
+      .getProfile()
+      .then((res) => {
+        user = res.data;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
   };
 
   const updateConfig = (config: string) => {
@@ -114,24 +115,26 @@
 
   const deleteFile = async (fileName: string) => {
     configAPI.deleteConfig(fileName).then(() => {
-      configAPI.getAllConfigs()
+      configAPI
+        .getAllConfigs()
+        .then((res) => {
+          configs = res.data;
+        })
+        .catch((err) => {
+          toastService.show(err.message, 'error');
+        });
+    });
+  };
+
+  onMount(() => {
+    configAPI
+      .getAllConfigs()
       .then((res) => {
         configs = res.data;
       })
       .catch((err) => {
         toastService.show(err.message, 'error');
       });
-    });
-  };
-
-  onMount(() => {
-    configAPI.getAllConfigs()
-    .then((res) => {
-      configs = res.data;
-    })
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    });
   });
 
   $: data = {

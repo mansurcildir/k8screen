@@ -26,10 +26,10 @@
 
   const loadSecrets = async (namespace: string) => {
     getAllSecrets(namespace)
-    .then(() =>  load(1))
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    });
+      .then(() => load(1))
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
   };
 
   const load = (page: number) => {
@@ -40,19 +40,17 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    return secretAPI.getSecretDetails(namespace, k8sItem)
-    .then((res) => {
+    return secretAPI.getSecretDetails(namespace, k8sItem).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 
   const updateItem = async () => {
-    return secretAPI.updateSecret(namespace, k8sItem, yaml.parse(k8sItem))
-    .then((res) => {
+    return secretAPI.updateSecret(namespace, k8sItem, yaml.parse(k8sItem)).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 </script>
 

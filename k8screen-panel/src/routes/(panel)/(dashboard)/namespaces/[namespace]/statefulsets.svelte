@@ -27,10 +27,10 @@
 
   const loadStatefulSets = async (namespace: string) => {
     getAllStatefulSets(namespace)
-    .then(() =>  load(1))
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    });
+      .then(() => load(1))
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
   };
 
   const load = (page: number) => {
@@ -41,19 +41,17 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    return statefulSetAPI.getStatefulSetDetails(namespace, k8sItem)
-    .then((res) => {
+    return statefulSetAPI.getStatefulSetDetails(namespace, k8sItem).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 
   const updateItem = async () => {
-    return statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(k8sItem))
-    .then((res) => {
+    return statefulSetAPI.updateStatefulSet(namespace, k8sItem, yaml.parse(k8sItem)).then((res) => {
       details = res.data;
       return details;
-    })
+    });
   };
 </script>
 

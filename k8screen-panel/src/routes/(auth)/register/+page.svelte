@@ -140,8 +140,10 @@
                 placeholder="username"
                 required
               />
-          <span class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out" 
-            style="opacity: {$errors.username ? 1 : 0};">
+              <span
+                class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+                style="opacity: {$errors.username ? 1 : 0};"
+              >
                 {#if $errors.username}
                   {$errors.username}
                 {/if}
@@ -157,8 +159,10 @@
                 placeholder="m@example.com"
                 required
               />
-          <span class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out" 
-            style="opacity: {$errors.email ? 1 : 0};">
+              <span
+                class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+                style="opacity: {$errors.email ? 1 : 0};"
+              >
                 {#if $errors.email}
                   {$errors.email}
                 {/if}
@@ -174,8 +178,10 @@
                 placeholder="******"
                 required
               />
-            <span class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out" 
-            style="opacity: {$errors.password ? 1 : 0};">
+              <span
+                class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+                style="opacity: {$errors.password ? 1 : 0};"
+              >
                 {#if $errors.password}
                   {$errors.password}
                 {/if}
@@ -186,20 +192,20 @@
               <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
             </div>
             <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGoogle()}>
-          {#if loadingGoogle}
-            <Spinner class="m-auto" color="black" />
-          {:else}
-            <IconGoogle class="mb-0.5" /> Google
-          {/if}
-        </Button>
+              {#if loadingGoogle}
+                <Spinner class="m-auto" color="black" />
+              {:else}
+                <IconGoogle class="mb-0.5" /> Google
+              {/if}
+            </Button>
 
-        <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
-          {#if loadingGoogle}
-            <Spinner class="m-auto" color="black" />
-          {:else}
-            <IconGithub class="mb-0.5"/> Github
-          {/if}
-        </Button>
+            <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
+              {#if loadingGoogle}
+                <Spinner class="m-auto" color="black" />
+              {:else}
+                <IconGithub class="mb-0.5" /> Github
+              {/if}
+            </Button>
           </div>
           <div class="mt-4 text-center text-sm">
             Do you have an account?

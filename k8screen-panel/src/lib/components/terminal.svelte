@@ -57,45 +57,45 @@
     loading = true;
 
     getDetails()
-    .then((data) => {
-      details = data;
-    })
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    })
-    .finally(() => {
-      loading = false;
-    });
+      .then((data) => {
+        details = data;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      })
+      .finally(() => {
+        loading = false;
+      });
   };
 
   const edit = async () => {
     loading = true;
 
     getDetails()
-    .then((data) => {
-      details = data;
-    })
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    })
-    .finally(() => {
-      loading = false;
-    });
+      .then((data) => {
+        details = data;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      })
+      .finally(() => {
+        loading = false;
+      });
   };
 
   const save = async () => {
     loading = true;
 
     updateItem()
-    .then((data) => {
-      editedItem = data;
-    })
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    })
-    .finally(() => {
-      loading = false;
-    });
+      .then((data) => {
+        editedItem = data;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      })
+      .finally(() => {
+        loading = false;
+      });
   };
 
   const log = async () => {
@@ -105,27 +105,27 @@
     closeSocket(wsLogs);
 
     getLogs()
-    .then((url) => {
-      if (option !== OptionTerminal.LOG) {
-        option = OptionTerminal.LOG;
-      }
+      .then((url) => {
+        if (option !== OptionTerminal.LOG) {
+          option = OptionTerminal.LOG;
+        }
 
-      if (!wsLogs || wsLogs.readyState !== WebSocket.OPEN) {
-        wsLogs = new WebSocket(url);
-      }
+        if (!wsLogs || wsLogs.readyState !== WebSocket.OPEN) {
+          wsLogs = new WebSocket(url);
+        }
 
-      wsLogs.onmessage = function (event) {
-        logs = event.data;
-        loading = false;
-      };
-    })
-    .catch((err) => {
-      toastService.show(err.message, 'error');
-    })
-    .finally(() => {
-      loading = true;
-      open = true;
-    });
+        wsLogs.onmessage = function (event) {
+          logs = event.data;
+          loading = false;
+        };
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      })
+      .finally(() => {
+        loading = true;
+        open = true;
+      });
   };
 
   const sendCommand = () => {
@@ -142,27 +142,27 @@
     closeSocket(wsExec);
 
     getExec()
-    .then((url) => {
-      if (option !== OptionTerminal.BASH) {
-        option = OptionTerminal.BASH;
-      }
+      .then((url) => {
+        if (option !== OptionTerminal.BASH) {
+          option = OptionTerminal.BASH;
+        }
 
-      if (!wsExec || wsExec.readyState !== WebSocket.OPEN) {
-        wsExec = new WebSocket(url);
-      }
+        if (!wsExec || wsExec.readyState !== WebSocket.OPEN) {
+          wsExec = new WebSocket(url);
+        }
 
-      wsExec.onmessage = function (event) {
-        execRes = event.data;
-        loading = false;
-      };
-    })
-    .catch((err) => {
-       toastService.show(err.message, 'error');
-    })
-    .finally(() => {
-      loading = true;
-      open = true;
-    });
+        wsExec.onmessage = function (event) {
+          execRes = event.data;
+          loading = false;
+        };
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      })
+      .finally(() => {
+        loading = true;
+        open = true;
+      });
   };
 
   const closeSocket = (socket: WebSocket | undefined) => {

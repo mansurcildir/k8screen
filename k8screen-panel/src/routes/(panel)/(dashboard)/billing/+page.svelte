@@ -18,11 +18,14 @@
   };
 
   const redirectToStripePanel = async () => {
-    stripeAPI.getPanelSession().then((res) => {
-      if(res.data) {
-        window.location.href = res.data;
-      }
-    }).catch((err) => {
+    stripeAPI
+      .getPanelSession()
+      .then((res) => {
+        if (res.data) {
+          window.location.href = res.data;
+        }
+      })
+      .catch((err) => {
         toastService.show(err.message, 'error');
       });
   };
