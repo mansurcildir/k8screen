@@ -3,11 +3,9 @@ package io.k8screen.backend.exception;
 import io.k8screen.backend.result.DataResult;
 import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +53,7 @@ public class GlobalExceptionHandler {
     log.info(ex.getMessage());
 
     final Result result =
-        this.responseFactory.error(HttpServletResponse.SC_NOT_FOUND, ex.getMessage());
+        this.responseFactory.error(HttpStatus.NO_CONTENT.value(), ex.getMessage());
     return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
   }
 
@@ -86,6 +84,22 @@ public class GlobalExceptionHandler {
     final Result result =
         this.responseFactory.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(ForbiddenException.class)
+  public @NotNull ResponseEntity<Result> handleForbiddenException(
+      final @NotNull ForbiddenException ex) {
+    log.info(ex.getMessage());
+    final Result result = this.responseFactory.error(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+    return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(StripeIsDisabledException.class)
+  public @NotNull ResponseEntity<Result> handleStripeIsDisabledException(
+      final @NotNull StripeIsDisabledException ex) {
+    log.info(ex.getMessage());
+    final Result result = this.responseFactory.error(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+    return new ResponseEntity<>(result, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(SubscriptionLimitExceed.class)

@@ -9,6 +9,7 @@ import type { Service } from './model/Service';
 import { serviceAPI } from './service/service-service';
 import { statefulSetAPI } from './service/statefulset-service';
 import type { StatefulSet } from './model/StatefulSet';
+import { toastService } from './service/toast-service';
 
 export const loadingDeployment = writable<boolean>();
 export const loadingPod = writable<boolean>();
@@ -22,39 +23,49 @@ export const secrets = writable<Secret[]>([]);
 export const services = writable<Service[]>([]);
 export const statefulSets = writable<StatefulSet[]>([]);
 
-export const getAllDeployments = async (namespace: string) => {
+export const getAllDeployments = (namespace: string): Promise<void> => {
   loadingDeployment.set(true);
-  const data = await deploymentAPI.getAllDeployments(namespace);
-  deployments.set(data);
-  loadingDeployment.set(false);
+  return deploymentAPI
+    .getAllDeployments(namespace)
+    .then((res) => deployments.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
+    .finally(() => loadingDeployment.set(false));
 };
 
-export const getAllPods = async (namespace: string) => {
+export const getAllPods = (namespace: string): Promise<void> => {
   loadingPod.set(true);
-  const data = await podAPI.getAllPods(namespace);
-  pods.set(data);
-  loadingPod.set(false);
+  return podAPI
+    .getAllPods(namespace)
+    .then((res) => pods.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
+    .finally(() => loadingPod.set(false));
 };
 
-export const getAllSecrets = async (namespace: string) => {
+export const getAllSecrets = (namespace: string): Promise<void> => {
   loadingSecret.set(true);
-  const data = await secretAPI.getAllSecrets(namespace);
-  secrets.set(data);
-  loadingSecret.set(false);
+  return secretAPI
+    .getAllSecrets(namespace)
+    .then((res) => secrets.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
+    .finally(() => loadingSecret.set(false));
 };
 
-export const getAllServices = async (namespace: string) => {
+export const getAllServices = (namespace: string): Promise<void> => {
   loadingService.set(true);
-  const data = await serviceAPI.getAllServices(namespace);
-  services.set(data);
-  loadingService.set(false);
+  return serviceAPI
+    .getAllServices(namespace)
+    .then((res) => services.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
+    .finally(() => loadingService.set(false));
 };
 
-export const getAllStatefulSets = async (namespace: string) => {
+export const getAllStatefulSets = (namespace: string): Promise<void> => {
   loadingStatefulSet.set(true);
-  const data = await statefulSetAPI.getAllStatefulSets(namespace);
-  statefulSets.set(data);
-  loadingStatefulSet.set(false);
+  return statefulSetAPI
+    .getAllStatefulSets(namespace)
+    .then((res) => statefulSets.set(res.data))
+    .catch((err) => toastService.show(err.message, 'error'))
+    .finally(() => loadingStatefulSet.set(false));
 };
 
 export const refresh = async (namespace: string) => {

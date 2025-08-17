@@ -17,16 +17,16 @@ public class ResponseFactory {
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
 
-    return new SuccessResult<>(status, message);
+    return new SuccessResult<>(status, msgId, message);
   }
 
   public @NotNull <T> DataResult<T> success(
-      final int status, final @NotNull String msgId, final T data) {
+      final int status, final @NotNull String msgId, final @NotNull T data) {
     final String message =
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
 
-    return new SuccessDataResult<>(status, message, data);
+    return new SuccessDataResult<>(status, msgId, message, data);
   }
 
   public @NotNull Result error(final int status, final @NotNull String msgId) {
@@ -34,15 +34,15 @@ public class ResponseFactory {
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
 
-    return new ErrorResult<>(status, message);
+    return new ErrorResult<>(status, msgId, message);
   }
 
   public @NotNull <T> DataResult<T> error(
-      final int status, final @NotNull String msgId, final T data) {
+      final int status, final @NotNull String msgId, final @NotNull T data) {
     final String message =
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
 
-    return new ErrorDataResult<>(status, message, data);
+    return new ErrorDataResult<>(status, msgId, message, data);
   }
 }

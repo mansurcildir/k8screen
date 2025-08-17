@@ -11,18 +11,27 @@
   import Badge from '$lib/components/ui/badge/badge.svelte';
   import { deployments, getAllDeployments, loadingDeployment } from '$lib/store';
   import IconEllipsis from 'lucide-svelte/icons/ellipsis';
+  import { toastService } from '$lib/service/toast-service';
 
-  export let namespace;
+  export let namespace: string;
 
   let perPage: number = 5;
   let details: string;
   let paginated: Deployment[] = [];
-  let k8sItem: string = '';
+  let k8sItem: string;
   let open: boolean;
 
   $: if (namespace) {
-    getAllDeployments(namespace).then(() => load(1));
+    loadDeployments(namespace);
   }
+
+  const loadDeployments = async (namespace: string) => {
+    getAllDeployments(namespace)
+      .then(() => load(1))
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
+  };
 
   const load = (page: number) => {
     const startIndex = (page - 1) * perPage;
@@ -32,13 +41,17 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    details = await deploymentAPI.getDeploymentDetails(namespace, k8sItem);
-    return details;
+    return deploymentAPI.getDeploymentDetails(namespace, k8sItem).then((res) => {
+      details = res.data;
+      return details;
+    });
   };
 
   const updateItem = async () => {
-    details = await deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(k8sItem));
-    return details;
+    return deploymentAPI.updateDeployment(namespace, k8sItem, yaml.parse(k8sItem)).then((res) => {
+      details = res.data;
+      return details;
+    });
   };
 </script>
 

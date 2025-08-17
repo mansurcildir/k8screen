@@ -1,0 +1,4 @@
+apiVersion: v1
+kind: Config
+metadata:
+  name: test-config

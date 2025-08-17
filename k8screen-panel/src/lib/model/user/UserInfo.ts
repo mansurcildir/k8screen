@@ -2,6 +2,6 @@ export interface UserInfo {
   uuid: string;
   username: string;
   email: string;
-  picture: string;
+  avatarUrl: string;
   active_config: string;
 }

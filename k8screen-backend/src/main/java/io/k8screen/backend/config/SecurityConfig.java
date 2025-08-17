@@ -15,8 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,25 +26,38 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-  @Value("${k8screen-frontend.success-url}")
+  @Value("${k8screen.success-url}")
   private String apiSuccessURL;
 
   private final @NotNull JwtUtil jwtUtil;
   private final @NotNull ResponseFactory responseFactory;
+  private final @NotNull OAuthSuccessHandler oAuthSuccessHandler;
 
   public SecurityConfig(
-      final @NotNull JwtUtil jwtUtil, final @NotNull ResponseFactory responseFactory) {
+      final @NotNull JwtUtil jwtUtil,
+      final @NotNull ResponseFactory responseFactory,
+      final @NotNull OAuthSuccessHandler oAuthSuccessHandler) {
     this.jwtUtil = jwtUtil;
     this.responseFactory = responseFactory;
+    this.oAuthSuccessHandler = oAuthSuccessHandler;
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(final @NotNull HttpSecurity http)
+  public SecurityFilterChain securityFilterChain(
+      final @NotNull HttpSecurity http, final @NotNull ClientRegistrationRepository repo)
       throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .cors(this::cors)
         .authorizeHttpRequests(this::authorizeHttpRequests)
         .oauth2Login(this::oAuth2Login)
+        .oauth2Login(
+            oauth2 ->
+                oauth2
+                    .successHandler(this.oAuthSuccessHandler)
+                    .authorizationEndpoint(
+                        auth ->
+                            auth.authorizationRequestResolver(
+                                new AuthorizationRequestResolver(repo))))
         .addFilterBefore(
             new JwtAuthenticationFilter(this.jwtUtil, this.responseFactory),
             UsernamePasswordAuthenticationFilter.class);
@@ -53,16 +65,11 @@ public class SecurityConfig {
     return http.build();
   }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
   private void cors(final @NotNull CorsConfigurer<HttpSecurity> corsConfigurer) {
     corsConfigurer.configurationSource(this.configurationSource());
   }
 
-  private CorsConfigurationSource configurationSource() {
+  private @NotNull CorsConfigurationSource configurationSource() {
     final var configuration = new CorsConfiguration();
     configuration.setAllowedOriginPatterns(List.of("*"));
     configuration.setAllowCredentials(true);
@@ -87,10 +94,12 @@ public class SecurityConfig {
                   .AuthorizationManagerRequestMatcherRegistry
               auth) {
     auth.requestMatchers(
+            "/auth/google/callback",
             "/v1/auth/register",
             "/v1/auth/login",
             "/v1/auth/login/google",
             "/v1/auth/refresh",
+            "/v1/auth/token/**",
             "/v1/webhooks/**",
             "/ws/**")
         .permitAll()

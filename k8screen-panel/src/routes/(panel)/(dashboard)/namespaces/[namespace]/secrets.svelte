@@ -10,6 +10,7 @@
   import IconEllipsis from 'lucide-svelte/icons/ellipsis';
   import Pagination from '$lib/components/pagination.svelte';
   import { secrets, getAllSecrets, loadingSecret } from '$lib/store';
+  import { toastService } from '$lib/service/toast-service';
 
   export let namespace;
 
@@ -20,8 +21,16 @@
   let open: boolean;
 
   $: if (namespace) {
-    getAllSecrets(namespace).then(() => load(1));
+    loadSecrets(namespace);
   }
+
+  const loadSecrets = async (namespace: string) => {
+    getAllSecrets(namespace)
+      .then(() => load(1))
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
+  };
 
   const load = (page: number) => {
     const startIndex = (page - 1) * perPage;
@@ -31,13 +40,17 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    details = await secretAPI.getSecretDetails(namespace, k8sItem);
-    return details;
+    return secretAPI.getSecretDetails(namespace, k8sItem).then((res) => {
+      details = res.data;
+      return details;
+    });
   };
 
   const updateItem = async () => {
-    details = await secretAPI.updateSecret(namespace, k8sItem, yaml.parse(k8sItem));
-    return details;
+    return secretAPI.updateSecret(namespace, k8sItem, yaml.parse(k8sItem)).then((res) => {
+      details = res.data;
+      return details;
+    });
   };
 </script>
 

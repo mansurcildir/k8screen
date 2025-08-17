@@ -13,16 +13,17 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
 
-  private final String accessKey =
-      "561744090F30C5564F793305AB783BC96545E88EE42A7ED0CED578C72CE132A3";
+  @Value("${jwt.access-key}")
+  private String accessKey;
 
-  private final String refreshKey =
-      "42DCCF1E0B06EF601CF9DCDA0ED3877F4F0DB32FAE243DC5F0C681DB09AFB454";
+  @Value("${jwt.refresh-key}")
+  private String refreshKey;
 
   public @NotNull UUID getUserUuidFromAccessToken(final @NotNull String token) {
     return this.extractClaim(token, this.accessKey, claims -> UUID.fromString(claims.getSubject()));

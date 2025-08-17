@@ -1,12 +1,12 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import IconGithub from '$lib/components/icons/IconGithub.svelte';
   import IconGoogle from '$lib/components/icons/IconGoogle.svelte';
   import Spinner from '$lib/components/spinner.svelte';
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import Label from '$lib/components/ui/label/label.svelte';
   import type { LoginReq } from '$lib/model/user/LoginReq';
-  import type { LoginRes } from '$lib/model/user/LoginRes';
   import { authAPI } from '$lib/service/auth-service';
   import { setTokens } from '$lib/service/storage-manager';
   import { toastService } from '$lib/service/toast-service';
@@ -28,12 +28,12 @@
       loading = true;
       authAPI
         .login(userRegister)
-        .then((data: LoginRes) => {
-          setTokens(data.access_token, data.refresh_token);
+        .then((res) => {
+          setTokens(res.data.access_token, res.data.refresh_token);
           goto('/');
         })
-        .catch((e) => {
-          toastService.show(e.message, 'error');
+        .catch((err) => {
+          toastService.show(err.message, 'error');
         })
         .finally(() => (loading = false));
     } catch (e: any) {
@@ -47,8 +47,65 @@
   };
 
   const loginGoogle = () => {
-    loadingGoogle = true;
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const frontendBaseUrl = window.location.origin;
+
+    window.open(
+      'http://localhost:8080/oauth2/authorization/google?action=login',
+      'googleLogin',
+      `width=${width},height=${height},left=${left},top=${top},resizable,scrollbars`
+    );
+
+    const messageHandler = (event: MessageEvent) => {
+      if (event.origin !== frontendBaseUrl) {
+        return;
+      }
+
+      if (event.data.status === 'google-auth-success') {
+        window.removeEventListener('message', messageHandler);
+        window.location.href = frontendBaseUrl;
+      } else if (event.data.status === 'google-auth-error') {
+        window.removeEventListener('message', messageHandler);
+        toastService.show(event.data.error, 'error');
+      }
+    };
+
+    window.addEventListener('message', messageHandler);
+  };
+
+  const loginGithub = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const frontendBaseUrl = window.location.origin;
+
+    window.open(
+      'http://localhost:8080/oauth2/authorization/github?action=login',
+      'githubLogin',
+      `width=${width},height=${height},left=${left},top=${top},resizable,scrollbars`
+    );
+
+    const messageHandler = (event: MessageEvent) => {
+      if (event.origin !== frontendBaseUrl) {
+        return;
+      }
+
+      if (event.data.status === 'github-auth-success') {
+        window.removeEventListener('message', messageHandler);
+        window.location.href = frontendBaseUrl;
+      } else if (event.data.status === 'github-auth-error') {
+        window.removeEventListener('message', messageHandler);
+        toastService.show(event.data.error, 'error');
+      }
+    };
+
+    window.addEventListener('message', messageHandler);
   };
 
   const schema = z.object({
@@ -92,7 +149,10 @@
             bind:value={userRegister.username}
             required
           />
-          <span class="mb-2 h-2 text-sm text-red-500">
+          <span
+            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+            style="opacity: {$errors.username ? 1 : 0};"
+          >
             {#if $errors.username}
               {$errors.username}
             {/if}
@@ -111,7 +171,10 @@
             bind:value={userRegister.password}
             required
           />
-          <span class="mb-2 h-2 text-sm text-red-500">
+          <span
+            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+            style="opacity: {$errors.password ? 1 : 0};"
+          >
             {#if $errors.password}
               {$errors.password}
             {/if}
@@ -131,7 +194,15 @@
           {#if loadingGoogle}
             <Spinner class="m-auto" color="black" />
           {:else}
-            <IconGoogle /> Google
+            <IconGoogle class="mb-0.5" /> Google
+          {/if}
+        </Button>
+
+        <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
+          {#if loadingGoogle}
+            <Spinner class="m-auto" color="black" />
+          {:else}
+            <IconGithub class="mb-0.5" /> Github
           {/if}
         </Button>
       </div>
