@@ -22,6 +22,7 @@
   import RefreshCw from 'lucide-svelte/icons/refresh-cw';
   import { refresh } from '$lib/store';
   import { toastService } from '$lib/service/toast-service';
+  import { authAPI } from '$lib/service/auth-service';
 
   $: namespace = $page.params.namespace;
 
@@ -43,18 +44,25 @@
     loading = true;
     namespaceAPI
       .getAllNamespaces()
-      .then((data) => {
-        namespaces = data.map((ns) => ({
+      .then((res) => {
+        namespaces = res.data.map((ns) => ({
           title: ns,
           url: `/namespaces/${ns}`
         }));
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
       })
       .finally(() => (loading = false));
   };
 
   const getProfile = () => {
-    userAPI.getProfile().then((data: UserInfo) => {
-      user = data;
+    authAPI.getProfile()
+    .then((res) => {
+      user = res.data;
+    })
+    .catch((err) => {
+      toastService.show(err.message, 'error');
     });
   };
 
@@ -67,11 +75,14 @@
     userAPI.updateConfig(userConfig).then(() => {
       namespaceAPI
         .getAllNamespaces()
-        .then((data) => {
-          namespaces = data.map((ns) => ({
+        .then((res) => {
+          namespaces = res.data.map((ns) => ({
             title: ns,
             url: `/namespaces/${ns}`
           }));
+        })
+        .catch((err) => {
+          toastService.show(err.message, 'error');
         })
         .finally(() => (loading = false));
     });
@@ -92,26 +103,34 @@
           .then(() => {
             window.location.href = '/namespaces';
           })
-          .catch((e) => {
-            toastService.show(e.message, 'error');
+          .catch((err) => {
+            toastService.show(err.message, 'error');
           });
       })
-      .catch((e) => {
-        toastService.show(e.message, 'error');
+      .catch((err) => {
+        toastService.show(err.message, 'error');
       });
   };
 
   const deleteFile = async (fileName: string) => {
     configAPI.deleteConfig(fileName).then(() => {
-      configAPI.getAllConfigs().then((d) => {
-        configs = d;
+      configAPI.getAllConfigs()
+      .then((res) => {
+        configs = res.data;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
       });
     });
   };
 
   onMount(() => {
-    configAPI.getAllConfigs().then((d) => {
-      configs = d;
+    configAPI.getAllConfigs()
+    .then((res) => {
+      configs = res.data;
+    })
+    .catch((err) => {
+      toastService.show(err.message, 'error');
     });
   });
 
@@ -119,7 +138,7 @@
     user: {
       name: user?.username,
       email: user?.email,
-      avatar: user?.picture || '/favicon.png',
+      avatar: user?.avatarUrl || '/favicon.png',
       active_config: user?.active_config
     },
     updateConfig: updateConfig,

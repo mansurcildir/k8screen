@@ -11,6 +11,7 @@
   import { OptionTerminal } from '$lib/model/enum';
   import HighlightBlock from './highlight-block.svelte';
   import TextArea from './text-area.svelte';
+  import { toastService } from '$lib/service/toast-service';
 
   export let k8sItem: string;
   export let details: string;
@@ -54,51 +55,77 @@
 
   const detail = async () => {
     loading = true;
-    option = OptionTerminal.DETAIL;
-    details = await getDetails();
-    loading = false;
+
+    getDetails()
+    .then((data) => {
+      details = data;
+    })
+    .catch((err) => {
+      toastService.show(err.message, 'error');
+    })
+    .finally(() => {
+      loading = false;
+    });
   };
 
   const edit = async () => {
     loading = true;
-    option = OptionTerminal.EDIT;
-    details = await getDetails();
-    loading = false;
+
+    getDetails()
+    .then((data) => {
+      details = data;
+    })
+    .catch((err) => {
+      toastService.show(err.message, 'error');
+    })
+    .finally(() => {
+      loading = false;
+    });
   };
 
   const save = async () => {
     loading = true;
-    editedItem = await updateItem();
-    loading = false;
+
+    updateItem()
+    .then((data) => {
+      editedItem = data;
+    })
+    .catch((err) => {
+      toastService.show(err.message, 'error');
+    })
+    .finally(() => {
+      loading = false;
+    });
   };
 
   const log = async () => {
-    closeSocket(wsLogs);
-
     loading = true;
     open = true;
-    const url = await getLogs();
 
-    if (option !== OptionTerminal.LOG) {
-      option = OptionTerminal.LOG;
-    }
+    closeSocket(wsLogs);
 
-    if (!wsLogs || wsLogs.readyState !== WebSocket.OPEN) {
-      wsLogs = new WebSocket(url);
-    }
+    getLogs()
+    .then((url) => {
+      if (option !== OptionTerminal.LOG) {
+        option = OptionTerminal.LOG;
+      }
 
-    wsLogs.onopen = function () {
-      console.log('WebSocket connection opened!');
-    };
+      if (!wsLogs || wsLogs.readyState !== WebSocket.OPEN) {
+        wsLogs = new WebSocket(url);
+      }
 
-    wsLogs.onmessage = function (event) {
-      logs = event.data;
-      loading = false;
-    };
-
-    wsLogs.onclose = function () {
-      console.log('WebSocket connection closed!');
-    };
+      wsLogs.onmessage = function (event) {
+        logs = event.data;
+        loading = false;
+      };
+    })
+    .catch((err) => {
+      toastService.show(err.message, 'error');
+    })
+    .finally(() => {
+      loading = true;
+      open = true;
+    });
   };
 
   const sendCommand = () => {
@@ -109,37 +136,37 @@
   };
 
   const exec = async () => {
-    closeSocket(wsExec);
-
     loading = true;
     open = true;
-    const url = await getExec();
 
-    if (option !== OptionTerminal.BASH) {
-      option = OptionTerminal.BASH;
-    }
+    closeSocket(wsExec);
 
-    if (!wsExec || wsExec.readyState !== WebSocket.OPEN) {
-      wsExec = new WebSocket(url);
-    }
+    getExec()
+    .then((url) => {
+      if (option !== OptionTerminal.BASH) {
+        option = OptionTerminal.BASH;
+      }
 
-    wsExec.onopen = function () {
-      console.log('WebSocket connection opened!');
-    };
+      if (!wsExec || wsExec.readyState !== WebSocket.OPEN) {
+        wsExec = new WebSocket(url);
+      }
 
-    wsExec.onmessage = function (event) {
-      execRes = event.data;
-      loading = false;
-    };
-
-    wsExec.onclose = function () {
-      console.log('WebSocket connection closed!');
-    };
+      wsExec.onmessage = function (event) {
+        execRes = event.data;
+        loading = false;
+      };
+    })
+    .catch((err) => {
+       toastService.show(err.message, 'error');
+    })
+    .finally(() => {
+      loading = true;
+      open = true;
+    });
   };
 
   const closeSocket = (socket: WebSocket | undefined) => {
     if (socket) {
-      console.log('WebSocket is already open, closing it first.');
       socket.close();
     }
   };

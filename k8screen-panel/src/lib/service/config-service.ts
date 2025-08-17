@@ -1,11 +1,12 @@
 import type { ConfigInfo } from '$lib/model/config/ConfigInfo';
+import type { DataResult } from '$lib/model/result/DataResult';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
 import { authAPI } from './auth-service';
 import { applyDeleteRequestWithBearerHeader, applyGetRequestWithBearerHeader } from './http-request';
 import { getAccessToken } from './storage-manager';
 
 export const configAPI = {
-  getAllConfigs: async (): Promise<ConfigInfo[]> => {
+  getAllConfigs: async (): Promise<DataResult<ConfigInfo[]>> => {
     const url = `${SPRING_BASE_URL}/v1/configs`;
     return (await applyGetRequestWithBearerHeader(url)).json();
   },
@@ -13,7 +14,7 @@ export const configAPI = {
   uploadConfig: async (formData: FormData) => {
     await authAPI.authorize();
 
-    const response = await fetch(`${SPRING_BASE_URL}/v1/configs/upload`, {
+    const response = await fetch(`${SPRING_BASE_URL}/v1/configs`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -29,7 +30,7 @@ export const configAPI = {
   },
 
   deleteConfig: async (fileName: string) => {
-    const url = `${SPRING_BASE_URL}/v1/configs/delete?name=${fileName}`;
+    const url = `${SPRING_BASE_URL}/v1/configs?name=${fileName}`;
     return await applyDeleteRequestWithBearerHeader(url);
   }
 };

@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  #-------Postgresql service-------
+  #-------PostgreSQL service-------
   k8screen-postgres:
     container_name: k8screen-postgres
     image: postgres:16.3-alpine
@@ -11,6 +9,15 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-k8screen}
       POSTGRES_USER: ${POSTGRES_USER:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+    networks:
+      - k8screen
+
+  #-------Redis service-------
+  k8screen-redis:
+    container_name: k8screen-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
     networks:
       - k8screen
 

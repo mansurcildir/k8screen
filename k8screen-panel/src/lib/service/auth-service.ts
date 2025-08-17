@@ -1,27 +1,21 @@
-import { goto } from '$app/navigation';
-import type { GoogleLoginReq } from '$lib/model/user/GoogleLoginReq';
+import type { DataResult } from '$lib/model/result/DataResult';
 import type { LoginReq } from '$lib/model/user/LoginReq';
 import type { LoginRes } from '$lib/model/user/LoginRes';
 import type { UserForm } from '$lib/model/user/UserForm';
 import type { UserInfo } from '$lib/model/user/UserInfo';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
 import { applyGetRequestWithBearerHeader, applyGetRequestWithRefreshToken, applyPostRequest } from './http-request';
-import { clearTokens, getAllTokens, setTokens } from './storage-manager';
+import { clearTokens, getAllTokens } from './storage-manager';
 import { isTokenExpired } from './token-decoder';
 
 export const authAPI = {
-  register: async (body: UserForm): Promise<{ access_token: string; refresh_token: string }> => {
+  register: async (body: UserForm): Promise<DataResult<LoginRes>> => {
     const url = `${SPRING_BASE_URL}/v1/auth/register`;
     return (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
-  login: async (body: LoginReq): Promise<LoginRes> => {
+  login: async (body: LoginReq): Promise<DataResult<LoginRes>> => {
     const url = `${SPRING_BASE_URL}/v1/auth/login`;
-    return (await applyPostRequest(url, JSON.stringify(body))).json();
-  },
-
-  loginGoogle: async (body: GoogleLoginReq): Promise<LoginRes> => {
-    const url = `${SPRING_BASE_URL}/v1/auth/login/google`;
     return (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
@@ -31,19 +25,18 @@ export const authAPI = {
     clearTokens();
   },
 
-  getProfile: async (): Promise<UserInfo> => {
+  getProfile: async (): Promise<DataResult<UserInfo>> => {
     const url = `${SPRING_BASE_URL}/v1/auth/profile`;
     return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
-  getAccessToken: async (): Promise<LoginRes> => {
+  getAccessToken: async (): Promise<DataResult<LoginRes>> => {
     return (await applyGetRequestWithRefreshToken(`${SPRING_BASE_URL}/v1/auth/refresh`)).json();
   },
 
-  refreshToken: async (): Promise<LoginRes> => {
-    const data: LoginRes = await authAPI.getAccessToken();
-    localStorage.setItem('access-token', data.access_token);
-    return data;
+  refreshToken: async () => {
+    const res: DataResult<LoginRes> = await authAPI.getAccessToken();
+    localStorage.setItem('access-token', res.data.access_token);
   },
 
   unAuthorize: () => {
@@ -52,11 +45,7 @@ export const authAPI = {
     throw new Error('Unauthorized');
   },
 
-  authorize: async (code: string | null = null): Promise<void> => {
-    if (code) {
-      return await loginGoogle(code);
-    }
-
+  authorize: async (): Promise<void> => {
     const tokens = getAllTokens();
 
     if (!tokens.accessToken || isTokenExpired(tokens.accessToken)) {
@@ -71,10 +60,4 @@ export const authAPI = {
       }
     }
   }
-};
-
-const loginGoogle = async (code: string) => {
-  const data = await authAPI.loginGoogle({ code });
-  setTokens(data?.access_token, data?.refresh_token);
-  goto('/');
 };

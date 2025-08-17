@@ -19,8 +19,8 @@
 
 <Button
   type="button"
-  onclick={(e) => {
-    onclick?.(e);
+  onclick={(err) => {
+    onclick?.(err);
     sidebar.toggle();
   }}
   data-sidebar="trigger"

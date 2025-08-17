@@ -10,11 +10,13 @@ Backend application of k8screen
 
 **Security**: Spring Security, JWT, Google OAuth2 Authentication
 
-**Database**: PostgreSQL
+**Database**: PostgreSQL, Redis (caching)
 
 **Storage**: File System
 
 **Migration**: Flyway
+
+**Subscription and Payment**: Stripe
 
 **API and Clients:**
 - https://github.com/kubernetes-client/java

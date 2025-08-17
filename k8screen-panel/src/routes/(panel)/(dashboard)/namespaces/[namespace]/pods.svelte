@@ -13,6 +13,8 @@
   import { Badge } from '$lib/components/ui/badge/index.js';
   import { pods, getAllPods, loadingPod } from '$lib/store';
   import { userAPI } from '$lib/service/user-service';
+  import { authAPI } from '$lib/service/auth-service';
+  import { toastService } from '$lib/service/toast-service';
 
   export let namespace;
 
@@ -24,8 +26,16 @@
   let open: boolean;
 
   $: if (namespace) {
-    getAllPods(namespace).then(() => load(1));
+    loadPods(namespace);
   }
+
+  const loadPods= async (namespace: string) => {
+    getAllPods(namespace)
+    .then(() =>  load(1))
+    .catch((err) => {
+      toastService.show(err.message, 'error');
+    });
+  };
 
   const load = (page: number) => {
     const startIndex = (page - 1) * perPage;
@@ -35,35 +45,47 @@
 
   const getDetails = async (): Promise<string> => {
     open = true;
-    details = await podAPI.getPodDetails(namespace, k8sItem);
-    return details;
+    return podAPI.getPodDetails(namespace, k8sItem)
+    .then((res) => {
+      details = res.data;
+      return details;
+    })
+  };
+
+  const updateItem = async () => {
+    return podAPI.updatePod(namespace, k8sItem, yaml.parse(k8sItem))
+    .then((res) => {
+      details = res.data;
+      return details;
+    })
   };
 
   const getLogs = async (): Promise<string> => {
     open = true;
 
-    const user = await userAPI.getProfile();
-    if (user && user.uuid) {
-      const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
-      return wsUrl;
-    }
-    return '';
-  };
-
-  const updateItem = async () => {
-    details = await podAPI.updatePod(namespace, k8sItem, yaml.parse(k8sItem));
-    return details;
+    return authAPI.getProfile()
+    .then((res) => {
+      const user = res.data;
+      if (user && user.uuid) {
+        const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
+        return wsUrl;
+      }
+      return '';
+    })
   };
 
   const getExec = async (): Promise<string> => {
     open = true;
 
-    const user = await userAPI.getProfile();
-    if (user && user.uuid) {
-      const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
-      return wsUrl;
-    }
-    return '';
+    return authAPI.getProfile()
+    .then((res) => {
+      const user = res.data;
+      if (user && user.uuid) {
+        const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
+        return wsUrl;
+      }
+      return '';
+    })
   };
 </script>
 

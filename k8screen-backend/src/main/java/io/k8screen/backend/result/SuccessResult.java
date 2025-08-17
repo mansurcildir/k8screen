@@ -7,7 +7,8 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @Setter
 public class SuccessResult<T> extends Result {
-  public SuccessResult(final int status, final @NotNull String message) {
-    super(true, status, message);
+  public SuccessResult(
+      final int status, final @NotNull String messageId, final @NotNull String message) {
+    super(true, status, messageId, message);
   }
 }

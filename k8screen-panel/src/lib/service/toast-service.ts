@@ -12,6 +12,8 @@ let nextId = 1;
 
 export const toastService = {
   show(message: string, type: 'success' | 'error' = 'success', duration = 3000) {
+    console.error(message);
+
     const id = nextId++;
     const toast: Toast = { id, message, type };
 

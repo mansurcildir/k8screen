@@ -1,9 +1,9 @@
 package io.k8screen.backend.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.k8screen.backend.data.dto.user.UserDetails;
 import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
+import io.k8screen.backend.user.dto.UserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -68,13 +69,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private void unAuthorize(final @NotNull String msg, final @NotNull HttpServletResponse response)
       throws IOException {
-    final Result result = this.responseFactory.error(HttpServletResponse.SC_UNAUTHORIZED, msg);
+    final Result result = this.responseFactory.error(HttpStatus.UNAUTHORIZED.value(), msg);
     final ObjectMapper objectMapper = new ObjectMapper();
     final String jsonResponse = objectMapper.writeValueAsString(result);
 
     response.setContentType("application/json");
     response.getWriter().write(jsonResponse);
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setStatus(HttpStatus.UNAUTHORIZED.value());
   }
 
   private @Nullable String extractToken(final @NotNull HttpServletRequest request) {

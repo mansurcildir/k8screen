@@ -6,6 +6,7 @@
   import { useSidebar } from '$lib/components/ui/sidebar/index.js';
   import { authAPI } from '$lib/service/auth-service';
   import { stripeAPI } from '$lib/service/stripe-service';
+  import { toastService } from '$lib/service/toast-service';
   import BadgeCheck from 'lucide-svelte/icons/badge-check';
   import Bell from 'lucide-svelte/icons/bell';
   import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
@@ -23,9 +24,16 @@
   };
 
   const redirectToStripePanel = async () => {
-    stripeAPI.getPanelSession().then((url: string) => {
-      window.location.href = url;
-    });
+    stripeAPI
+      .getPanelSession()
+      .then((res) => {
+        if(res.data) {
+          window.location.href = res.data;
+        }
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
   };
 </script>
 
@@ -57,7 +65,11 @@
         align="end"
         sideOffset={4}
       >
-        <DropdownMenu.Label class="p-0 font-normal">
+        <DropdownMenu.Label 
+          class="cursor-pointer p-0 font-normal"
+          onclick={() => {
+            goto('/profile');
+          }}>
           <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar.Root class="h-8 w-8 rounded-lg">
               <Avatar.Image src={user.avatar} alt={user.name} />
@@ -83,7 +95,11 @@
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-          <DropdownMenu.Item>
+          <DropdownMenu.Item
+            class="cursor-pointer"
+            onclick={() => {
+              goto('/profile');
+            }}>
             <BadgeCheck />
             Account
           </DropdownMenu.Item>

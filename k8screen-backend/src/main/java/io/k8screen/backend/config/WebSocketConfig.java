@@ -1,7 +1,7 @@
 package io.k8screen.backend.config;
 
-import io.k8screen.backend.websocket.PodExecHandler;
-import io.k8screen.backend.websocket.PodLogHandler;
+import io.k8screen.backend.k8s.pod.websocket.PodExecHandler;
+import io.k8screen.backend.k8s.pod.websocket.PodLogHandler;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
