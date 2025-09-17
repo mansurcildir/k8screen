@@ -36,9 +36,22 @@
   }
 
   let loading = false;
+  let avatarSrc: string;
   let namespaces: { title: string; url: string }[] = [];
   let user: UserInfo;
   let configs: ConfigInfo[] = [];
+
+  const getAvatar = async () => {
+    await userAPI
+      .getAvatar()
+      .then((buffer) => {
+        const base64 = btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        avatarSrc = `data:image/png;base64,${base64}`;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
+  };
 
   const getNamespaces = () => {
     loading = true;
@@ -141,7 +154,7 @@
     user: {
       name: user?.username,
       email: user?.email,
-      avatar: user?.avatarUrl || '/favicon.png',
+      avatar: avatarSrc || '/favicon.png',
       active_config: user?.active_config
     },
     updateConfig: updateConfig,
@@ -162,8 +175,9 @@
   // Fetch namespaces on mount and update `navMain`
   onMount(async () => {
     try {
-      getNamespaces();
+      getAvatar();
       getProfile();
+      getNamespaces();
 
       // Update navMain with the fetched namespaces
       data = {

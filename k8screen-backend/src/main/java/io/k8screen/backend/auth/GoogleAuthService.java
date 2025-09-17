@@ -50,12 +50,7 @@ public class GoogleAuthService implements OAuthService {
     }
 
     final UserRegister userRegister =
-        UserRegister.builder()
-            .email(accountEmail)
-            .username(username)
-            .password(null)
-            .avatarUrl(avatarUrl)
-            .build();
+        UserRegister.builder().email(accountEmail).username(username).password(null).build();
 
     final AuthResponse authResponse = this.authService.register(userRegister);
     final UUID userUuid = this.jwtUtil.getUserUuidFromAccessToken(authResponse.accessToken());

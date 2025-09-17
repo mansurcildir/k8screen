@@ -18,6 +18,9 @@ k8screen:
   backend-base-url: http://localhost:8080
   frontend-base-url: http://localhost:5173
   success-url: ${k8screen.frontend-base-url}/login
+  user:
+    avatar:
+      path: ${user.home}/.k8screen/avatars
   config:
     path: ${user.home}/.k8screen/configs
   trash:

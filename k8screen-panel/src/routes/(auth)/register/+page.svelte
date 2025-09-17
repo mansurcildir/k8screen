@@ -15,6 +15,7 @@
 
   let loading = false;
   let loadingGoogle = false;
+  let loadingGithub = false;
   let disabled = false;
   let errors = writable<Record<string, string>>({});
 
@@ -243,8 +244,8 @@
             {/if}
           </Button>
 
-          <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
-            {#if loadingGoogle}
+          <Button variant="outline" class="w-full" disabled={loading || loadingGithub} onclick={() => loginGithub()}>
+            {#if loadingGithub}
               <Spinner class="m-auto" color="black" />
             {:else}
               <IconGithub class="mb-0.5" /> Github

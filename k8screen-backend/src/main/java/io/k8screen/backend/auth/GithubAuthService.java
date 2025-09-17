@@ -64,12 +64,7 @@ public class GithubAuthService implements OAuthService {
     }
 
     final UserRegister userRegister =
-        UserRegister.builder()
-            .username(username)
-            .email(email)
-            .password(null)
-            .avatarUrl(avatarUrl)
-            .build();
+        UserRegister.builder().username(username).email(email).password(null).build();
 
     final AuthResponse authResponse = this.authService.register(userRegister);
     final UUID userUuid = this.jwtUtil.getUserUuidFromAccessToken(authResponse.accessToken());

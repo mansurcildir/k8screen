@@ -8,5 +8,7 @@ public interface StorageStrategy {
   void upload(@NotNull InputStream inputStream, @NotNull String path, @NotNull String fileName)
       throws IOException;
 
+  byte[] download(@NotNull String path, @NotNull String fileName) throws IOException;
+
   void delete(@NotNull String path, @NotNull String fileName) throws IOException;
 }

@@ -37,6 +37,12 @@ public class FileSystem implements StorageStrategy {
   }
 
   @Override
+  public byte[] download(final @NotNull String path, final @NotNull String fileName) throws IOException {
+    final File file = this.getFile(path + File.separator + fileName);
+    return Files.readAllBytes(file.toPath());
+  }
+
+  @Override
   public void delete(final @NotNull String path, final @NotNull String fileName)
       throws IOException {
     final Path resource = this.getFile(path + File.separator + fileName).toPath();

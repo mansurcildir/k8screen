@@ -5,7 +5,6 @@ CREATE TABLE "user" (
     username             VARCHAR(255) NOT NULL,
     password             VARCHAR(255),
     email                VARCHAR(255) NOT NULL,
-    avatar_url           TEXT,
     active_config        VARCHAR(255),
     stripe_customer_id   UUID,
     subscription_plan_id BIGINT NOT NULL,

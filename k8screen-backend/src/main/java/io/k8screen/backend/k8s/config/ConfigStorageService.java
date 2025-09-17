@@ -1,5 +1,6 @@
-package io.k8screen.backend.storage;
+package io.k8screen.backend.k8s.config;
 
+import io.k8screen.backend.storage.StorageStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

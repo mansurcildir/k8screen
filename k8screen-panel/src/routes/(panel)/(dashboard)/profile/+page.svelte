@@ -19,17 +19,57 @@
   let disabled = false;
   let readonly = true;
   let loading = false;
+  let avatarSrc: string;
 
   let errors = writable<Record<string, string>>({});
+  const fileError = writable<string | null>(null);
 
+  let file: File;
   let userInfo: UserInfo;
   const profileForm: ProfileForm = { username: '', email: '' };
 
   onMount(() => {
+    getAvatar();
     getProfile();
     getGoogleAccounts();
     getGithubAccounts();
   });
+
+  const getAvatar = async () => {
+    await userAPI
+      .getAvatar()
+      .then((buffer) => {
+        const base64 = btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        avatarSrc = `data:image/png;base64,${base64}`;
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
+  };
+
+  const uploadAvatar = () => {
+    const validation = fileSchema.safeParse(file);
+    if (!validation.success) {
+      fileError.set(validation.error.errors[0].message);
+    } else {
+      fileError.set(null);
+      uploadFile(file);
+    }
+  };
+
+  const uploadFile = (file: File) => {
+    const formData = new FormData();
+    formData.append('config', file);
+
+    userAPI
+      .uploadAvatar(formData)
+      .then(() => {
+        window.location.href = '/profile';
+      })
+      .catch((err) => {
+        toastService.show(err.message, 'error');
+      });
+  };
 
   const handleValidation = (): Promise<void> => {
     return new Promise((resolve) => {
@@ -217,6 +257,21 @@
       disabled = true;
     }
   };
+
+  const fileSchema = z.instanceof(File, {
+    message: 'You must upload a valid file.'
+  });
+
+  const handleFileChange = (event: any) => {
+    file = event.target.files[0];
+
+    const validation = fileSchema.safeParse(file);
+    if (!validation.success) {
+      fileError.set(validation.error.errors[0].message);
+    } else {
+      fileError.set(null);
+    }
+  };
 </script>
 
 <div class="flex flex-col justify-center gap-2 lg:flex-row">
@@ -227,10 +282,27 @@
         <!-- Header -->
         <div class="flex flex-col items-center space-y-3">
           <img
-            src={userInfo?.avatarUrl ? userInfo.avatarUrl : '/favicon.png'}
+            src={avatarSrc || '/favicon.png'}
             alt="avatar"
-            class="h-28 w-28 rounded-full border-4 border-indigo-500 shadow-sm"
+            class="h-28 w-28 rounded-full border-2 border-primary shadow-sm"
           />
+
+          <form onsubmit={uploadAvatar}>
+            <div class="grid gap-4">
+              <div class="grid gap-2">
+                <Input type="file" id="name" accept="image/*" class="cursor-pointer" onchange={handleFileChange} />
+                <span
+                  class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+                  style="opacity: {$fileError ? 1 : 0};"
+                >
+                  {#if $fileError}
+                    {$fileError}
+                  {/if}
+                </span>
+              </div>
+              <Button type="submit" class="w-full">Upload</Button>
+            </div>
+          </form>
         </div>
 
         <!-- Username -->
