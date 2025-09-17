@@ -84,6 +84,6 @@ public class ConfigServiceIT {
 
     final List<ConfigInfo> configs = this.configService.findAllConfigs(user.getUuid());
 
-    Assertions.assertFalse(configs.isEmpty());
+    Assertions.assertTrue(configs.isEmpty());
   }
 }

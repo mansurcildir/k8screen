@@ -3,10 +3,12 @@ package io.k8screen.backend.k8s.config;
 import io.k8screen.backend.exception.ItemNotFoundException;
 import io.k8screen.backend.exception.SubscriptionLimitExceed;
 import io.k8screen.backend.k8s.config.dto.ConfigInfo;
-import io.k8screen.backend.storage.FileSystemService;
+import io.k8screen.backend.storage.ConfigStorageService;
 import io.k8screen.backend.subscription.SubscriptionPlan;
 import io.k8screen.backend.user.User;
 import io.k8screen.backend.user.UserRepository;
+import io.k8screen.backend.user.UserService;
+import io.k8screen.backend.user.dto.UserInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
@@ -24,20 +26,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class ConfigService {
-
-  private final @NotNull UserRepository userRepository;
   private final @NotNull ConfigRepository configRepository;
   private final @NotNull ConfigConverter configConverter;
-  private final @NotNull FileSystemService fileSystemService;
+  private final @NotNull ConfigStorageService configStorageService;
+  private final @NotNull UserService userService;
+  private final @NotNull UserRepository userRepository;
 
   public @NotNull List<ConfigInfo> findAllConfigs(final @NotNull UUID userUuid) {
-    final User user =
-        this.userRepository
-            .findByUuid(userUuid)
-            .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
+    final UserInfo userInfo = this.userService.getUserInfo(userUuid);
 
-    final List<Config> configs = this.configRepository.findAllByUserId(user.getId());
-    return configs.stream().map(this.configConverter::toConfigItem).toList();
+    final List<Config> configs = this.configRepository.findAllByUserUuid(userInfo.uuid());
+    return configs.stream().map(this.configConverter::toConfigInfo).toList();
   }
 
   public @NotNull ConfigInfo findConfigByName(
@@ -72,7 +71,7 @@ public class ConfigService {
       throw new BadRequestException("configExists");
     }
 
-    this.fileSystemService.uploadConfig(filePart.getInputStream(), fileName, userUuid);
+    this.configStorageService.uploadConfig(filePart.getInputStream(), fileName, userUuid);
 
     final Config config = Config.builder().name(fileName).build();
     config.setUuid(UUID.randomUUID());
@@ -82,7 +81,7 @@ public class ConfigService {
 
   public void deleteConfigByName(final @NotNull String name, final @NotNull UUID userUuid)
       throws IOException {
-    this.fileSystemService.deleteConfig(name, userUuid);
+    this.configStorageService.deleteConfig(name, userUuid);
 
     final User user =
         this.userRepository

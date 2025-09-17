@@ -18,6 +18,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
+  @Value("${jwt.access-exp-min}")
+  private int accessExpMin;
+
+  @Value("${jwt.refresh-exp-min}")
+  private int refreshExpMin;
 
   @Value("${jwt.access-key}")
   private String accessKey;
@@ -66,7 +71,8 @@ public class JwtUtil {
       final @NotNull Map<String, Object> claims,
       final int expMin) {
 
-    final Date expirationDate = Date.from(Instant.now().plus(expMin, ChronoUnit.MINUTES));
+    final Instant now = Instant.now();
+    final Instant expiryInstant = now.plus(expMin, ChronoUnit.MINUTES);
 
     return Jwts.builder()
         .header()
@@ -77,8 +83,8 @@ public class JwtUtil {
         .and()
         .subject(subject)
         .claims(claims)
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(expirationDate)
+        .issuedAt(Date.from(now))
+        .expiration(Date.from(expiryInstant))
         .signWith(this.getSignKey(signKey))
         .compact();
   }
@@ -88,11 +94,14 @@ public class JwtUtil {
       final @NotNull String username,
       final @NotNull List<String> roles) {
     return this.generateToken(
-        this.accessKey, userUuid.toString(), Map.of("username", username, "roles", roles), 5);
+        this.accessKey,
+        userUuid.toString(),
+        Map.of("username", username, "roles", roles),
+        this.accessExpMin);
   }
 
   public @NotNull String generateRefreshToken(final @NotNull UUID userUuid) {
-    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), 30);
+    return this.generateToken(this.refreshKey, userUuid.toString(), Map.of(), this.refreshExpMin);
   }
 
   private @NotNull SecretKey getSignKey(final @NotNull String signKey) {

@@ -57,7 +57,7 @@
   };
 
   const getProfile = () => {
-    authAPI
+    userAPI
       .getProfile()
       .then((res) => {
         user = res.data;

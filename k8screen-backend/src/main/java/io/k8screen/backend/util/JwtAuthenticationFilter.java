@@ -26,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final @NotNull JwtUtil jwtUtil;
   private final @NotNull ResponseFactory responseFactory;
   private static final @NotNull String ROLE_PREFIX = "ROLE_";
+  private static final int BEARER_INDEX = 7;
 
   public JwtAuthenticationFilter(
       final @NotNull JwtUtil jwtUtil, final @NotNull ResponseFactory responseFactory) {
@@ -81,7 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private @Nullable String extractToken(final @NotNull HttpServletRequest request) {
     final String header = request.getHeader("Authorization");
     if (header != null && header.startsWith("Bearer ")) {
-      final String token = header.substring(7).trim();
+      final String token = header.substring(BEARER_INDEX).trim();
       return token.equals("null") ? null : token;
     }
     return null;

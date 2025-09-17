@@ -7,7 +7,6 @@ import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
 import io.k8screen.backend.user.dto.AuthResponse;
 import io.k8screen.backend.user.dto.UserDetails;
-import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
 import jakarta.validation.Valid;
@@ -65,19 +64,11 @@ public class AuthController {
         .body(this.responseFactory.success(HttpStatus.OK.value(), "refreshed", authResponse));
   }
 
-  @GetMapping("/profile")
-  public @NotNull ResponseEntity<Result> profile(final @NotNull Authentication authentication) {
-    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    final UserInfo userInfo = this.authService.getUserInfo(userDetails.userUuid());
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(this.responseFactory.success(HttpStatus.OK.value(), "profileFetched", userInfo));
-  }
-
   @GetMapping("/token/{sessionId}")
   public @NotNull ResponseEntity<Result> getTokenFromSession(
       @PathVariable final @NotNull String sessionId) {
     final AuthResponse authResponse = this.tokenStore.get(sessionId);
     return ResponseEntity.status(HttpStatus.OK)
-        .body((this.responseFactory.success(HttpStatus.OK.value(), "tokensFetched", authResponse)));
+        .body(this.responseFactory.success(HttpStatus.OK.value(), "tokensFetched", authResponse));
   }
 }

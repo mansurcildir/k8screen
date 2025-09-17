@@ -2,49 +2,34 @@ package io.k8screen.backend.util;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import org.jetbrains.annotations.NotNull;
 
 public class FormatUtil {
 
   public static @NotNull String formatAge(final @NotNull OffsetDateTime creationTimestamp) {
-    final Duration duration =
-        Duration.between(creationTimestamp, OffsetDateTime.now(ZoneId.systemDefault()));
+    long totalSeconds =
+        Duration.between(creationTimestamp, OffsetDateTime.now(ZoneOffset.UTC)).toSeconds();
 
-    long days = duration.toDays();
-    final long hours = duration.toHours() % 24;
-    final long minutes = duration.toMinutes() % 60;
-    final long seconds = duration.toSeconds() % 60;
+    final long[][] units = {
+      {365L * 24 * 3600, 'y'}, // years
+      {24 * 3600, 'd'}, // days
+      {3600, 'h'}, // hours
+      {60, 'm'} // minutes
+    };
 
-    final long years = days / 365;
-    days = days % 365;
-
-    final StringBuilder age = new StringBuilder();
-
-    if (years > 0) {
-      age.append(years).append("y");
-      if (days > 0) {
-        age.append(days).append("d");
+    final StringBuilder sb = new StringBuilder();
+    for (final long[] unit : units) {
+      final long value = totalSeconds / unit[0];
+      if (value > 0) {
+        sb.append(value).append((char) unit[1]);
+        totalSeconds %= unit[0];
       }
-    } else if (days > 0) {
-      age.append(days).append("d");
-      if (hours > 0) {
-        age.append(hours).append("h");
-      }
-    } else if (hours > 0) {
-      age.append(hours).append("h");
-      if (minutes > 0) {
-        age.append(minutes).append("m");
-      }
-    } else if (minutes > 0) {
-      age.append(minutes).append("m");
-      if (seconds > 0) {
-        age.append(seconds).append("s");
-      }
-    } else {
-      age.append(seconds).append("s");
     }
 
-    return age.toString().trim();
+    if (sb.isEmpty()) {
+      sb.append(totalSeconds).append("s");
+    }
+    return sb.toString();
   }
 }

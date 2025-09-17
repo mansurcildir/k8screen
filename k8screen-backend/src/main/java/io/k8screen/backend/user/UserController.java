@@ -3,6 +3,7 @@ package io.k8screen.backend.user;
 import io.k8screen.backend.k8s.config.dto.UserConfig;
 import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
+import io.k8screen.backend.user.dto.ProfileForm;
 import io.k8screen.backend.user.dto.UserDetails;
 import io.k8screen.backend.user.dto.UserInfo;
 import jakarta.validation.Valid;
@@ -31,6 +32,16 @@ public class UserController {
     final UserInfo userInfo = this.userService.getUserInfo(userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK)
         .body(this.responseFactory.success(HttpStatus.OK.value(), "profileFetched", userInfo));
+  }
+
+  @PutMapping("/profile")
+  public @NotNull ResponseEntity<Result> updateProfile(
+      final @NotNull Authentication authentication,
+      @Valid @RequestBody final @NotNull ProfileForm profileForm) {
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    this.userService.updateProfile(profileForm, userDetails.userUuid());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.responseFactory.success(HttpStatus.OK.value(), "profileUpdated"));
   }
 
   @PutMapping("/config")
