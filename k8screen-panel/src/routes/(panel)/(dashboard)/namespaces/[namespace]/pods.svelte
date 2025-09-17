@@ -61,7 +61,7 @@
   const getLogs = async (): Promise<string> => {
     open = true;
 
-    return authAPI.getProfile().then((res) => {
+    return userAPI.getProfile().then((res) => {
       const user = res.data;
       if (user && user.uuid) {
         const wsUrl = `ws://localhost:8080/ws/logs?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;
@@ -74,7 +74,7 @@
   const getExec = async (): Promise<string> => {
     open = true;
 
-    return authAPI.getProfile().then((res) => {
+    return userAPI.getProfile().then((res) => {
       const user = res.data;
       if (user && user.uuid) {
         const wsUrl = `ws://localhost:8080/ws/exec?namespace=${namespace}&podName=${k8sItem}&userUuid=${user.uuid}`;

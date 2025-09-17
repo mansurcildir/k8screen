@@ -8,10 +8,8 @@ import io.k8screen.backend.stripe.StripeService;
 import io.k8screen.backend.subscription.SubscriptionPlan;
 import io.k8screen.backend.subscription.SubscriptionPlanRepository;
 import io.k8screen.backend.user.User;
-import io.k8screen.backend.user.UserConverter;
 import io.k8screen.backend.user.UserRepository;
 import io.k8screen.backend.user.dto.AuthResponse;
-import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
 import io.k8screen.backend.user.role.Role;
@@ -27,7 +25,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,25 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class AuthService {
-
-  @Value("${spring.security.oauth2.client.registration.google.client-id}")
-  private String clientId;
-
-  @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-  private String clientSecret;
-
-  @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-  private String redirectUri;
-
-  @Value("${spring.security.oauth2.client.registration.google.authorization-grant-type}")
-  private String authorizationGrantType;
-
-  @Value("${spring.security.oauth2.client.provider.google.token-uri}")
-  private String tokenUri;
-
-  @Value("${spring.security.oauth2.client.provider.google.user-info-uri}")
-  private String userInfoUri;
-
   private static final @NotNull String SUBSCRIPTION_PLAN_FREE = "Free";
 
   private final @NotNull JwtUtil jwtUtil;
@@ -66,7 +44,6 @@ public class AuthService {
   private final @NotNull RefreshTokenRepository refreshTokenRepository;
   private final @NotNull SubscriptionPlanRepository subscriptionPlanRepository;
   private final @NotNull StripeService stripeService;
-  private final @NotNull UserConverter userConverter;
 
   public @NotNull AuthResponse login(final @NotNull UserLogin loginRequest) {
     final User user =
@@ -126,15 +103,6 @@ public class AuthService {
     }
 
     return this.createAuthResponse(user);
-  }
-
-  public @NotNull UserInfo getUserInfo(final @NotNull UUID userUuid) {
-    final User user =
-        this.userRepository
-            .findByUuid(userUuid)
-            .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
-
-    return this.userConverter.toUserInfo(user);
   }
 
   public @NotNull AuthResponse refresh(final @NotNull String token) {

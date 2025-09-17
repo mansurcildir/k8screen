@@ -15,19 +15,35 @@
 
   let loading = false;
   let loadingGoogle = false;
+  let disabled = false;
   let errors = writable<Record<string, string>>({});
 
-  const userRegister: LoginReq = {
+  const userLogin: LoginReq = {
     username: '',
     password: ''
   };
 
+  const handleValidation = (): Promise<void> => {
+    return new Promise((resolve) => {
+      try {
+        schema.parse(userLogin);
+        resolve();
+      } catch (err: any) {
+        const errorMessages: Record<string, string> = {};
+        err.errors.forEach((e: any) => {
+          errorMessages[e.path[0]] = e.message;
+        });
+        errors.set(errorMessages);
+        disabled = true;
+      }
+    });
+  };
+
   const login = () => {
-    try {
-      schema.parse(userRegister);
+    handleValidation().then(() => {
       loading = true;
       authAPI
-        .login(userRegister)
+        .login(userLogin)
         .then((res) => {
           setTokens(res.data.access_token, res.data.refresh_token);
           goto('/');
@@ -36,14 +52,7 @@
           toastService.show(err.message, 'error');
         })
         .finally(() => (loading = false));
-    } catch (e: any) {
-      const errorMessages: Record<string, string> = {};
-      e.errors.forEach((err: any) => {
-        errorMessages[err.path[0]] = err.message;
-      });
-
-      errors.set(errorMessages);
-    }
+    });
   };
 
   const loginGoogle = () => {
@@ -109,13 +118,23 @@
   };
 
   const schema = z.object({
-    username: z.string().min(1, { message: 'Username is required' }).max(50),
-    password: z.string().min(1, { message: 'Password is required' }).max(50)
+    username: z
+      .string()
+      .min(1, { message: 'Username is required' })
+      .max(50, { message: 'Username cannot exceed 50 characters' }),
+    password: z
+      .string()
+      .min(1, { message: 'Password is required' })
+      .max(50, { message: 'Password cannot exceed 50 characters' })
   });
 
   const validate = (field: keyof LoginReq) => {
+    if (Object.keys($errors).length === 0) {
+      disabled = false;
+    }
+
     try {
-      schema.pick({ [field]: true } as any).parse({ [field]: userRegister[field] });
+      schema.pick({ [field]: true } as any).parse({ [field]: userLogin[field] });
 
       errors.update((currentErrors) => {
         const { [field]: _, ...rest } = currentErrors;
@@ -127,90 +146,110 @@
         ...currentErrors,
         [field]: error.message
       }));
+
+      disabled = true;
     }
   };
 </script>
 
 <div class="min-h-screen w-full lg:grid lg:grid-cols-2">
   <div class="flex items-center justify-center py-12">
-    <div class="mx-auto grid w-[350px] gap-6">
-      <div class="grid gap-2 text-center">
-        <h1 class="text-3xl font-bold">Login</h1>
-        <p class="text-balance text-muted-foreground">Login to your account</p>
-      </div>
-      <div class="grid gap-4">
-        <div class="grid gap-2">
-          <Label for="username">Username</Label>
-          <Input
-            id="username"
-            type="text"
-            placeholder="username"
-            oninput={() => validate('username')}
-            bind:value={userRegister.username}
-            required
-          />
-          <span
-            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
-            style="opacity: {$errors.username ? 1 : 0};"
-          >
-            {#if $errors.username}
-              {$errors.username}
-            {/if}
-          </span>
+    {#if !loading}
+      <div class="mx-auto grid w-[350px] gap-6">
+        <div class="grid gap-2 text-center">
+          <h1 class="text-3xl font-bold">Login</h1>
+          <p class="text-balance text-muted-foreground">Login to your account</p>
         </div>
-        <div class="grid gap-2">
-          <div class="flex items-center">
-            <Label for="password">Password</Label>
-            <a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
+        <div class="grid gap-4">
+          <div class=" flex flex-col gap-2">
+            <Label for="username">Username</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="username"
+              oninput={() => validate('username')}
+              bind:value={userLogin.username}
+              required
+            />
+            <span
+              class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+              style="opacity: {$errors.username ? 1 : 0};"
+            >
+              {#if $errors.username}
+                {$errors.username}
+              {/if}
+            </span>
           </div>
-          <Input
-            id="password"
-            type="password"
-            placeholder="******"
-            oninput={() => validate('password')}
-            bind:value={userRegister.password}
-            required
-          />
-          <span
-            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
-            style="opacity: {$errors.password ? 1 : 0};"
-          >
-            {#if $errors.password}
-              {$errors.password}
+          <div class=" flex flex-col gap-2">
+            <div class="flex items-center">
+              <Label for="password">Password</Label>
+              <a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              placeholder="******"
+              oninput={() => validate('password')}
+              bind:value={userLogin.password}
+              required
+            />
+            <span
+              class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+              style="opacity: {$errors.password ? 1 : 0};"
+            >
+              {#if $errors.password}
+                {$errors.password}
+              {/if}
+            </span>
+          </div>
+          <Button class="w-full" disabled={disabled || loading} onclick={() => login()}>
+            {#if loading}
+              <Spinner class="m-auto" />
+            {:else}
+              Login
             {/if}
-          </span>
-        </div>
-        <Button class="w-full" disabled={loading || loadingGoogle} onclick={() => login()}>
-          {#if loading}
-            <Spinner class="m-auto" />
-          {:else}
-            Login
-          {/if}
-        </Button>
-        <div class="relative flex justify-center text-xs uppercase">
-          <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
-        </div>
-        <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGoogle()}>
-          {#if loadingGoogle}
-            <Spinner class="m-auto" color="black" />
-          {:else}
-            <IconGoogle class="mb-0.5" /> Google
-          {/if}
-        </Button>
+          </Button>
+          <div class="relative flex justify-center text-xs uppercase">
+            <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
+          </div>
+          <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGoogle()}>
+            {#if loadingGoogle}
+              <Spinner class="m-auto" color="black" />
+            {:else}
+              <IconGoogle class="mb-0.5" /> Google
+            {/if}
+          </Button>
 
-        <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
-          {#if loadingGoogle}
-            <Spinner class="m-auto" color="black" />
-          {:else}
-            <IconGithub class="mb-0.5" /> Github
-          {/if}
-        </Button>
+          <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
+            {#if loadingGoogle}
+              <Spinner class="m-auto" color="black" />
+            {:else}
+              <IconGithub class="mb-0.5" /> Github
+            {/if}
+          </Button>
+        </div>
+        <div class="mt-4 text-center text-sm">
+          Don&apos;t you have an account?
+          <a href="register" class="underline"> Register </a>
+        </div>
       </div>
-      <div class="mt-4 text-center text-sm">
-        Don&apos;t you have an account?
-        <a href="register" class="underline"> Register </a>
+    {:else}
+      <div class="flex h-full w-full items-center justify-center">
+        <div class="h-10 w-10">
+          <svg
+            class="animate-spin text-black"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" class="opacity-25"></circle>
+            <path d="M4 12a8 8 0 0 1 16 0" class="opacity-75"></path>
+          </svg>
+        </div>
       </div>
-    </div>
+    {/if}
   </div>
   <div class="hidden w-full items-center justify-center bg-muted lg:flex lg:justify-center">
     <div class="lg:w-[450px] xl:w-[500px] 2xl:w-[500px]">

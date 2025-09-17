@@ -7,19 +7,69 @@
   import { toastService } from '$lib/service/toast-service';
   import { onMount } from 'svelte';
   import type { Account } from '$lib/model/account/Account';
-  import { authAPI } from '$lib/service/auth-service';
   import type { UserInfo } from '$lib/model/user/UserInfo';
+  import { z } from 'zod';
+  import type { ProfileForm } from '$lib/model/user/ProfileForm';
+  import { writable } from 'svelte/store';
+  import { userAPI } from '$lib/service/user-service';
+  import Input from '$lib/components/ui/input/input.svelte';
 
   let googleAccounts: Account[] = [];
   let githubAccounts: Account[] = [];
+  let disabled = false;
+  let readonly = true;
+  let loading = false;
+
+  let errors = writable<Record<string, string>>({});
 
   let userInfo: UserInfo;
+  const profileForm: ProfileForm = { username: '', email: '' };
 
   onMount(() => {
     getProfile();
     getGoogleAccounts();
     getGithubAccounts();
   });
+
+  const handleValidation = (): Promise<void> => {
+    return new Promise((resolve) => {
+      try {
+        schema.parse(profileForm);
+        resolve();
+      } catch (err: any) {
+        const errorMessages: Record<string, string> = {};
+        err.errors.forEach((e: any) => {
+          errorMessages[e.path[0]] = e.message;
+        });
+        errors.set(errorMessages);
+        disabled = true;
+      }
+    });
+  };
+
+  const resetForm = () => {
+    profileForm.username = userInfo.username;
+    profileForm.email = userInfo.email;
+
+    errors = writable<Record<string, string>>({});
+    readonly = true;
+    disabled = false;
+  };
+
+  const saveProfile = () => {
+    loading = true;
+    handleValidation().then(() => {
+      userAPI
+        .updateProfile(profileForm)
+        .then(() => {
+          window.location.href = '/profile';
+        })
+        .catch((err) => {
+          toastService.show(err.message, 'error');
+        })
+        .finally(() => (loading = false));
+    });
+  };
 
   const getGoogleAccounts = () => {
     accountAPI
@@ -44,10 +94,12 @@
   };
 
   const getProfile = () => {
-    authAPI
+    userAPI
       .getProfile()
       .then((res) => {
         userInfo = res.data;
+        profileForm.username = userInfo.username;
+        profileForm.email = userInfo.email;
       })
       .catch((err) => {
         toastService.show(err.message, 'error');
@@ -130,106 +182,178 @@
 
     window.addEventListener('message', messageHandler);
   };
+
+  const schema = z.object({
+    username: z
+      .string()
+      .min(1, { message: 'Username is required' })
+      .max(50, { message: 'Username cannot exceed 20 characters' }),
+    email: z
+      .string()
+      .min(1, { message: 'Email is required' })
+      .email({ message: 'Invalid email format' })
+      .max(100, { message: 'Email cannot exceed 100 characters' })
+  });
+
+  const validate = (field: keyof ProfileForm) => {
+    if (Object.keys($errors).length === 0) {
+      disabled = false;
+    }
+
+    try {
+      schema.pick({ [field]: true } as any).parse({ [field]: profileForm[field] });
+
+      errors.update((currentErrors) => {
+        const { [field]: _, ...rest } = currentErrors;
+        return rest;
+      });
+    } catch (e: any) {
+      const error = e.errors[0];
+      errors.update((currentErrors) => ({
+        ...currentErrors,
+        [field]: error.message
+      }));
+
+      disabled = true;
+    }
+  };
 </script>
 
-<h1>Profile Info</h1>
-<Card.Root class="mb-4 w-full border border-primary bg-secondary hover:border">
-  <Card.Content class="space-y-6 text-sm">
-    <!-- Header -->
-    <div class="flex flex-col items-center space-y-3">
-      <img
-        src={userInfo?.avatarUrl ? userInfo.avatarUrl : '/favicon.png'}
-        alt="avatar"
-        class="h-28 w-28 rounded-full border-4 border-indigo-500 shadow-sm"
-      />
-    </div>
-
-    <!-- Username -->
-    <div class="mx-auto max-w-lg">
-      <label class="text-sm font-medium text-gray-600" for="username">Username</label>
-      <input
-        id="username"
-        type="text"
-        readonly
-        value={userInfo?.username}
-        class="mt-1 w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-800"
-      />
-    </div>
-
-    <!-- Email -->
-    <div class="mx-auto max-w-lg">
-      <label class="text-sm font-medium text-gray-600" for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        readonly
-        value={userInfo?.email}
-        class="mt-1 w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-800"
-      />
-    </div>
-  </Card.Content>
-</Card.Root>
-
-<h1>Accounts</h1>
-<Card.Root class="w-full border border-primary bg-secondary hover:border">
-  <Card.Content class="space-y-6 text-sm">
-    <!-- Connected Accounts -->
-    <div class="mx-auto max-w-lg space-y-4">
-      <h3 class="text-sm font-medium text-gray-600">Accounts</h3>
-      <!-- Google Card -->
-      <div class="rounded-lg border border-gray-200 p-4 transition hover:shadow-md">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <Button variant="outline" disabled>
-              <IconGoogle /> Google
-            </Button>
-          </div>
-          <button on:click={connectGoogleAccount} class="text-sm hover:underline">Connect</button>
+<div class="flex flex-col justify-center gap-2 lg:flex-row">
+  <div class="w-full max-w-[600px]">
+    <h1>Profile</h1>
+    <Card.Root class="mx-auto mb-4 w-full border border-primary bg-secondary hover:border">
+      <Card.Content class="flex flex-col items-center space-y-3 text-sm">
+        <!-- Header -->
+        <div class="flex flex-col items-center space-y-3">
+          <img
+            src={userInfo?.avatarUrl ? userInfo.avatarUrl : '/favicon.png'}
+            alt="avatar"
+            class="h-28 w-28 rounded-full border-4 border-indigo-500 shadow-sm"
+          />
         </div>
 
-        {#each googleAccounts as account}
-          <div class="mt-4 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-              <img src={account.avatarUrl} class="h-10 w-10 rounded-full" alt="Google User" />
-              <div>
-                <p class="text-sm font-medium text-gray-800">{account.username}</p>
-                <p class="text-xs text-gray-600">{account.email}</p>
-              </div>
-            </div>
-            <button on:click={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline"
-              >Disconnect</button
-            >
-          </div>
-        {/each}
-      </div>
+        <!-- Username -->
+        <div class="flex w-full flex-col gap-2">
+          <label class="text-sm font-medium text-gray-600" for="username">Username</label>
+          <Input
+            ondblclick={() => (readonly = false)}
+            id="username"
+            type="text"
+            readonly={readonly}
+            oninput={() => validate('username')}
+            bind:value={profileForm.username}
+            class={`mt-1 w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-800`}
+          />
 
-      <!-- GitHub Card -->
-      <div class="rounded-xl border border-gray-200 p-4 transition hover:shadow-md">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <Button variant="outline" disabled>
-              <IconGithub /> Github
-            </Button>
-          </div>
-
-          <button on:click={connectGithubAccount} class="text-sm hover:underline">Connect</button>
+          <span
+            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+            style="opacity: {$errors.username ? 1 : 0};"
+          >
+            {#if $errors.username}
+              {$errors.username}
+            {/if}
+          </span>
         </div>
 
-        {#each githubAccounts as account}
-          <div class="mt-4 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-              <img src={account.avatarUrl} class="h-10 w-10 rounded-full" alt="Google User" />
-              <div>
-                <p class="text-sm font-medium text-gray-800">{account.username}</p>
-                <p class="text-xs text-gray-600">{account.email}</p>
+        <!-- Email -->
+        <div class="flex w-full flex-col gap-2">
+          <label class="text-sm font-medium text-gray-600" for="email">Email</label>
+          <Input
+            ondblclick={() => (readonly = false)}
+            id="email"
+            type="email"
+            readonly={readonly}
+            oninput={() => validate('email')}
+            bind:value={profileForm.email}
+            class={`mt-1 w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-800`}
+          />
+
+          <span
+            class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+            style="opacity: {$errors.email ? 1 : 0};"
+          >
+            {#if $errors.email}
+              {$errors.email}
+            {/if}
+          </span>
+        </div>
+
+        <span class="ml-auto flex gap-2">
+          <Button onclick={resetForm} class={`${readonly ? 'invisible' : ''} w-[100px]`}>Reset</Button>
+
+          <Button
+            onclick={saveProfile}
+            disabled={disabled || loading}
+            class={`${readonly ? 'invisible' : ''} w-[100px]`}>Save</Button
+          >
+        </span>
+      </Card.Content>
+    </Card.Root>
+  </div>
+
+  <div class="w-full max-w-[600px]">
+    <h1>Accounts</h1>
+    <Card.Root class="mx-auto w-full border border-primary bg-secondary hover:border">
+      <Card.Content class="space-y-6 text-sm">
+        <!-- Connected Accounts -->
+        <div class="mx-auto space-y-4">
+          <!-- Google Card -->
+          <div class="rounded-lg border border-gray-200 p-2 transition hover:shadow-md">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <Button class="p-2" variant="outline" disabled>
+                  <IconGoogle class="w-[100px]" /> Google
+                </Button>
               </div>
+              <button onclick={connectGoogleAccount} class="text-sm hover:underline">Connect</button>
             </div>
-            <button on:click={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline"
-              >Disconnect</button
-            >
+
+            {#each googleAccounts as account}
+              <div class="mt-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-x-2">
+                  <img src={account.avatarUrl} class="h-10 w-10 rounded-full" alt="Google User" />
+                  <div class="min-w-[200px] break-words">
+                    <p class="text-sm font-medium text-gray-800">{account.username}</p>
+                    <p class="text-xs text-gray-600">{account.email}</p>
+                  </div>
+                </div>
+                <button onclick={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline"
+                  >Disconnect</button
+                >
+              </div>
+            {/each}
           </div>
-        {/each}
-      </div>
-    </div>
-  </Card.Content>
-</Card.Root>
+
+          <!-- GitHub Card -->
+          <div class="rounded-lg border border-gray-200 p-2 transition hover:shadow-md">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-x-2">
+                <Button class="p-2" variant="outline" disabled>
+                  <IconGithub class="w-[100px]" /> Github
+                </Button>
+              </div>
+
+              <button onclick={connectGithubAccount} class="text-sm hover:underline">Connect</button>
+            </div>
+
+            {#each githubAccounts as account}
+              <div class="mt-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <img src={account.avatarUrl} class="h-10 w-10 rounded-full" alt="Google User" />
+                  <div class="min-w-[200px] break-words">
+                    <p class="text-sm font-medium text-gray-800">{account.username}</p>
+                    <p class="text-xs text-gray-600">{account.email}</p>
+                  </div>
+                </div>
+                <button onclick={() => deleteAccountByUuid(account.uuid)} class="text-sm text-red-500 hover:underline"
+                  >Disconnect</button
+                >
+              </div>
+            {/each}
+          </div>
+        </div>
+      </Card.Content>
+    </Card.Root>
+  </div>
+</div>

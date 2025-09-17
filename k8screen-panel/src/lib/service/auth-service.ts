@@ -2,7 +2,6 @@ import type { DataResult } from '$lib/model/result/DataResult';
 import type { LoginReq } from '$lib/model/user/LoginReq';
 import type { LoginRes } from '$lib/model/user/LoginRes';
 import type { UserForm } from '$lib/model/user/UserForm';
-import type { UserInfo } from '$lib/model/user/UserInfo';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
 import { applyGetRequestWithBearerHeader, applyGetRequestWithRefreshToken, applyPostRequest } from './http-request';
 import { clearTokens, getAllTokens } from './storage-manager';
@@ -23,11 +22,6 @@ export const authAPI = {
     const url = `${SPRING_BASE_URL}/v1/auth/logout`;
     await applyGetRequestWithBearerHeader(url);
     clearTokens();
-  },
-
-  getProfile: async (): Promise<DataResult<UserInfo>> => {
-    const url = `${SPRING_BASE_URL}/v1/auth/profile`;
-    return (await applyGetRequestWithBearerHeader(url)).json();
   },
 
   getAccessToken: async (): Promise<DataResult<LoginRes>> => {

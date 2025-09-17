@@ -81,6 +81,6 @@ public class UserServiceIT {
     User response = userRepository.findById(user.getId()).orElseThrow();
 
     Assertions.assertNotNull(response);
-    Assertions.assertEquals("test", response.getActiveConfig());
+    Assertions.assertEquals("config", response.getActiveConfig());
   }
 }

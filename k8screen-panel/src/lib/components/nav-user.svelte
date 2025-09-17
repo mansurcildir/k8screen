@@ -84,12 +84,7 @@
         </DropdownMenu.Label>
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-          <DropdownMenu.Item
-            class="cursor-pointer"
-            onclick={() => {
-              redirectToStripePanel();
-            }}
-          >
+          <DropdownMenu.Item class="cursor-pointer" onclick={redirectToStripePanel}>
             <Sparkles />
             Upgrade to Pro
           </DropdownMenu.Item>

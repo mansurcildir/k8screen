@@ -37,7 +37,9 @@ public class StripeService {
   @Value("${stripe.product.price-id.free}")
   private String stripeFreeProductPriceId;
 
-  private static final @NotNull String STRIPE_RETURN_URL = "http://localhost:5173";
+  @Value("${stripe.return-url}")
+  private String stripeReturnUrl;
+
   private final @NotNull UserRepository userRepository;
 
   @PostConstruct
@@ -59,7 +61,7 @@ public class StripeService {
     final SessionCreateParams params =
         SessionCreateParams.builder()
             .setCustomer(user.getStripeCustomerId().toString())
-            .setReturnUrl(STRIPE_RETURN_URL)
+            .setReturnUrl(this.stripeReturnUrl)
             .build();
 
     return Session.create(params).getUrl();

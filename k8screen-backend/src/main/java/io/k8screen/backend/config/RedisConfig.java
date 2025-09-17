@@ -14,12 +14,15 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 @Configuration
 @EnableCaching
 public class RedisConfig {
+
+  private static final long ENTRY_TTL = 30L;
+
   @Bean
   public @NotNull RedisCacheManager cacheManager(
       final @NotNull RedisConnectionFactory redisConnectionFactory) {
     final RedisCacheConfiguration config =
         RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(30))
+            .entryTtl(Duration.ofMinutes(ENTRY_TTL))
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
                     new GenericJackson2JsonRedisSerializer()));

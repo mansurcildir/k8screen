@@ -7,7 +7,6 @@ import io.k8screen.backend.user.role.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -76,7 +75,8 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private Set<RefreshToken> refreshTokens;
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @Builder.Default
+  @ManyToMany
   @JoinTable(
       name = "user_role",
       joinColumns = @JoinColumn(name = "user_id"),

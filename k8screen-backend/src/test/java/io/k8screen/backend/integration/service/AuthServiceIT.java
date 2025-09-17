@@ -6,7 +6,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import io.k8screen.backend.auth.AuthService;
 import io.k8screen.backend.user.User;
 import io.k8screen.backend.user.dto.AuthResponse;
-import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
 import org.flywaydb.core.Flyway;
@@ -60,15 +59,6 @@ public class AuthServiceIT {
 
     assertThat(response).isNotNull();
     assertThat(response.getUsername()).isEqualTo("test");
-  }
-
-  @Test
-  public void test_getUserInfo_returnUserInfo() {
-    final User user = this.authService.createUser("test", "test@gmail.com", "Tester123", null);
-    final UserInfo response = this.authService.getUserInfo(user.getUuid());
-
-    assertThat(response).isNotNull();
-    assertThat(response.username()).isEqualTo("test");
   }
 
   @Test

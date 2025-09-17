@@ -13,11 +13,14 @@ k8screen:
     path: ${k8screen.config.path}/trash
 
 jwt:
+  access-exp-min: 5
+  refresh-exp-min: 30
   access-key: 561744090F30C5564F793305AB783BC96545E88EE42A7ED0CED578C72CE132A3
   refresh-key: 42DCCF1E0B06EF601CF9DCDA0ED3877F4F0DB32FAE243DC5F0C681DB09AFB454
 
 stripe:
   enable: false
+  return-url: http://localhost:5173
   publishable-key: ${STRIPE_PUBLISHABLE_KEY:YOUR_STRIPE_PUBLISHABLE_KEY}
   secret-key: ${STRIPE_SECRET_KEY:YOUR_STRIPE_SECRET_KEY}
   product:

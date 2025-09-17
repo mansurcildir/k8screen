@@ -3,6 +3,7 @@ package io.k8screen.backend.user;
 import io.k8screen.backend.exception.ItemNotFoundException;
 import io.k8screen.backend.k8s.config.ConfigRepository;
 import io.k8screen.backend.k8s.config.dto.UserConfig;
+import io.k8screen.backend.user.dto.ProfileForm;
 import io.k8screen.backend.user.dto.UserInfo;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,19 @@ public class UserService {
             .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
 
     return this.userConverter.toUserInfo(user);
+  }
+
+  @CacheEvict(value = "users", key = "#userUuid")
+  public void updateProfile(final @NotNull ProfileForm profileForm, final @NotNull UUID userUuid) {
+    final User user =
+        this.userRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
+
+    user.setUsername(profileForm.username());
+    user.setEmail(profileForm.email());
+
+    this.userRepository.save(user);
   }
 
   @CacheEvict(value = "users", key = "#userUuid")

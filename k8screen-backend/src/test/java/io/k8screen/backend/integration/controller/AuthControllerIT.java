@@ -6,7 +6,6 @@ import io.k8screen.backend.config.TemporaryTokenStore;
 import io.k8screen.backend.result.DataResult;
 import io.k8screen.backend.result.Result;
 import io.k8screen.backend.user.dto.AuthResponse;
-import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
 import io.k8screen.backend.util.JwtUtil;
@@ -107,27 +106,6 @@ public class AuthControllerIT {
     Assertions.assertNotNull(response.getBody().getData().accessToken());
     Assertions.assertNotNull(
         this.jwtUtil.extractAllClaims(response.getBody().getData().accessToken(), this.accessKey));
-  }
-
-  @Test
-  public void get_profile_returnDataResult() {
-    final String accessToken = this.register().getData().accessToken();
-
-    final HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.setBearerAuth(accessToken);
-
-    final HttpEntity<Object> entity = new HttpEntity<>(headers);
-
-    final String url = "http://localhost:" + port + "/v1/auth/profile";
-
-    ResponseEntity<DataResult<UserInfo>> response =
-        restTemplate.exchange(url, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {});
-
-    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-    Assertions.assertNotNull(response.getBody());
-    Assertions.assertNotNull(response.getBody().getData());
-    Assertions.assertEquals("test", response.getBody().getData().username());
   }
 
   @Test

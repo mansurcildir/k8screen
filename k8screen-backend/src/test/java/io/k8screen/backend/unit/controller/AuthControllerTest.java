@@ -11,7 +11,6 @@ import io.k8screen.backend.result.DataResult;
 import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
 import io.k8screen.backend.user.dto.AuthResponse;
-import io.k8screen.backend.user.dto.UserDetails;
 import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
@@ -74,22 +73,6 @@ public class AuthControllerTest {
         .thenReturn(Mockito.mock(DataResult.class));
 
     final ResponseEntity<Result> response = this.authController.login(userLogin);
-
-    assertNotNull(response.getBody());
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-  }
-
-  @Test
-  public void get_profile_returnDataResult() {
-    when(this.authentication.getPrincipal())
-        .thenReturn(UserDetails.builder().userUuid(UUID.randomUUID()).username("test").build());
-
-    when(this.authService.getUserInfo(Mockito.any(UUID.class))).thenReturn(this.userInfo);
-
-    when(this.responseFactory.success(200, "profileFetched", this.userInfo))
-        .thenReturn(Mockito.mock(DataResult.class));
-
-    final ResponseEntity<Result> response = this.authController.profile(this.authentication);
 
     assertNotNull(response.getBody());
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

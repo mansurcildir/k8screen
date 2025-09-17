@@ -96,7 +96,9 @@ public class DeploymentController {
     final V1Deployment updatedDeployment =
         this.deploymentService.updateByName(namespace, name, deployment, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK)
-        .body(this.responseFactory.success(HttpStatus.OK.value(), "deploymentUpdated", deployment));
+        .body(
+            this.responseFactory.success(
+                HttpStatus.OK.value(), "deploymentUpdated", updatedDeployment));
   }
 
   @DeleteMapping("/{name}")
