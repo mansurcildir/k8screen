@@ -17,6 +17,10 @@ CREATE TABLE "user" (
     CONSTRAINT uq_user_uuid UNIQUE (uuid)
 );
 
+CREATE UNIQUE INDEX ux_user_email
+ON "user" (email)
+WHERE deleted = false;
+
 CREATE TABLE IF NOT EXISTS account (
     id                   BIGSERIAL                   NOT NULL,
     uuid                 UUID                        NOT NULL,
@@ -118,3 +122,17 @@ VALUES
   ('Free', 1),
   ('Standard', 5),
   ('Premium', 50);
+
+CREATE TABLE verification (
+    id                   BIGSERIAL                   NOT NULL,
+    uuid                 UUID                        NOT NULL,
+    user_id              BIGINT                      NOT NULL,
+    type                 VARCHAR(255)                NOT NULL,
+    code                 VARCHAR(255)                NOT NULL,
+    created_at           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    expires_at           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    CONSTRAINT ch_verification CHECK (id > 0),
+    CONSTRAINT pk_verification PRIMARY KEY (id),
+    CONSTRAINT uq_verification_uuid UNIQUE (uuid),
+    CONSTRAINT uq_verification_code UNIQUE (code)
+);

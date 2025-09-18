@@ -1,10 +1,7 @@
 package io.k8screen.backend.user;
 
-import io.k8screen.backend.k8s.config.Config;
-import io.k8screen.backend.refresh_token.RefreshToken;
 import io.k8screen.backend.subscription.SubscriptionPlan;
 import io.k8screen.backend.user.role.Role;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.HashSet;
@@ -50,7 +46,7 @@ public class User {
   @Column(name = "password")
   private String password;
 
-  @Column(name = "email", nullable = false)
+  @Column(name = "email", unique = true, nullable = false)
   private String email;
 
   @Column(name = "active_config")
@@ -65,12 +61,6 @@ public class User {
 
   @Column(name = "deleted", nullable = false)
   private boolean deleted;
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  private Set<Config> configs;
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  private Set<RefreshToken> refreshTokens;
 
   @Builder.Default
   @ManyToMany

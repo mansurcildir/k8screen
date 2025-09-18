@@ -13,6 +13,7 @@ import io.k8screen.backend.result.Result;
 import io.k8screen.backend.user.dto.AuthResponse;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
+import io.k8screen.backend.verification.VerificationService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,7 @@ public class AuthControllerTest {
   private @Mock AuthService authService;
   private @Mock ResponseFactory responseFactory;
   private @Mock TemporaryTokenStore tokenStore;
+  private @Mock VerificationService verificationService;
 
   private @InjectMocks AuthController authController;
 

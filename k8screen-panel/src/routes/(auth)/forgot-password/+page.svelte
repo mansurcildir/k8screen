@@ -4,6 +4,8 @@
   import { Input } from '$lib/components/ui/input/index.js';
   import Label from '$lib/components/ui/label/label.svelte';
   import type { EmailForm } from '$lib/model/user/EmailForm';
+  import { authAPI } from '$lib/service/auth-service';
+  import { toastService } from '$lib/service/toast-service';
   import { writable } from 'svelte/store';
   import { z } from 'zod';
 
@@ -32,7 +34,18 @@
   };
 
   const sendEmail = () => {
-    handleValidation().then(() => {});
+    handleValidation().then(() => {
+      loading = true;
+      authAPI
+        .sendPasswordRecovery(emailForm)
+        .then((res) => {
+          toastService.show(res.message, 'success');
+        })
+        .catch((err) => {
+          toastService.show(err.message, 'error');
+        })
+        .finally(() => (loading = false));
+    });
   };
 
   const validate = (field: keyof EmailForm) => {

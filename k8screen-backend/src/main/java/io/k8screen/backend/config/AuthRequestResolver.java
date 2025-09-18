@@ -10,11 +10,11 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
+public class AuthRequestResolver implements OAuth2AuthorizationRequestResolver {
 
   private final @NotNull OAuth2AuthorizationRequestResolver defaultResolver;
 
-  public AuthorizationRequestResolver(final @NotNull ClientRegistrationRepository repo) {
+  public AuthRequestResolver(final @NotNull ClientRegistrationRepository repo) {
     this.defaultResolver =
         new DefaultOAuth2AuthorizationRequestResolver(repo, "/oauth2/authorization");
   }

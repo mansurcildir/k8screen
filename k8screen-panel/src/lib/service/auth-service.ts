@@ -1,9 +1,17 @@
 import type { DataResult } from '$lib/model/result/DataResult';
+import type { Result } from '$lib/model/result/Result';
+import type { EmailForm } from '$lib/model/user/EmailForm';
 import type { LoginReq } from '$lib/model/user/LoginReq';
 import type { LoginRes } from '$lib/model/user/LoginRes';
+import type { ResetPasswordForm } from '$lib/model/user/ResetPasswordForm';
 import type { UserForm } from '$lib/model/user/UserForm';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
-import { applyGetRequestWithBearerHeader, applyGetRequestWithRefreshToken, applyPostRequest } from './http-request';
+import {
+  applyGetRequestWithBearerHeader,
+  applyGetRequestWithRefreshToken,
+  applyPostRequest,
+  applyPutRequest
+} from './http-request';
 import { clearTokens, getAllTokens } from './storage-manager';
 import { isTokenExpired } from './token-decoder';
 
@@ -22,6 +30,16 @@ export const authAPI = {
     const url = `${SPRING_BASE_URL}/v1/auth/logout`;
     await applyGetRequestWithBearerHeader(url);
     clearTokens();
+  },
+
+  sendPasswordRecovery: async (body: EmailForm): Promise<Result> => {
+    const url = `${SPRING_BASE_URL}/v1/auth/password-recovery`;
+    return (await applyPostRequest(url, JSON.stringify(body))).json();
+  },
+
+  resetPassword: async (body: ResetPasswordForm): Promise<Result> => {
+    const url = `${SPRING_BASE_URL}/v1/auth/reset-password`;
+    return (await applyPutRequest(url, JSON.stringify(body))).json();
   },
 
   getAccessToken: async (): Promise<DataResult<LoginRes>> => {

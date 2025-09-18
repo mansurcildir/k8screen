@@ -55,9 +55,7 @@ public class SecurityConfig {
                 oauth2
                     .successHandler(this.oAuthSuccessHandler)
                     .authorizationEndpoint(
-                        auth ->
-                            auth.authorizationRequestResolver(
-                                new AuthorizationRequestResolver(repo))))
+                        auth -> auth.authorizationRequestResolver(new AuthRequestResolver(repo))))
         .addFilterBefore(
             new JwtAuthenticationFilter(this.jwtUtil, this.responseFactory),
             UsernamePasswordAuthenticationFilter.class);
@@ -95,6 +93,8 @@ public class SecurityConfig {
               auth) {
     auth.requestMatchers(
             "/auth/google/callback",
+            "/v1/auth/password-recovery",
+            "/v1/auth/reset-password",
             "/v1/auth/register",
             "/v1/auth/login",
             "/v1/auth/login/google",

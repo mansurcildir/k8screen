@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import Spinner from '$lib/components/spinner.svelte';
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import Label from '$lib/components/ui/label/label.svelte';
   import type { ResetPasswordForm } from '$lib/model/user/ResetPasswordForm';
+  import { authAPI } from '$lib/service/auth-service';
+  import { toastService } from '$lib/service/toast-service';
   import { writable } from 'svelte/store';
   import { z } from 'zod';
 
@@ -11,10 +15,13 @@
   let disabled = false;
   let errors = writable<Record<string, string>>({});
 
+  $: code = $page.params.code;
+  $: resetPasswordForm.code = code;
+
   const resetPasswordForm: ResetPasswordForm = {
     password: '',
     confirmPassword: '',
-    code: null
+    code: ''
   };
 
   const handleValidation = (): Promise<void> => {
@@ -34,7 +41,18 @@
   };
 
   const resetPassword = () => {
-    handleValidation().then(() => {});
+    handleValidation().then(() => {
+      loading = true;
+      authAPI
+        .resetPassword(resetPasswordForm)
+        .then(() => {
+          goto('/login');
+        })
+        .catch((err) => {
+          toastService.show(err.message, 'error');
+        })
+        .finally(() => (loading = false));
+    });
   };
 
   const validate = (field: keyof ResetPasswordForm) => {
@@ -70,10 +88,9 @@
       .min(1, { message: 'Password is required' })
       .max(50, { message: 'Password cannot exceed 50 characters' }),
     code: z
-      .number({ message: 'Verification code must be number' })
-      .int({ message: 'Verification code must be integer' })
-      .min(0, { message: 'Verification code cannot be negative' })
-      .max(999999, { message: 'Verification code cannot exceed 6 digits' })
+      .string()
+      .regex(/^\d{6}$/, { message: 'Code must be 6 digits' })
+      .transform((val) => Number(val))
   });
 </script>
 
@@ -111,7 +128,7 @@
               oninput={() => validate('confirmPassword')}
               bind:value={resetPasswordForm.confirmPassword}
               id="confirm-password"
-              type="confirm-password"
+              type="password"
               placeholder="******"
               required
             />
@@ -128,7 +145,7 @@
             <Label for="code">Verification code</Label>
             <Input
               id="code"
-              type="number"
+              type="text"
               oninput={() => validate('code')}
               bind:value={resetPasswordForm.code}
               placeholder="123456"
@@ -152,9 +169,9 @@
           </Button>
         </div>
         <div class="mt-4 text-center text-sm">
-          <a href="login" class="underline"> Login </a>
+          <a href="/login" class="underline"> Login </a>
           or
-          <a href="register" class="underline"> Register </a>
+          <a href="/register" class="underline"> Register </a>
         </div>
       </div>
     {:else}
