@@ -9,7 +9,9 @@ import io.k8screen.backend.subscription.SubscriptionPlan;
 import io.k8screen.backend.subscription.SubscriptionPlanRepository;
 import io.k8screen.backend.user.User;
 import io.k8screen.backend.user.UserRepository;
+import io.k8screen.backend.user.UserService;
 import io.k8screen.backend.user.dto.AuthResponse;
+import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
 import io.k8screen.backend.user.role.Role;
@@ -43,6 +45,7 @@ public class AuthService {
   private final @NotNull RoleRepository roleRepository;
   private final @NotNull RefreshTokenRepository refreshTokenRepository;
   private final @NotNull SubscriptionPlanRepository subscriptionPlanRepository;
+  private final @NotNull UserService userService;
   private final @NotNull StripeService stripeService;
 
   public @NotNull AuthResponse login(final @NotNull UserLogin loginRequest) {
@@ -51,16 +54,8 @@ public class AuthService {
             .findByUsername(loginRequest.username())
             .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
 
-    final boolean matched =
-        this.passwordEncoder.matches(loginRequest.password(), user.getPassword());
-
-    if (user.getPassword() == null) {
-      throw new UnauthorizedException("accessDenied");
-    }
-
-    if (!matched) {
-      throw new UnauthorizedException("wrongPassword");
-    }
+    this.checkPasswordNotNull(user.getPassword());
+    this.checkPasswordMatches(loginRequest.password(), user.getPassword());
 
     this.logout(user.getUuid());
     return this.createAuthResponse(user);
@@ -82,17 +77,16 @@ public class AuthService {
 
   @SneakyThrows
   public @NotNull AuthResponse register(final @NotNull UserRegister userRegister) {
+    this.checkUsernameExists(userRegister.username());
+    this.checkEmailExists(userRegister.email());
+
     String encodedPassword = null;
     if (userRegister.password() != null) {
       encodedPassword = this.passwordEncoder.encode(userRegister.password());
     }
 
     final User user =
-        this.createUser(
-            userRegister.username(),
-            userRegister.email(),
-            encodedPassword,
-            userRegister.avatarUrl());
+        this.createUser(userRegister.username(), userRegister.email(), encodedPassword);
 
     log.warn("{} has been registered!", user.getEmail());
 
@@ -107,24 +101,18 @@ public class AuthService {
 
   public @NotNull AuthResponse refresh(final @NotNull String token) {
     final UUID userUuid = this.jwtUtil.getUserUuidFromRefreshToken(token);
-    final User user =
-        this.userRepository
-            .findByUuid(userUuid)
-            .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
-
-    final List<String> roles = user.getRoles().stream().map(Role::getName).toList();
+    final UserInfo userInfo = this.userService.getUserInfo(userUuid);
+    final List<String> roles = userInfo.roles();
 
     final Optional<RefreshToken> refreshToken = this.refreshTokenRepository.findByToken(token);
 
-    if (refreshToken.isPresent()) {
-      final String accessToken =
-          this.jwtUtil.generateAccessToken(user.getUuid(), user.getUsername(), roles);
-      final String newRefreshToken = this.jwtUtil.generateRefreshToken(user.getUuid());
+    this.checkRefreshTokenEmpty(refreshToken.isEmpty());
 
-      return AuthResponse.builder().accessToken(accessToken).refreshToken(newRefreshToken).build();
-    }
+    final String accessToken =
+        this.jwtUtil.generateAccessToken(userInfo.uuid(), userInfo.username(), roles);
+    final String newRefreshToken = this.jwtUtil.generateRefreshToken(userInfo.uuid());
 
-    throw new UnauthorizedException("accessDenied");
+    return AuthResponse.builder().accessToken(accessToken).refreshToken(newRefreshToken).build();
   }
 
   @CacheEvict(value = "users", key = "#userUuid")
@@ -136,30 +124,69 @@ public class AuthService {
   public @NotNull User createUser(
       final @NotNull String username,
       final @NotNull String email,
-      final @Nullable String password,
-      final @Nullable String picture) {
+      final @Nullable String password) {
     final User user =
         User.builder()
             .uuid(UUID.randomUUID())
             .username(username)
             .email(email)
             .password(password)
-            .avatarUrl(picture)
             .build();
 
+    this.setRoles(user);
+    this.setSubscriptionPlan(user);
+
+    return this.userRepository.save(user);
+  }
+
+  private void setRoles(final @NotNull User user) {
     final Role role =
         this.roleRepository
             .findByName("USER")
             .orElseThrow(() -> new ItemNotFoundException("roleNotFound"));
 
     user.setRoles(new HashSet<>(Set.of(role)));
+  }
 
+  private void setSubscriptionPlan(final @NotNull User user) {
     final SubscriptionPlan subscriptionPlan =
         this.subscriptionPlanRepository
             .findByName(SUBSCRIPTION_PLAN_FREE)
             .orElseThrow(() -> new ItemNotFoundException("subscriptionPlanNotFound"));
 
     user.setSubscriptionPlan(subscriptionPlan);
-    return this.userRepository.save(user);
+  }
+
+  private void checkPasswordNotNull(final @Nullable String password) {
+    if (password == null) {
+      throw new UnauthorizedException("accessDenied");
+    }
+  }
+
+  private void checkPasswordMatches(
+      final @NotNull String requestedPassword, final @NotNull String userPassword) {
+    final boolean passwordMatches = this.passwordEncoder.matches(requestedPassword, userPassword);
+
+    if (!passwordMatches) {
+      throw new UnauthorizedException("wrongPassword");
+    }
+  }
+
+  private void checkRefreshTokenEmpty(final boolean empty) {
+    if (empty) {
+      throw new UnauthorizedException("accessDenied");
+    }
+  }
+
+  private void checkUsernameExists(final @NotNull String username) {
+    if (this.userRepository.existsByUsername(username)) {
+      throw new UnauthorizedException("usernameExists");
+    }
+  }
+
+  private void checkEmailExists(final @NotNull String email) {
+    if (this.userRepository.existsByEmail(email)) {
+      throw new UnauthorizedException("emailExists");
+    }
   }
 }

@@ -1,5 +1,6 @@
-package io.k8screen.backend.storage;
+package io.k8screen.backend.k8s.config;
 
+import io.k8screen.backend.storage.StorageStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ConfigStorageService {
 
-  @Value("${k8screen.config.path}")
+  @Value("${k8screen.storage.config.path}")
   private String configPath;
 
   private final @NotNull StorageStrategy storageStrategy;
@@ -26,14 +27,15 @@ public class ConfigStorageService {
       final @NotNull UUID userUuid)
       throws IOException {
 
-    final String relativePath = this.configPath + File.separator + userUuid;
-
-    this.storageStrategy.upload(inputStream, relativePath, filename);
+    final String relativePath =
+        this.configPath + File.separator + userUuid + File.separator + filename;
+    this.storageStrategy.upload(inputStream, relativePath);
   }
 
   public void deleteConfig(final @NotNull String fileName, final @NotNull UUID userUuid)
       throws IOException {
-    final String relativePath = this.configPath + File.separator + userUuid;
-    this.storageStrategy.delete(relativePath, fileName);
+    final String relativePath =
+        this.configPath + File.separator + userUuid + File.separator + fileName;
+    this.storageStrategy.delete(relativePath);
   }
 }

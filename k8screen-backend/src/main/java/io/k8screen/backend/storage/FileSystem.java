@@ -16,31 +16,38 @@ import org.springframework.stereotype.Component;
 public class FileSystem implements StorageStrategy {
   private static final int BUFFER_SIZE = 8192;
 
-  @Value("${k8screen.trash.path}")
+  @Value("${k8screen.storage.file-system.route}")
+  private String route;
+
+  @Value("${k8screen.storage.trash.path}")
   private String trashPath;
 
   @Override
-  public void upload(
-      final @NotNull InputStream inputStream,
-      final @NotNull String path,
-      final @NotNull String fileName)
+  public void upload(final @NotNull InputStream inputStream, final @NotNull String path)
       throws IOException {
 
-    final File parent = new File(path);
+    final File file = new File(this.route + File.separator + path);
+    final File parent = file.getParentFile();
 
-    if (!parent.exists() && !parent.mkdirs()) {
+    if (parent != null && !parent.exists() && !parent.mkdirs()) {
       throw new IOException("directoryNotFound");
     }
 
-    final File file = new File(parent, fileName);
     this.uploadFile(inputStream, file);
   }
 
   @Override
-  public void delete(final @NotNull String path, final @NotNull String fileName)
-      throws IOException {
-    final Path resource = this.getFile(path + File.separator + fileName).toPath();
-    final Path trash = this.getTrashDir(this.trashPath, fileName).toPath();
+  public byte[] download(final @NotNull String path) throws IOException {
+    final File file = this.getFile(this.route + File.separator + path);
+    return Files.readAllBytes(file.toPath());
+  }
+
+  @Override
+  public void delete(final @NotNull String path) throws IOException {
+    final Path resource = this.getFile(this.route + File.separator + path).toPath();
+    final Path trash =
+        this.getTrashDir(this.route + File.separator + this.trashPath + File.separator + path)
+            .toPath();
 
     Files.move(resource, trash, StandardCopyOption.REPLACE_EXISTING);
   }
@@ -66,14 +73,14 @@ public class FileSystem implements StorageStrategy {
     return file;
   }
 
-  private @NotNull File getTrashDir(final @NotNull String path, final @NotNull String fileName)
-      throws IOException {
+  private @NotNull File getTrashDir(final @NotNull String path) throws IOException {
     final File file = new File(path);
+    final File parent = file.getParentFile();
 
-    if (!file.exists() && !file.mkdirs()) {
+    if (parent != null && !parent.exists() && !parent.mkdirs()) {
       throw new IOException("directoryNotFound");
     }
 
-    return new File(path, fileName);
+    return file;
   }
 }

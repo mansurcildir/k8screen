@@ -14,4 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @NotNull
   Optional<User> findByStripeCustomerId(@NotNull UUID stripeCustomerId);
+
+  boolean existsByUsername(@NotNull String username);
+
+  boolean existsByEmail(@NotNull String email);
 }

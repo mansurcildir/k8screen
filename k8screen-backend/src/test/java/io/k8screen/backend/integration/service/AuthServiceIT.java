@@ -29,7 +29,7 @@ public class AuthServiceIT {
   }
 
   private @NotNull AuthResponse register() {
-    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com", null);
+    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com");
     return this.authService.register(userRegister);
   }
 
@@ -46,7 +46,7 @@ public class AuthServiceIT {
 
   @Test
   public void test_register_returnAuthResponse() {
-    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com", null);
+    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com");
     final AuthResponse response = this.authService.register(userRegister);
 
     assertThat(response).isNotNull();
@@ -55,7 +55,7 @@ public class AuthServiceIT {
 
   @Test
   public void test_createUser_returnUserInfo() {
-    final User response = this.authService.createUser("test", "test@gmail.com", "Tester123", null);
+    final User response = this.authService.createUser("test", "test@gmail.com", "Tester123");
 
     assertThat(response).isNotNull();
     assertThat(response.getUsername()).isEqualTo("test");

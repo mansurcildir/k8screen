@@ -15,6 +15,7 @@
 
   let loading = false;
   let loadingGoogle = false;
+  let loadingGithub = false;
   let disabled = false;
   let errors = writable<Record<string, string>>({});
 
@@ -183,7 +184,7 @@
           <div class=" flex flex-col gap-2">
             <div class="flex items-center">
               <Label for="password">Password</Label>
-              <a href="##" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
+              <a href="forgot-password" class="ml-auto inline-block text-sm underline"> Forgot your password? </a>
             </div>
             <Input
               id="password"
@@ -220,8 +221,8 @@
             {/if}
           </Button>
 
-          <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGithub()}>
-            {#if loadingGoogle}
+          <Button variant="outline" class="w-full" disabled={loading || loadingGithub} onclick={() => loginGithub()}>
+            {#if loadingGithub}
               <Spinner class="m-auto" color="black" />
             {:else}
               <IconGithub class="mb-0.5" /> Github

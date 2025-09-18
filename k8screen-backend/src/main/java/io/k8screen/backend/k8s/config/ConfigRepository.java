@@ -16,8 +16,8 @@ public interface ConfigRepository extends JpaRepository<Config, Long> {
   Optional<Config> findByNameAndUserUuid(@NotNull String name, @NotNull UUID userUuid);
 
   @NotNull
-  @Query("select c from Config c where c.user.uuid = :userUuid")
-  List<Config> findAllByUserUuid(@NotNull UUID userUuid);
+  @Query("select c from Config c where c.user.id = :userId")
+  List<Config> findAllByUserId(long userId);
 
   @NotNull
   @Query(

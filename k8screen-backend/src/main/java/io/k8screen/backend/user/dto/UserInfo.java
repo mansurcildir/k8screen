@@ -13,6 +13,5 @@ public record UserInfo(
     @NotNull @NotEmpty UUID uuid,
     @NotNull @NotEmpty String username,
     @NotNull @NotEmpty String email,
-    @Nullable String avatarUrl,
     @Nullable @JsonProperty("active_config") String activeConfig,
     @NotNull @NotEmpty List<String> roles) {}

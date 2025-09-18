@@ -53,9 +53,6 @@ public class User {
   @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(name = "avatarUrl")
-  private String avatarUrl;
-
   @Column(name = "active_config")
   private String activeConfig;
 

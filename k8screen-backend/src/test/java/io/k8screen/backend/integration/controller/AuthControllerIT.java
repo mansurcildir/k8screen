@@ -53,7 +53,7 @@ public class AuthControllerIT {
     final HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com", null);
+    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com");
     final HttpEntity<UserRegister> entity = new HttpEntity<>(userRegister, headers);
 
     final String url = "http://localhost:" + port + "/v1/auth/register";
@@ -69,7 +69,7 @@ public class AuthControllerIT {
     final HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com", null);
+    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com");
     final HttpEntity<UserRegister> entity = new HttpEntity<>(userRegister, headers);
 
     final String url = "http://localhost:" + port + "/v1/auth/register";

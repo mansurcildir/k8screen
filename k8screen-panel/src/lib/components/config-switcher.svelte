@@ -38,7 +38,7 @@
     message: 'You must upload a valid file.'
   });
 
-  function handleFileChange(event: any) {
+  const handleFileChange = (event: any) => {
     file = event.target.files[0];
 
     const validation = fileSchema.safeParse(file);
@@ -47,7 +47,7 @@
     } else {
       fileError.set(null);
     }
-  }
+  };
 
   const submit = () => {
     const validation = fileSchema.safeParse(file);
@@ -153,13 +153,17 @@
                 <Dialog.Description>
                   <br />
                   <form onsubmit={submit}>
-                    <div class="grid gap-4">
-                      <div class="grid gap-2">
-                        <Input type="file" id="name" class="col-span-3 cursor-pointer" onchange={handleFileChange} />
+                    <div class="flex flex-col gap-4">
+                      <Input type="file" id="name" class="cursor-pointer" onchange={handleFileChange} />
+
+                      <span
+                        class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+                        style="opacity: {$fileError ? 1 : 0};"
+                      >
                         {#if $fileError}
-                          <div class="mt-2 text-sm text-red-400">{$fileError}</div>
+                          {$fileError}
                         {/if}
-                      </div>
+                      </span>
                       <Button type="submit" class="w-full">Upload</Button>
                     </div>
                   </form>

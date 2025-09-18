@@ -7,10 +7,16 @@ k8screen:
   backend-base-url: http://localhost:8080
   frontend-base-url: http://localhost:5173
   success-url: ${k8screen.frontend-base-url}/login
-  config:
-    path: ${user.home}/.k8screen/configs
-  trash:
-    path: ${k8screen.config.path}/trash
+  storage:
+    strategy: file-system #file-system or s3
+    file-system:
+      route: ${user.home}/.k8screen
+    avatar:
+      path: avatars
+    config:
+      path: configs
+    trash:
+      path: trash
 
 jwt:
   access-exp-min: 5
