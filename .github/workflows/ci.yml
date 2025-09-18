@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     name: check
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check one editorconfig
         run: |
@@ -34,7 +34,7 @@ jobs:
       - check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -54,7 +54,7 @@ jobs:
       run:
         working-directory: ./k8screen-panel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node
         uses: actions/setup-node@v5
