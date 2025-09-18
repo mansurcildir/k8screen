@@ -11,11 +11,8 @@ import io.k8screen.backend.result.DataResult;
 import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
 import io.k8screen.backend.user.dto.AuthResponse;
-import io.k8screen.backend.user.dto.UserInfo;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
-import java.util.List;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,17 +37,9 @@ public class AuthControllerTest {
   private final @NotNull AuthResponse authResponse =
       AuthResponse.builder().accessToken("test-access").refreshToken("test-refresh").build();
 
-  final UserInfo userInfo =
-      UserInfo.builder()
-          .uuid(UUID.randomUUID())
-          .username("test-username")
-          .email("test@gmail.com")
-          .roles(List.of())
-          .build();
-
   @Test
   public void test_register_returnDataResult() {
-    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com", null);
+    final UserRegister userRegister = new UserRegister("test", "Tester123", "test@gmail.com");
 
     when(this.authService.register(Mockito.any(UserRegister.class))).thenReturn(this.authResponse);
 

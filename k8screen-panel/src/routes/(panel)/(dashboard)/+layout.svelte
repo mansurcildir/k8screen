@@ -132,6 +132,7 @@
         .getAllConfigs()
         .then((res) => {
           configs = res.data;
+          window.location.reload();
         })
         .catch((err) => {
           toastService.show(err.message, 'error');

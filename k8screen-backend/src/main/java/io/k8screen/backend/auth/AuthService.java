@@ -77,6 +77,9 @@ public class AuthService {
 
   @SneakyThrows
   public @NotNull AuthResponse register(final @NotNull UserRegister userRegister) {
+    this.checkUsernameExists(userRegister.username());
+    this.checkEmailExists(userRegister.email());
+
     String encodedPassword = null;
     if (userRegister.password() != null) {
       encodedPassword = this.passwordEncoder.encode(userRegister.password());
@@ -172,6 +175,18 @@ public class AuthService {
   private void checkRefreshTokenEmpty(final boolean empty) {
     if (empty) {
       throw new UnauthorizedException("accessDenied");
+    }
+  }
+
+  private void checkUsernameExists(final @NotNull String username) {
+    if (this.userRepository.existsByUsername(username)) {
+      throw new UnauthorizedException("usernameExists");
+    }
+  }
+
+  private void checkEmailExists(final @NotNull String email) {
+    if (this.userRepository.existsByEmail(email)) {
+      throw new UnauthorizedException("emailExists");
     }
   }
 }

@@ -39,6 +39,9 @@
     await userAPI
       .getAvatar()
       .then((buffer) => {
+        if (!buffer || buffer.byteLength === 0) {
+          return;
+        }
         const base64 = btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
         avatarSrc = `data:image/png;base64,${base64}`;
       })

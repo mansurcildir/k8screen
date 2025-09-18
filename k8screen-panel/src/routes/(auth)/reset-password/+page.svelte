@@ -3,7 +3,7 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import Label from '$lib/components/ui/label/label.svelte';
-  import type { LoginReq } from '$lib/model/user/LoginReq';
+  import type { ResetPasswordForm } from '$lib/model/user/ResetPasswordForm';
   import { writable } from 'svelte/store';
   import { z } from 'zod';
 
@@ -11,14 +11,16 @@
   let disabled = false;
   let errors = writable<Record<string, string>>({});
 
-  const body = {
-    code: ''
+  const resetPasswordForm: ResetPasswordForm = {
+    password: '',
+    confirmPassword: '',
+    code: null
   };
 
   const handleValidation = (): Promise<void> => {
     return new Promise((resolve) => {
       try {
-        schema.parse(body);
+        schema.parse(resetPasswordForm);
         resolve();
       } catch (err: any) {
         const errorMessages: Record<string, string> = {};
@@ -35,11 +37,43 @@
     handleValidation().then(() => {});
   };
 
+  const validate = (field: keyof ResetPasswordForm) => {
+    if (Object.keys($errors).length === 0) {
+      disabled = false;
+    }
+
+    try {
+      schema.pick({ [field]: true } as any).parse({ [field]: resetPasswordForm[field] });
+
+      errors.update((currentErrors) => {
+        const { [field]: _, ...rest } = currentErrors;
+        return rest;
+      });
+    } catch (e: any) {
+      const error = e.errors[0];
+      errors.update((currentErrors) => ({
+        ...currentErrors,
+        [field]: error.message
+      }));
+
+      disabled = true;
+    }
+  };
+
   const schema = z.object({
-    code: z
+    password: z
       .string()
-      .min(1, { message: 'Verification code is required' })
-      .max(6, { message: 'Verification code cannot exceed 6 characters' })
+      .min(1, { message: 'Password is required' })
+      .max(50, { message: 'Password cannot exceed 50 characters' }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: 'Password is required' })
+      .max(50, { message: 'Password cannot exceed 50 characters' }),
+    code: z
+      .number({ message: 'Verification code must be number' })
+      .int({ message: 'Verification code must be integer' })
+      .min(0, { message: 'Verification code cannot be negative' })
+      .max(999999, { message: 'Verification code cannot exceed 6 digits' })
   });
 </script>
 
@@ -52,9 +86,54 @@
           <p class="text-balance text-muted-foreground">Reset your password with verification code</p>
         </div>
         <div class="grid gap-4">
+          <div class=" flex flex-col gap-2">
+            <Label for="password">Enter new password</Label>
+            <Input
+              oninput={() => validate('password')}
+              bind:value={resetPasswordForm.password}
+              id="password"
+              type="password"
+              placeholder="******"
+              required
+            />
+            <span
+              class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+              style="opacity: {$errors.password ? 1 : 0};"
+            >
+              {#if $errors.password}
+                {$errors.password}
+              {/if}
+            </span>
+          </div>
+          <div class=" flex flex-col gap-2">
+            <Label for="confirm-password">Confirm new password</Label>
+            <Input
+              oninput={() => validate('confirmPassword')}
+              bind:value={resetPasswordForm.confirmPassword}
+              id="confirm-password"
+              type="confirm-password"
+              placeholder="******"
+              required
+            />
+            <span
+              class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
+              style="opacity: {$errors.confirmPassword ? 1 : 0};"
+            >
+              {#if $errors.confirmPassword}
+                {$errors.confirmPassword}
+              {/if}
+            </span>
+          </div>
           <div class="flex flex-col gap-2">
-            <Label for="code">Verification Code</Label>
-            <Input id="code" type="password" placeholder="******" required />
+            <Label for="code">Verification code</Label>
+            <Input
+              id="code"
+              type="number"
+              oninput={() => validate('code')}
+              bind:value={resetPasswordForm.code}
+              placeholder="123456"
+              required
+            />
             <span
               class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
               style="opacity: {$errors.code ? 1 : 0};"

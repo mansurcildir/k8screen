@@ -5,10 +5,9 @@ import java.io.InputStream;
 import org.jetbrains.annotations.NotNull;
 
 public interface StorageStrategy {
-  void upload(@NotNull InputStream inputStream, @NotNull String path, @NotNull String fileName)
-      throws IOException;
+  void upload(@NotNull InputStream inputStream, @NotNull String path) throws IOException;
 
-  byte[] download(@NotNull String path, @NotNull String fileName) throws IOException;
+  byte[] download(@NotNull String path) throws IOException;
 
-  void delete(@NotNull String path, @NotNull String fileName) throws IOException;
+  void delete(@NotNull String relativePath) throws IOException;
 }

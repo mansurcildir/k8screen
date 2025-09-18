@@ -48,8 +48,7 @@ public class UserController {
   }
 
   @GetMapping("/avatar")
-  public @NotNull ResponseEntity<byte[]> getAvatar(final @NotNull Authentication authentication)
-      throws Exception {
+  public @NotNull ResponseEntity<byte[]> getAvatar(final @NotNull Authentication authentication) {
     final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     final byte[] bytes = this.userStorageService.getAvatar(userDetails.userUuid());
 

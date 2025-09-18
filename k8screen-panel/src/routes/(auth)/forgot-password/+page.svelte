@@ -3,7 +3,7 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import Label from '$lib/components/ui/label/label.svelte';
-  import type { LoginReq } from '$lib/model/user/LoginReq';
+  import type { EmailForm } from '$lib/model/user/EmailForm';
   import { writable } from 'svelte/store';
   import { z } from 'zod';
 
@@ -11,14 +11,14 @@
   let disabled = false;
   let errors = writable<Record<string, string>>({});
 
-  const body = {
+  const emailForm: EmailForm = {
     email: ''
   };
 
   const handleValidation = (): Promise<void> => {
     return new Promise((resolve) => {
       try {
-        schema.parse(body);
+        schema.parse(emailForm);
         resolve();
       } catch (err: any) {
         const errorMessages: Record<string, string> = {};
@@ -33,6 +33,29 @@
 
   const sendEmail = () => {
     handleValidation().then(() => {});
+  };
+
+  const validate = (field: keyof EmailForm) => {
+    if (Object.keys($errors).length === 0) {
+      disabled = false;
+    }
+
+    try {
+      schema.pick({ [field]: true } as any).parse({ [field]: emailForm[field] });
+
+      errors.update((currentErrors) => {
+        const { [field]: _, ...rest } = currentErrors;
+        return rest;
+      });
+    } catch (e: any) {
+      const error = e.errors[0];
+      errors.update((currentErrors) => ({
+        ...currentErrors,
+        [field]: error.message
+      }));
+
+      disabled = true;
+    }
   };
 
   const schema = z.object({
@@ -55,7 +78,14 @@
         <div class="grid gap-4">
           <div class="flex flex-col gap-2">
             <Label for="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
+            <Input
+              oninput={() => validate('email')}
+              bind:value={emailForm.email}
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+            />
             <span
               class="mb-2 h-2 text-sm text-red-500 transition-all duration-300 ease-in-out"
               style="opacity: {$errors.email ? 1 : 0};"

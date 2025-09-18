@@ -1,14 +1,14 @@
 -- User table
 CREATE TABLE "user" (
-    id                   BIGSERIAL NOT NULL,
-    uuid                 UUID NOT NULL,
-    username             VARCHAR(255) NOT NULL,
+    id                   BIGSERIAL                   NOT NULL,
+    uuid                 UUID                        NOT NULL,
+    username             VARCHAR(255)                NOT NULL,
     password             VARCHAR(255),
-    email                VARCHAR(255) NOT NULL,
+    email                VARCHAR(255)                NOT NULL,
     active_config        VARCHAR(255),
     stripe_customer_id   UUID,
-    subscription_plan_id BIGINT NOT NULL,
-    deleted              BOOLEAN DEFAULT FALSE NOT NULL,
+    subscription_plan_id BIGINT                      NOT NULL,
+    deleted              BOOLEAN DEFAULT FALSE       NOT NULL,
     created_at           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at           TIMESTAMP WITHOUT TIME ZONE,
@@ -18,15 +18,15 @@ CREATE TABLE "user" (
 );
 
 CREATE TABLE IF NOT EXISTS account (
-    id                   BIGSERIAL NOT NULL,
-    uuid                 UUID NOT NULL,
-    account_type         VARCHAR(256) NOT NULL,
+    id                   BIGSERIAL                   NOT NULL,
+    uuid                 UUID                        NOT NULL,
+    account_type         VARCHAR(256)                NOT NULL,
     subject_id           VARCHAR(256),
     username             VARCHAR(256),
     email                VARCHAR(256),
     user_id              BIGINT NOT NULL,
     avatar_url           TEXT,
-    deleted              BOOLEAN DEFAULT FALSE NOT NULL,
+    deleted              BOOLEAN DEFAULT FALSE       NOT NULL,
     created_at           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at           TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at           TIMESTAMP WITHOUT TIME ZONE,
@@ -36,16 +36,13 @@ CREATE TABLE IF NOT EXISTS account (
     CONSTRAINT fk_account__user_id FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE
 );
 
-DROP INDEX IF EXISTS ux_account__account_type_email;
-
 CREATE UNIQUE INDEX ux_account__account_type_subject_id
     ON account (account_type, subject_id)
     WHERE deleted = false;
 
-
 -- role table
 CREATE TABLE role (
-    id   BIGSERIAL NOT NULL,
+    id   BIGSERIAL    NOT NULL,
     name VARCHAR(255) NOT NULL,
     CONSTRAINT ch_role CHECK (id > 0),
     CONSTRAINT pk_role PRIMARY KEY (id),
@@ -69,10 +66,10 @@ VALUES
 
 -- refresh_token table
 CREATE TABLE refresh_token (
-    id         BIGSERIAL NOT NULL,
-    uuid       UUID NOT NULL,
-    token      TEXT NOT NULL,
-    user_id    BIGINT NOT NULL,
+    id         BIGSERIAL                   NOT NULL,
+    uuid       UUID                        NOT NULL,
+    token      TEXT                        NOT NULL,
+    user_id    BIGINT                      NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT ch_refresh_token CHECK (id > 0),
@@ -84,11 +81,11 @@ CREATE TABLE refresh_token (
 
 -- config table
 CREATE TABLE config (
-    id         BIGSERIAL NOT NULL,
-    uuid       UUID NOT NULL,
-    name       VARCHAR(255) NOT NULL,
-    user_id    BIGINT NOT NULL,
-    deleted    BOOLEAN DEFAULT FALSE NOT NULL,
+    id         BIGSERIAL                   NOT NULL,
+    uuid       UUID                        NOT NULL,
+    name       VARCHAR(255)                NOT NULL,
+    user_id    BIGINT                      NOT NULL,
+    deleted    BOOLEAN DEFAULT FALSE       NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at TIMESTAMP WITHOUT TIME ZONE,
@@ -108,9 +105,9 @@ WHERE deleted = false;
 
 -- subscription_plan table
 CREATE TABLE subscription_plan (
-    id               BIGSERIAL NOT NULL,
+    id               BIGSERIAL    NOT NULL,
     name             VARCHAR(255) NOT NULL,
-    max_config_count BIGINT NOT NULL,
+    max_config_count BIGINT       NOT NULL,
     CONSTRAINT ch_subscription_plan CHECK (id > 0),
     CONSTRAINT pk_subscription_plan PRIMARY KEY (id),
     CONSTRAINT uq_subscription_plan_name UNIQUE (name)
