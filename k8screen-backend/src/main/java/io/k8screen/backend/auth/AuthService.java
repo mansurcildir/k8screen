@@ -1,5 +1,6 @@
 package io.k8screen.backend.auth;
 
+import io.k8screen.backend.auth.dto.ResetPasswordForm;
 import io.k8screen.backend.exception.ItemNotFoundException;
 import io.k8screen.backend.exception.UnauthorizedException;
 import io.k8screen.backend.refresh_token.RefreshToken;
@@ -17,6 +18,8 @@ import io.k8screen.backend.user.dto.UserRegister;
 import io.k8screen.backend.user.role.Role;
 import io.k8screen.backend.user.role.RoleRepository;
 import io.k8screen.backend.util.JwtUtil;
+import io.k8screen.backend.verification.Verification;
+import io.k8screen.backend.verification.VerificationRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,6 +47,7 @@ public class AuthService {
   private final @NotNull PasswordEncoder passwordEncoder;
   private final @NotNull UserRepository userRepository;
   private final @NotNull RoleRepository roleRepository;
+  private final @NotNull VerificationRepository verificationRepository;
   private final @NotNull RefreshTokenRepository refreshTokenRepository;
   private final @NotNull SubscriptionPlanRepository subscriptionPlanRepository;
   private final @NotNull UserService userService;
@@ -137,6 +142,28 @@ public class AuthService {
     this.setSubscriptionPlan(user);
 
     return this.userRepository.save(user);
+  }
+
+  public void resetPassword(final @NotNull ResetPasswordForm resetPasswordForm) {
+    final String hashedCode = DigestUtils.sha256Hex(resetPasswordForm.code());
+    final Verification verification =
+        this.verificationRepository
+            .findByCode(hashedCode)
+            .orElseThrow(() -> new ItemNotFoundException("verificationNotFound"));
+
+    this.confirmPassword(resetPasswordForm);
+
+    final User user = verification.getUser();
+    final String encodedPassword = this.passwordEncoder.encode(resetPasswordForm.password());
+    user.setPassword(encodedPassword);
+
+    this.userRepository.save(user);
+  }
+
+  private void confirmPassword(final @NotNull ResetPasswordForm form) {
+    if (!form.password().equals(form.confirmPassword())) {
+      throw new UnauthorizedException("wrongPassword");
+    }
   }
 
   private void setRoles(final @NotNull User user) {

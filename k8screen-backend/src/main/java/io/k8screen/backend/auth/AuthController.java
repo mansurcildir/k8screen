@@ -2,13 +2,17 @@ package io.k8screen.backend.auth;
 
 import static io.k8screen.backend.util.Constant.REFRESH_TOKEN;
 
+import io.k8screen.backend.auth.dto.ResetPasswordForm;
 import io.k8screen.backend.config.TemporaryTokenStore;
+import io.k8screen.backend.mail.EmailForm;
 import io.k8screen.backend.result.ResponseFactory;
 import io.k8screen.backend.result.Result;
 import io.k8screen.backend.user.dto.AuthResponse;
 import io.k8screen.backend.user.dto.UserDetails;
 import io.k8screen.backend.user.dto.UserLogin;
 import io.k8screen.backend.user.dto.UserRegister;
+import io.k8screen.backend.verification.VerificationService;
+import io.k8screen.backend.verification.VerificationType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +36,7 @@ public class AuthController {
   private final @NotNull AuthService authService;
   private final @NotNull ResponseFactory responseFactory;
   private final @NotNull TemporaryTokenStore tokenStore;
+  private final @NotNull VerificationService verificationService;
 
   @PostMapping("/login")
   public @NotNull ResponseEntity<Result> login(
@@ -46,6 +52,22 @@ public class AuthController {
     final AuthResponse authResponse = this.authService.register(userRegister);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(this.responseFactory.success(HttpStatus.CREATED.value(), "registered", authResponse));
+  }
+
+  @PostMapping("/password-recovery")
+  public @NotNull ResponseEntity<Result> sendPasswordRecovery(
+      @Valid @RequestBody final @NotNull EmailForm emailForm) {
+    this.verificationService.createVerification(emailForm, VerificationType.PASSWORD_RESET);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.responseFactory.success(HttpStatus.OK.value(), "passwordVerificationSent"));
+  }
+
+  @PutMapping("/reset-password")
+  public @NotNull ResponseEntity<Result> resetPassword(
+      @Valid @RequestBody final @NotNull ResetPasswordForm resetPasswordForm) {
+    this.authService.resetPassword(resetPasswordForm);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.responseFactory.success(HttpStatus.OK.value(), "passwordReset"));
   }
 
   @GetMapping("/logout")
