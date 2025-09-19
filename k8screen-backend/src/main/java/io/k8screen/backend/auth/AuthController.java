@@ -2,6 +2,7 @@ package io.k8screen.backend.auth;
 
 import static io.k8screen.backend.util.Constant.REFRESH_TOKEN;
 
+import io.k8screen.backend.auth.dto.RecoverPasswordForm;
 import io.k8screen.backend.auth.dto.ResetPasswordForm;
 import io.k8screen.backend.config.TemporaryTokenStore;
 import io.k8screen.backend.mail.EmailForm;
@@ -62,10 +63,20 @@ public class AuthController {
         .body(this.responseFactory.success(HttpStatus.OK.value(), "passwordVerificationSent"));
   }
 
+  @PutMapping("/recover-password")
+  public @NotNull ResponseEntity<Result> recoverPassword(
+      @Valid @RequestBody final @NotNull RecoverPasswordForm recoverPasswordForm) {
+    this.authService.recoverPassword(recoverPasswordForm);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(this.responseFactory.success(HttpStatus.OK.value(), "passwordReset"));
+  }
+
   @PutMapping("/reset-password")
   public @NotNull ResponseEntity<Result> resetPassword(
+      final @NotNull Authentication authentication,
       @Valid @RequestBody final @NotNull ResetPasswordForm resetPasswordForm) {
-    this.authService.resetPassword(resetPasswordForm);
+    final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    this.authService.resetPassword(resetPasswordForm, userDetails.userUuid());
     return ResponseEntity.status(HttpStatus.OK)
         .body(this.responseFactory.success(HttpStatus.OK.value(), "passwordReset"));
   }

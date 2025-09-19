@@ -3,6 +3,7 @@ import type { Result } from '$lib/model/result/Result';
 import type { EmailForm } from '$lib/model/user/EmailForm';
 import type { LoginReq } from '$lib/model/user/LoginReq';
 import type { LoginRes } from '$lib/model/user/LoginRes';
+import type { RecoverPasswordForm } from '$lib/model/user/RecoverPasswordForm';
 import type { ResetPasswordForm } from '$lib/model/user/ResetPasswordForm';
 import type { UserForm } from '$lib/model/user/UserForm';
 import { SPRING_BASE_URL } from '$lib/utils/utils';
@@ -10,7 +11,8 @@ import {
   applyGetRequestWithBearerHeader,
   applyGetRequestWithRefreshToken,
   applyPostRequest,
-  applyPutRequest
+  applyPutRequest,
+  applyPutRequestWithBearerHeader
 } from './http-request';
 import { clearTokens, getAllTokens } from './storage-manager';
 import { isTokenExpired } from './token-decoder';
@@ -37,9 +39,14 @@ export const authAPI = {
     return (await applyPostRequest(url, JSON.stringify(body))).json();
   },
 
+  recoverPassword: async (body: RecoverPasswordForm): Promise<Result> => {
+    const url = `${SPRING_BASE_URL}/v1/auth/recover-password`;
+    return (await applyPutRequest(url, JSON.stringify(body))).json();
+  },
+
   resetPassword: async (body: ResetPasswordForm): Promise<Result> => {
     const url = `${SPRING_BASE_URL}/v1/auth/reset-password`;
-    return (await applyPutRequest(url, JSON.stringify(body))).json();
+    return (await applyPutRequestWithBearerHeader(url, JSON.stringify(body))).json();
   },
 
   getAccessToken: async (): Promise<DataResult<LoginRes>> => {

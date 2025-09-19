@@ -108,7 +108,7 @@
               {/if}
             </span>
           </div>
-          <Button class="w-full" disabled={disabled || loading} onclick={() => sendEmail()}>
+          <Button class="w-full" disabled={disabled || loading} onclick={sendEmail}>
             {#if loading}
               <Spinner class="m-auto" />
             {:else}

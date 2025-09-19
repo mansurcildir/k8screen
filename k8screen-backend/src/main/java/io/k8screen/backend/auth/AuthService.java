@@ -1,5 +1,6 @@
 package io.k8screen.backend.auth;
 
+import io.k8screen.backend.auth.dto.RecoverPasswordForm;
 import io.k8screen.backend.auth.dto.ResetPasswordForm;
 import io.k8screen.backend.exception.ItemNotFoundException;
 import io.k8screen.backend.exception.UnauthorizedException;
@@ -144,25 +145,41 @@ public class AuthService {
     return this.userRepository.save(user);
   }
 
-  public void resetPassword(final @NotNull ResetPasswordForm resetPasswordForm) {
-    final String hashedCode = DigestUtils.sha256Hex(resetPasswordForm.code());
+  public void recoverPassword(final @NotNull RecoverPasswordForm recoverPasswordForm) {
+    final String hashedCode = DigestUtils.sha256Hex(recoverPasswordForm.code());
     final Verification verification =
         this.verificationRepository
             .findByCode(hashedCode)
             .orElseThrow(() -> new ItemNotFoundException("verificationNotFound"));
 
-    this.confirmPassword(resetPasswordForm);
+    this.confirmPassword(recoverPasswordForm.password(), recoverPasswordForm.confirmPassword());
 
     final User user = verification.getUser();
+    final String encodedPassword = this.passwordEncoder.encode(recoverPasswordForm.password());
+    user.setPassword(encodedPassword);
+
+    this.userRepository.save(user);
+  }
+
+  public void resetPassword(
+      final @NotNull ResetPasswordForm resetPasswordForm, final @NotNull UUID userUuid) {
+    this.confirmPassword(resetPasswordForm.password(), resetPasswordForm.confirmPassword());
+
+    final User user =
+        this.userRepository
+            .findByUuid(userUuid)
+            .orElseThrow(() -> new ItemNotFoundException("userNotFound"));
+
     final String encodedPassword = this.passwordEncoder.encode(resetPasswordForm.password());
     user.setPassword(encodedPassword);
 
     this.userRepository.save(user);
   }
 
-  private void confirmPassword(final @NotNull ResetPasswordForm form) {
-    if (!form.password().equals(form.confirmPassword())) {
-      throw new UnauthorizedException("wrongPassword");
+  private void confirmPassword(
+      final @NotNull String password, final @NotNull String confirmPassword) {
+    if (!password.equals(confirmPassword)) {
+      throw new UnauthorizedException("passwordsDoNotMatch");
     }
   }
 

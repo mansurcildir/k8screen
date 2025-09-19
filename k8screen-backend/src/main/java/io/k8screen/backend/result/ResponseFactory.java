@@ -17,7 +17,7 @@ public class ResponseFactory {
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
 
-    return new SuccessResult<>(status, msgId, message);
+    return new SuccessResult(status, msgId, message);
   }
 
   public @NotNull <T> DataResult<T> success(
@@ -34,7 +34,7 @@ public class ResponseFactory {
         Objects.requireNonNull(
             this.messageSource.getMessage(msgId, null, msgId, Locale.getDefault()));
 
-    return new ErrorResult<>(status, msgId, message);
+    return new ErrorResult(status, msgId, message);
   }
 
   public @NotNull <T> DataResult<T> error(
