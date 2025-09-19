@@ -3,7 +3,6 @@ package io.k8screen.backend.storage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FileSystem implements StorageStrategy {
-  private static final int BUFFER_SIZE = 8192;
-
   @Value("${k8screen.storage.file-system.route}")
   private String route;
 
@@ -23,8 +20,7 @@ public class FileSystem implements StorageStrategy {
   private String trashPath;
 
   @Override
-  public void upload(final @NotNull InputStream inputStream, final @NotNull String path)
-      throws IOException {
+  public void upload(final @NotNull String path, final byte[] bytes) throws IOException {
 
     final File file = new File(this.route + File.separator + path);
     final File parent = file.getParentFile();
@@ -33,7 +29,7 @@ public class FileSystem implements StorageStrategy {
       throw new IOException("directoryNotFound");
     }
 
-    this.uploadFile(inputStream, file);
+    this.uploadFile(file, bytes);
   }
 
   @Override
@@ -52,14 +48,9 @@ public class FileSystem implements StorageStrategy {
     Files.move(resource, trash, StandardCopyOption.REPLACE_EXISTING);
   }
 
-  private void uploadFile(final @NotNull InputStream inputStream, final @NotNull File file)
-      throws IOException {
-    try (final OutputStream outputStream = new FileOutputStream(file)) {
-      final byte[] buffer = new byte[BUFFER_SIZE];
-      int bytesRead;
-      while ((bytesRead = inputStream.read(buffer)) != -1) {
-        outputStream.write(buffer, 0, bytesRead);
-      }
+  private void uploadFile(final @NotNull File file, final byte[] bytes) throws IOException {
+    try (OutputStream outputStream = new FileOutputStream(file)) {
+      outputStream.write(bytes);
     }
   }
 
