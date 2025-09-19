@@ -27,10 +27,11 @@ public class UserStorageService {
 
   public void uploadAvatar(final @NotNull InputStream inputStream, final @NotNull UUID userUuid)
       throws IOException {
+    final byte[] fileBytes = inputStream.readAllBytes();
 
     final String path =
         this.avatarPath + File.separator + userUuid + File.separator + AVATAR_SUFFIX;
-    this.storageStrategy.upload(inputStream, path);
+    this.storageStrategy.upload(path, fileBytes);
   }
 
   public byte[] getAvatar(final @NotNull UUID userUuid) {

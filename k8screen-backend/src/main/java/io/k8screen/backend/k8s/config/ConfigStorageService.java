@@ -26,10 +26,11 @@ public class ConfigStorageService {
       final @NotNull String filename,
       final @NotNull UUID userUuid)
       throws IOException {
+    final byte[] fileBytes = inputStream.readAllBytes();
 
     final String relativePath =
         this.configPath + File.separator + userUuid + File.separator + filename;
-    this.storageStrategy.upload(inputStream, relativePath);
+    this.storageStrategy.upload(relativePath, fileBytes);
   }
 
   public void deleteConfig(final @NotNull String fileName, final @NotNull UUID userUuid)
