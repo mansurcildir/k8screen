@@ -94,7 +94,7 @@ public class SecurityConfig {
     auth.requestMatchers(
             "/auth/google/callback",
             "/v1/auth/password-recovery",
-            "/v1/auth/reset-password",
+            "/v1/auth/recover-password",
             "/v1/auth/register",
             "/v1/auth/login",
             "/v1/auth/login/google",

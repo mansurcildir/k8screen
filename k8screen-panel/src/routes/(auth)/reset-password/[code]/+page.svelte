@@ -5,7 +5,7 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import { Input } from '$lib/components/ui/input/index.js';
   import Label from '$lib/components/ui/label/label.svelte';
-  import type { ResetPasswordForm } from '$lib/model/user/ResetPasswordForm';
+  import type { RecoverPasswordForm } from '$lib/model/user/RecoverPasswordForm';
   import { authAPI } from '$lib/service/auth-service';
   import { toastService } from '$lib/service/toast-service';
   import { writable } from 'svelte/store';
@@ -16,9 +16,9 @@
   let errors = writable<Record<string, string>>({});
 
   $: code = $page.params.code;
-  $: resetPasswordForm.code = code;
+  $: recoverPasswordForm.code = code;
 
-  const resetPasswordForm: ResetPasswordForm = {
+  const recoverPasswordForm: RecoverPasswordForm = {
     password: '',
     confirmPassword: '',
     code: ''
@@ -27,7 +27,7 @@
   const handleValidation = (): Promise<void> => {
     return new Promise((resolve) => {
       try {
-        schema.parse(resetPasswordForm);
+        schema.parse(recoverPasswordForm);
         resolve();
       } catch (err: any) {
         const errorMessages: Record<string, string> = {};
@@ -44,7 +44,7 @@
     handleValidation().then(() => {
       loading = true;
       authAPI
-        .resetPassword(resetPasswordForm)
+        .recoverPassword(recoverPasswordForm)
         .then(() => {
           goto('/login');
         })
@@ -55,13 +55,13 @@
     });
   };
 
-  const validate = (field: keyof ResetPasswordForm) => {
+  const validate = (field: keyof RecoverPasswordForm) => {
     if (Object.keys($errors).length === 0) {
       disabled = false;
     }
 
     try {
-      schema.pick({ [field]: true } as any).parse({ [field]: resetPasswordForm[field] });
+      schema.pick({ [field]: true } as any).parse({ [field]: recoverPasswordForm[field] });
 
       errors.update((currentErrors) => {
         const { [field]: _, ...rest } = currentErrors;
@@ -107,7 +107,7 @@
             <Label for="password">Enter new password</Label>
             <Input
               oninput={() => validate('password')}
-              bind:value={resetPasswordForm.password}
+              bind:value={recoverPasswordForm.password}
               id="password"
               type="password"
               placeholder="******"
@@ -126,7 +126,7 @@
             <Label for="confirm-password">Confirm new password</Label>
             <Input
               oninput={() => validate('confirmPassword')}
-              bind:value={resetPasswordForm.confirmPassword}
+              bind:value={recoverPasswordForm.confirmPassword}
               id="confirm-password"
               type="password"
               placeholder="******"
@@ -147,7 +147,7 @@
               id="code"
               type="text"
               oninput={() => validate('code')}
-              bind:value={resetPasswordForm.code}
+              bind:value={recoverPasswordForm.code}
               placeholder="123456"
               required
             />

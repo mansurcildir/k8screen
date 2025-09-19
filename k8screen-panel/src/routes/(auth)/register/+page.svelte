@@ -226,7 +226,7 @@
               {/if}
             </span>
           </div>
-          <Button class="w-full" disabled={disabled || loading} onclick={() => register()}>
+          <Button class="w-full" disabled={disabled || loading} onclick={register}>
             {#if loading}
               <Spinner class="m-auto" />
             {:else}
@@ -236,7 +236,7 @@
           <div class="relative flex justify-center text-xs uppercase">
             <span class="bg-background px-2 text-muted-foreground"> Or continue with </span>
           </div>
-          <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={() => loginGoogle()}>
+          <Button variant="outline" class="w-full" disabled={loading || loadingGoogle} onclick={loginGoogle}>
             {#if loadingGoogle}
               <Spinner class="m-auto" color="black" />
             {:else}
@@ -244,7 +244,7 @@
             {/if}
           </Button>
 
-          <Button variant="outline" class="w-full" disabled={loading || loadingGithub} onclick={() => loginGithub()}>
+          <Button variant="outline" class="w-full" disabled={loading || loadingGithub} onclick={loginGithub}>
             {#if loadingGithub}
               <Spinner class="m-auto" color="black" />
             {:else}
