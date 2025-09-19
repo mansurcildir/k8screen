@@ -40,7 +40,7 @@
     <!-- Plugin Dependency Versions -->
     <error-prone.version>2.41.0</error-prone.version>
     <checkstyle.version>10.26.1</checkstyle.version>
-    <spotbugs.version>4.9.3</spotbugs.version>
+    <spotbugs.version>4.9.6</spotbugs.version>
   </properties>
 
   <modules>
